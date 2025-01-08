@@ -1,0 +1,23 @@
+name: size-label
+on: pull_request_target
+jobs:
+  size-label:
+    permissions:
+      contents: read
+      pull-requests: write
+    runs-on: ubuntu-latest
+    steps:
+      - name: size-label
+        uses: 'pascalgn/size-label-action@v0.5.5'
+        env:
+          GITHUB_TOKEN: '${{ secrets.ACON_TOKEN }}'
+        with:
+          sizes: >
+            {
+              "0": "XS",
+              "30": "S",
+              "100": "M",
+              "300": "L",
+              "700": "XL",
+              "1000": "XXL"
+            }
