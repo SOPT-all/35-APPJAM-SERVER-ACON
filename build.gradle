@@ -48,3 +48,20 @@ tasks.register('updateGitHooks', Copy) {
 tasks.named('build') {
     dependsOn 'updateGitHooks'
 }
+
+spotless {
+    java {
+        target '**/*.java'
+        eclipse().configFile file('eclipse-formatter.xml')
+        importOrder()
+        removeUnusedImports()
+        trimTrailingWhitespace()
+        endWithNewline()
+    }
+
+    format('misc') {
+        target '**/*.gradle', '**/*.gitignore'
+        trimTrailingWhitespace()
+        endWithNewline()
+    }
+}
