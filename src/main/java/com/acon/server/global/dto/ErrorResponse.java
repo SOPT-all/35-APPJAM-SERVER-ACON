@@ -10,7 +10,7 @@ import org.springframework.validation.BindingResult;
 
 @JsonInclude(Include.NON_NULL)
 public record ErrorResponse<T>(
-        String code,
+        int code,
         T data,
         String message,
         Object errors

@@ -39,7 +39,7 @@ public class GlobalExceptionHandler {
     // 필수 요청 파라미터(@RequestParam)가 요청에서 누락됐을 시 예외 처리
     @ExceptionHandler(MissingServletRequestParameterException.class)
     public ResponseEntity<ErrorResponse<?>> handleMissingServletRequestParameterException(
-                                                                                          MissingServletRequestParameterException e
+            MissingServletRequestParameterException e
     ) {
         return ResponseEntity
                 .status(ErrorType.NO_REQUEST_PARAMETER_ERROR.getHttpStatus())
