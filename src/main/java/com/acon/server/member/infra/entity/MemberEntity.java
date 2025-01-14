@@ -51,7 +51,7 @@ public class MemberEntity extends BaseTimeEntity {
     @Column(name = "birth_date")
     private LocalDate birthDate;
 
-    @Column(name = "left_acorn_count", nullable = false)
+    @Column(name = "left_acorn_count", nullable = false, columnDefinition = "integer default 0")
     private int leftAcornCount;
 
     @Builder

@@ -35,10 +35,10 @@ public class VerifiedAreaEntity {
     @Column(name = "verified_date", nullable = false)
     private List<LocalDate> verifiedDate;
 
-    @Column(name = "is_certified", nullable = false)
+    @Column(name = "is_certified", nullable = false, columnDefinition = "boolean default false")
     private boolean isCertified;
 
-    @Column(name = "has_certification_mark", nullable = false)
+    @Column(name = "has_certification_mark", nullable = false, columnDefinition = "boolean default false")
     private boolean hasCertificationMark;
 
     @Builder
