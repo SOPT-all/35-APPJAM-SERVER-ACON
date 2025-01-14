@@ -33,6 +33,11 @@ public enum ErrorType {
     /* Member Error */
     /* 400 Bad Request */
     INVALID_SOCIAL_TYPE_ERROR(HttpStatus.BAD_REQUEST, "40009", "유효하지 않은 socialType입니다."),
+    INVALID_DISLIKE_FOOD_ERROR(HttpStatus.BAD_REQUEST, "40010", "유효하지 않은 dislikeFood입니다."),
+    INVALID_CUISINE_ERROR(HttpStatus.BAD_REQUEST, "40011", "유효하지 않은 cuisine입니다."),
+    INVALID_SPOT_TYPE_ERROR(HttpStatus.BAD_REQUEST, "40012", "유효하지 않은 spotType입니다."),
+    INVALID_FAVORITE_SPOT_ERROR(HttpStatus.BAD_REQUEST, "40013", "유효하지 않은 favoriteSpot입니다."),
+    INVALID_SPOT_STYLE_ERROR(HttpStatus.BAD_REQUEST, "40014", "유효하지 않은 spotStyle입니다."),
     ;
 
     private final HttpStatus httpStatus;
