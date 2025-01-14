@@ -1,0 +1,16 @@
+#!/bin/bash
+
+COMMIT_EDITMSG_FILE_PATH=$1
+DEFAULT_COMMIT_MSG=$(cat "$COMMIT_EDITMSG_FILE_PATH")
+
+CURRENT_BRANCH_NAME=$(git rev-parse --abbrev-ref HEAD)
+
+ISSUE_NUMBER=$(echo "$CURRENT_BRANCH_NAME" | grep -o '/#.*' | sed 's/\///')
+
+if [[ "$DEFAULT_COMMIT_MSG" =~ ^[Mm]erge ]]; then
+  SUFFIX=""
+else
+  SUFFIX="($ISSUE_NUMBER)"
+fi
+
+echo "$DEFAULT_COMMIT_MSG $SUFFIX" > "$COMMIT_EDITMSG_FILE_PATH"
