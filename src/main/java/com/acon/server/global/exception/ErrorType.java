@@ -29,6 +29,10 @@ public enum ErrorType {
 
     /* 500 Internal Server Error */
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "50001", "예상치 못한 서버 에러가 발생했습니다."),
+
+    /* Member Error */
+    /* 400 Bad Request */
+    INVALID_SOCIAL_TYPE_ERROR(HttpStatus.BAD_REQUEST, "40009", "유효하지 않은 socialType입니다."),
     ;
 
     private final HttpStatus httpStatus;
