@@ -1,4 +1,4 @@
-package com.acon.server.member.infra.entity;
+package com.acon.server.member.infra.entity.member;
 
 import com.acon.server.member.domain.enums.Cuisine;
 import com.acon.server.member.domain.enums.DislikeFood;

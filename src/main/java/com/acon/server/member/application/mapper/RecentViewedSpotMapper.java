@@ -1,7 +1,7 @@
 package com.acon.server.member.application.mapper;
 
 import com.acon.server.member.domain.entity.RecentViewedSpot;
-import com.acon.server.member.infra.entity.RecentViewedSpotEntity;
+import com.acon.server.member.infra.entity.member.RecentViewedSpotEntity;
 import org.mapstruct.Mapper;
 import org.mapstruct.ReportingPolicy;
 

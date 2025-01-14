@@ -1,4 +1,4 @@
-package com.acon.server.member.infra.entity;
+package com.acon.server.member.infra.entity.member;
 
 import com.acon.server.global.entity.BaseTimeEntity;
 import jakarta.persistence.Column;
@@ -17,11 +17,11 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(
-        name = "recent_guided_spot", uniqueConstraints = @UniqueConstraint(
-                name = "unique_recent_guided_spot_member_id_spot_id", columnNames = {"member_id", "spot_id"}
+        name = "recent_viewed_spot", uniqueConstraints = @UniqueConstraint(
+                name = "unique_recent_viewed_spot_member_id_spot_id", columnNames = {"member_id", "spot_id"}
         )
 )
-public class RecentGuidedSpotEntity extends BaseTimeEntity {
+public class RecentViewedSpotEntity extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -34,7 +34,7 @@ public class RecentGuidedSpotEntity extends BaseTimeEntity {
     private Long spotId;
 
     @Builder
-    public RecentGuidedSpotEntity(
+    public RecentViewedSpotEntity(
             Long id,
             Long memberId,
             Long spotId

@@ -1,7 +1,7 @@
 package com.acon.server.member.application.mapper;
 
 import com.acon.server.member.domain.entity.VerifiedArea;
-import com.acon.server.member.infra.entity.VerifiedAreaEntity;
+import com.acon.server.member.infra.entity.member.VerifiedAreaEntity;
 import org.mapstruct.Mapper;
 import org.mapstruct.ReportingPolicy;
 

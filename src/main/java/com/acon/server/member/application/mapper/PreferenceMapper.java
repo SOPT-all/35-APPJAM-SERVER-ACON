@@ -1,7 +1,7 @@
 package com.acon.server.member.application.mapper;
 
 import com.acon.server.member.domain.entity.Preference;
-import com.acon.server.member.infra.entity.PreferenceEntity;
+import com.acon.server.member.infra.entity.member.PreferenceEntity;
 import org.mapstruct.Mapper;
 import org.mapstruct.ReportingPolicy;
 
