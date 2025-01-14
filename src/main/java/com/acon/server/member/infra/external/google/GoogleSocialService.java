@@ -1,4 +1,4 @@
-package com.acon.server.member.infra.external;
+package com.acon.server.member.infra.external.google;
 
 import com.acon.server.global.exception.BusinessException;
 import com.acon.server.global.exception.ErrorType;

@@ -1,5 +1,6 @@
 package com.acon.server.common.auth.jwt;
 
+import com.acon.server.common.auth.jwt.config.JwtConfig;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
@@ -20,8 +21,8 @@ public class JwtUtils {
     private static final long REFRESH_TOKEN_EXPIRE_TIME = 1000 * 60 * 60 * 24 * 30L; // 30일
     private static final String JWT_KEY = "memberId";
 
-    public JwtUtils(@Value("${jwt.secret}") String secretKey) {
-        byte[] keyBytes = Decoders.BASE64.decode(secretKey);
+    public JwtUtils(JwtConfig jwtConfig) {
+        byte[] keyBytes = Decoders.BASE64.decode(jwtConfig.getSecretKey());
         this.secretKey = Keys.hmacShaKeyFor(keyBytes);
     }
 

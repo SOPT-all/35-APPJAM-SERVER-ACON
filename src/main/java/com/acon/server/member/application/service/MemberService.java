@@ -7,7 +7,7 @@ import com.acon.server.member.application.mapper.MemberMapper;
 import com.acon.server.member.domain.entity.Member;
 import com.acon.server.member.domain.enums.SocialType;
 import com.acon.server.member.infra.entity.MemberEntity;
-import com.acon.server.member.infra.external.GoogleSocialService;
+import com.acon.server.member.infra.external.google.GoogleSocialService;
 import com.acon.server.member.infra.repository.MemberRepository;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
