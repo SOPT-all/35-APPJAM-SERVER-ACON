@@ -12,11 +12,11 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public enum DislikeFood {
 
-    DAKBAL("닭발"),
-    HOE_YUKHOE("회/육회"),
-    GOPCHANG_MAKCHANG_DAECHANG("곱창/막창/대창"),
-    SUNDAE_SEONJI("순대/선지"),
-    YANGGOGI("양고기"),
+    DAKBAL("DAKBAL"),
+    HOE_YUKHOE("HOE_YUKHOE"),
+    GOPCHANG_MAKCHANG_DAECHANG("GOPCHANG_MAKCHANG_DAECHANG"),
+    SUNDAE_SEONJI("SUNDAE_SEONJI"),
+    YANGGOGI("YANGGOGI"),
     ;
 
     private final String value;

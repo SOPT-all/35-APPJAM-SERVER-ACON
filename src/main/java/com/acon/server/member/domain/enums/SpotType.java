@@ -12,8 +12,8 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public enum SpotType {
 
-    RESTAURANT("음식점"),
-    CAFE("카페"),
+    RESTAURANT("RESTAURANT"),
+    CAFE("CAFE"),
     ;
 
     private final String value;

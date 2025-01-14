@@ -12,12 +12,12 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public enum Cuisine {
 
-    KOREAN("한식"),
-    WESTERN("양식"),
-    CHINESE("중식"),
-    JAPANESE("일식"),
-    SNACK("분식"),
-    ASIAN("아시안"),
+    KOREAN("KOREAN"),
+    WESTERN("WESTERN"),
+    CHINESE("CHINESE"),
+    JAPANESE("JAPANESE"),
+    KOREAN_STREET("KOREAN_STREET"),
+    ASIAN("ASIAN"),
     ;
 
     private final String value;

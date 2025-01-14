@@ -12,10 +12,10 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public enum SpotStyle {
 
-    SENSE("분위기와 인테리어가 감각적인 곳"),
-    NEW_FOOD("새로운 음식을 경험할 수 있는 곳"),
-    REASONABLE("가격과 양이 합리적인 곳"),
-    LUXURY("특별한 날을 위한 고급스러운 장소"),
+    SENSE("SENSE"),
+    NEW_FOOD("새NEW_FOOD"),
+    REASONABLE("REASONABLE"),
+    LUXURY("LUXURY"),
     ;
 
     private final String value;

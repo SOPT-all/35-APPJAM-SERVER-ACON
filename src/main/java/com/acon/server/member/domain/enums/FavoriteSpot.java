@@ -12,8 +12,8 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public enum FavoriteSpot {
 
-    TRADITIONAL("노포"),
-    MODERN("모던"),
+    TRADITIONAL("TRADITIONAL"),
+    MODERN("MODERN"),
     ;
 
     private final String value;
