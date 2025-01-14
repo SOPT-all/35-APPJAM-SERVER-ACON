@@ -38,6 +38,10 @@ public enum ErrorType {
     INVALID_SPOT_TYPE_ERROR(HttpStatus.BAD_REQUEST, "40012", "유효하지 않은 spotType입니다."),
     INVALID_FAVORITE_SPOT_ERROR(HttpStatus.BAD_REQUEST, "40013", "유효하지 않은 favoriteSpot입니다."),
     INVALID_SPOT_STYLE_ERROR(HttpStatus.BAD_REQUEST, "40014", "유효하지 않은 spotStyle입니다."),
+    INVALID_ID_TOKEN_ERROR(HttpStatus.BAD_REQUEST, "40010", "ID 토큰의 서명이 올바르지 않습니다."),
+
+    /* 500 Internal Server Error */
+    FAILED_DOWNLOAD_GOOGLE_PUBLIC_KEY_ERROR(HttpStatus.BAD_REQUEST, "50002", "구글 공개키 다운로드에 실패하였습니다."),
     ;
 
     private final HttpStatus httpStatus;
