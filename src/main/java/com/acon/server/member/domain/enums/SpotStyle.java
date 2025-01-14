@@ -12,19 +12,17 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public enum SpotStyle {
 
-    SENSE("분위기와 인테리어가 감각적인 곳"),
-    NEW_FOOD("새로운 음식을 경험할 수 있는 곳"),
-    REASONABLE("가격과 양이 합리적인 곳"),
-    LUXURY("특별한 날을 위한 고급스러운 장소"),
+    SENSE,
+    NEW_FOOD,
+    REASONABLE,
+    LUXURY,
     ;
-
-    private final String value;
 
     private static final Map<String, SpotStyle> SPOT_STYLE_MAP = new HashMap<>();
 
     static {
         for (SpotStyle spotStyle : SpotStyle.values()) {
-            SPOT_STYLE_MAP.put(spotStyle.getValue(), spotStyle);
+            SPOT_STYLE_MAP.put(spotStyle.name(), spotStyle);
         }
     }
 

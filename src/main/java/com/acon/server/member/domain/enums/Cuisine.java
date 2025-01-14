@@ -12,21 +12,19 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public enum Cuisine {
 
-    KOREAN("한식"),
-    WESTERN("양식"),
-    CHINESE("중식"),
-    JAPANESE("일식"),
-    SNACK("분식"),
-    ASIAN("아시안"),
+    KOREAN,
+    WESTERN,
+    CHINESE,
+    JAPANESE,
+    KOREAN_STREET,
+    ASIAN,
     ;
-
-    private final String value;
 
     private static final Map<String, Cuisine> CUISINE_MAP = new HashMap<>();
 
     static {
         for (Cuisine cuisine : Cuisine.values()) {
-            CUISINE_MAP.put(cuisine.getValue(), cuisine);
+            CUISINE_MAP.put(cuisine.name(), cuisine);
         }
     }
 

@@ -12,17 +12,15 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public enum FavoriteSpot {
 
-    TRADITIONAL("노포"),
-    MODERN("모던"),
+    TRADITIONAL,
+    MODERN,
     ;
-
-    private final String value;
 
     private static final Map<String, FavoriteSpot> FAVORITE_SPOT_MAP = new HashMap<>();
 
     static {
         for (FavoriteSpot favoriteSpot : FavoriteSpot.values()) {
-            FAVORITE_SPOT_MAP.put(favoriteSpot.getValue(), favoriteSpot);
+            FAVORITE_SPOT_MAP.put(favoriteSpot.name(), favoriteSpot);
         }
     }
 

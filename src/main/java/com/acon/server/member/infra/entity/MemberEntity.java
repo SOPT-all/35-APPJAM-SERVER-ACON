@@ -33,10 +33,10 @@ public class MemberEntity extends BaseTimeEntity {
     @Column(name = "social_id", nullable = false, unique = true)
     private String socialId;
 
-    @Column(name = "recent_latitude", columnDefinition = "double precision")
+    @Column(name = "recent_latitude")
     private Double recentLatitude;
 
-    @Column(name = "recent_longitude", columnDefinition = "double precision")
+    @Column(name = "recent_longitude")
     private Double recentLongitude;
 
     @Column(name = "profile_image")
@@ -51,7 +51,7 @@ public class MemberEntity extends BaseTimeEntity {
     @Column(name = "birth_date")
     private LocalDate birthDate;
 
-    @Column(name = "left_acorn_count", nullable = false)
+    @Column(name = "left_acorn_count", nullable = false, columnDefinition = "integer default 0")
     private int leftAcornCount;
 
     @Builder

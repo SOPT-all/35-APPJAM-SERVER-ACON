@@ -12,17 +12,15 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public enum SocialType {
 
-    GOOGLE("GOOGLE"),
-    APPLE("APPLE"),
+    GOOGLE,
+    APPLE,
     ;
-
-    private final String value;
 
     private static final Map<String, SocialType> SOCIAL_TYPE_MAP = new HashMap<>();
 
     static {
         for (SocialType socialType : SocialType.values()) {
-            SOCIAL_TYPE_MAP.put(socialType.getValue(), socialType);
+            SOCIAL_TYPE_MAP.put(socialType.name(), socialType);
         }
     }
 

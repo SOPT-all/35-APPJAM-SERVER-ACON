@@ -12,17 +12,15 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public enum SpotType {
 
-    RESTAURANT("음식점"),
-    CAFE("카페"),
+    RESTAURANT,
+    CAFE,
     ;
-
-    private final String value;
 
     private static final Map<String, SpotType> SPOT_TYPE_MAP = new HashMap<>();
 
     static {
         for (SpotType spotType : SpotType.values()) {
-            SPOT_TYPE_MAP.put(spotType.getValue(), spotType);
+            SPOT_TYPE_MAP.put(spotType.name(), spotType);
         }
     }
 
