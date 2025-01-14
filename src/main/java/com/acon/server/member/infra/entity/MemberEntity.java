@@ -33,10 +33,10 @@ public class MemberEntity extends BaseTimeEntity {
     @Column(name = "social_id", nullable = false, unique = true)
     private String socialId;
 
-    @Column(name = "recent_latitude", columnDefinition = "double precision")
+    @Column(name = "recent_latitude")
     private Double recentLatitude;
 
-    @Column(name = "recent_longitude", columnDefinition = "double precision")
+    @Column(name = "recent_longitude")
     private Double recentLongitude;
 
     @Column(name = "profile_image")
