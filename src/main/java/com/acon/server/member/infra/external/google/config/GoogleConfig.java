@@ -9,7 +9,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @RequiredArgsConstructor
 @Getter
 @Setter
-public class googleConfig {
+public class GoogleConfig {
 
     private final String clientId;
 }

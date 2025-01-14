@@ -8,12 +8,9 @@ import io.jsonwebtoken.security.Keys;
 import java.util.Date;
 import java.util.List;
 import javax.crypto.SecretKey;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Component
-@Slf4j
 public class JwtUtils {
 
     private final SecretKey secretKey;
