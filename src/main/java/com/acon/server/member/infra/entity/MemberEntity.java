@@ -56,16 +56,16 @@ public class MemberEntity extends BaseTimeEntity {
 
     @Builder
     public MemberEntity(
-                        Long id,
-                        SocialType socialType,
-                        String socialId,
-                        Double recentLatitude,
-                        Double recentLongitude,
-                        String profileImage,
-                        String nickname,
-                        LocalDate nicknameUpdatedAt,
-                        LocalDate birthDate,
-                        int leftAcornCount
+            Long id,
+            SocialType socialType,
+            String socialId,
+            Double recentLatitude,
+            Double recentLongitude,
+            String profileImage,
+            String nickname,
+            LocalDate nicknameUpdatedAt,
+            LocalDate birthDate,
+            int leftAcornCount
     ) {
         this.id = id;
         this.socialType = socialType;

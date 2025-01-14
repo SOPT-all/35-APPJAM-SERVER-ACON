@@ -20,12 +20,12 @@ public class VerifiedArea {
 
     @Builder
     private VerifiedArea(
-                         Long id,
-                         Long memberId,
-                         String name,
-                         List<LocalDate> verifiedDate,
-                         boolean isCertified,
-                         boolean hasCertificationMark
+            Long id,
+            Long memberId,
+            String name,
+            List<LocalDate> verifiedDate,
+            boolean isCertified,
+            boolean hasCertificationMark
     ) {
         this.id = id;
         this.memberId = memberId;

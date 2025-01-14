@@ -13,7 +13,11 @@ public class RecentViewedSpot {
     private final Long spotId;
 
     @Builder
-    private RecentViewedSpot(Long id, Long memberId, Long spotId) {
+    private RecentViewedSpot(
+            Long id,
+            Long memberId,
+            Long spotId
+    ) {
         this.id = id;
         this.memberId = memberId;
         this.spotId = spotId;

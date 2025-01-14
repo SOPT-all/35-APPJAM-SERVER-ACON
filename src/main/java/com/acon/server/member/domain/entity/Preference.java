@@ -24,12 +24,12 @@ public class Preference {
 
     @Builder
     private Preference(
-                       Long memberId,
-                       List<DislikeFood> dislikeFoodList,
-                       List<Cuisine> favoriteCuisineRank,
-                       SpotType favoriteSpotType,
-                       SpotStyle favoriteSpotStyle,
-                       List<FavoriteSpot> favoriteSpotRank
+            Long memberId,
+            List<DislikeFood> dislikeFoodList,
+            List<Cuisine> favoriteCuisineRank,
+            SpotType favoriteSpotType,
+            SpotStyle favoriteSpotStyle,
+            List<FavoriteSpot> favoriteSpotRank
     ) {
         this.memberId = memberId;
         this.dislikeFoodList = dislikeFoodList;

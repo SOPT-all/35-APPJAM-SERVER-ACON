@@ -43,12 +43,12 @@ public class VerifiedAreaEntity {
 
     @Builder
     public VerifiedAreaEntity(
-                              Long id,
-                              Long memberId,
-                              String name,
-                              List<LocalDate> verifiedDate,
-                              boolean isCertified,
-                              boolean hasCertificationMark
+            Long id,
+            Long memberId,
+            String name,
+            List<LocalDate> verifiedDate,
+            boolean isCertified,
+            boolean hasCertificationMark
     ) {
         this.id = id;
         this.memberId = memberId;
