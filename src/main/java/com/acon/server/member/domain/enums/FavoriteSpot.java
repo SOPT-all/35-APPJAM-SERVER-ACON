@@ -12,8 +12,10 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public enum FavoriteSpot {
 
-    TRADITIONAL,
-    MODERN,
+    SENSE,
+    NEW_FOOD,
+    REASONABLE,
+    LUXURY,
     ;
 
     private static final Map<String, FavoriteSpot> FAVORITE_SPOT_MAP = new HashMap<>();
