@@ -1,4 +1,4 @@
-package com.acon.server.member.domain.enums;
+package com.acon.server.spot.domain.enums;
 
 import com.acon.server.global.exception.BusinessException;
 import com.acon.server.global.exception.ErrorType;
