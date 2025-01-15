@@ -1,7 +1,7 @@
 package com.acon.server.review.application.mapper;
 
-import com.acon.server.member.infra.entity.review.ReviewEntity;
 import com.acon.server.review.domain.entity.Review;
+import com.acon.server.review.infra.entity.ReviewEntity;
 import org.mapstruct.Mapper;
 import org.mapstruct.ReportingPolicy;
 

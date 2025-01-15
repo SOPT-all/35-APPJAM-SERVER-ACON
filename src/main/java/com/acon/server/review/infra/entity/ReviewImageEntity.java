@@ -1,6 +1,5 @@
-package com.acon.server.member.infra.entity.review;
+package com.acon.server.review.infra.entity;
 
-import com.acon.server.global.entity.BaseTimeEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -15,8 +14,8 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "review")
-public class ReviewEntity extends BaseTimeEntity {
+@Table(name = "review_image")
+public class ReviewImageEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,21 +24,17 @@ public class ReviewEntity extends BaseTimeEntity {
     @Column(name = "spot_id", nullable = false)
     private Long spotId;
 
-    @Column(name = "member_id", nullable = false)
-    private Long memberId;
+    @Column(name = "review_id", nullable = false)
+    private Long reviewId;
 
-    @Column(name = "acorn_count", nullable = false)
-    private int acornCount;
-
-    @Column(name = "local_acorn", nullable = false)
-    private boolean localAcorn;
+    @Column(name = "image", nullable = false)
+    private String image;
 
     @Builder
-    public ReviewEntity(Long id, Long spotId, Long memberId, int acornCount, boolean localAcorn) {
+    public ReviewImageEntity(Long id, Long spotId, Long reviewId, String image) {
         this.id = id;
         this.spotId = spotId;
-        this.memberId = memberId;
-        this.acornCount = acornCount;
-        this.localAcorn = localAcorn;
+        this.reviewId = reviewId;
+        this.image = image;
     }
 }

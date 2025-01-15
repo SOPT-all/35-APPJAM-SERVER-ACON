@@ -1,4 +1,4 @@
-package com.acon.server.member.infra.entity.member;
+package com.acon.server.member.infra.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

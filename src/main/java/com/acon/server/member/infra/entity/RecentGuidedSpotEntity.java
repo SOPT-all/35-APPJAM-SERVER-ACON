@@ -1,4 +1,4 @@
-package com.acon.server.member.infra.entity.member;
+package com.acon.server.member.infra.entity;
 
 import com.acon.server.global.entity.BaseTimeEntity;
 import jakarta.persistence.Column;
