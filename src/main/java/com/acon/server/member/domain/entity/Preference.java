@@ -23,7 +23,7 @@ public class Preference {
     private List<FavoriteSpot> favoriteSpotRank;
 
     @Builder
-    private Preference(
+    public Preference(
             Long memberId,
             List<DislikeFood> dislikeFoodList,
             List<Cuisine> favoriteCuisineRank,

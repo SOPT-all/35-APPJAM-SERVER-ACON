@@ -13,7 +13,7 @@ public class RecentGuidedSpot {
     private final Long spotId;
 
     @Builder
-    private RecentGuidedSpot(
+    public RecentGuidedSpot(
             Long id,
             Long memberId,
             Long spotId

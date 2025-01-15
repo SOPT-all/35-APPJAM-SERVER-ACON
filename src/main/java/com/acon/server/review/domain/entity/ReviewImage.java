@@ -14,7 +14,7 @@ public class ReviewImage {
     private final String image;
 
     @Builder
-    private ReviewImage(
+    public ReviewImage(
             Long id,
             Long spotId,
             Long reviewId,

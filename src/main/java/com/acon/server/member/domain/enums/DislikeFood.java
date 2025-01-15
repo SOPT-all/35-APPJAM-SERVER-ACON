@@ -14,7 +14,8 @@ public enum DislikeFood {
     HOE_YUKHOE,
     GOPCHANG_MAKCHANG_DAECHANG,
     SUNDAE_SEONJI,
-    YANGGOGI;
+    YANGGOGI,
+    ;
 
     private static final Map<String, DislikeFood> DISLIKE_FOOD_MAP = new HashMap<>();
 
