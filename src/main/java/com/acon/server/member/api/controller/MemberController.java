@@ -1,6 +1,7 @@
 package com.acon.server.member.api.controller;
 
 import com.acon.server.member.api.request.LoginRequest;
+import com.acon.server.member.api.response.AcornCountResponse;
 import com.acon.server.member.api.response.LoginResponse;
 import com.acon.server.member.application.service.MemberService;
 import jakarta.validation.Valid;
@@ -25,4 +26,10 @@ public class MemberController {
         );
     }
 
+    @PostMapping("/acorn")
+    public ResponseEntity<AcornCountResponse> getAcornCount() {
+        return ResponseEntity.ok(
+                memberService.fetchAcornCount(1L)
+        );
+    }
 }
