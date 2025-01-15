@@ -22,7 +22,7 @@ public class GlobalExceptionHandler {
 
     // @Validated 유효성 검사 시 예외 처리
     @ExceptionHandler(ConstraintViolationException.class)
-    public ResponseEntity<ErrorResponse<?>> handleConstraintViolationException(ConstraintViolationException e) {
+    public ResponseEntity<ErrorResponse> handleConstraintViolationException(ConstraintViolationException e) {
         return ResponseEntity
                 .status(ErrorType.INVALID_PATH_ERROR.getHttpStatus())
                 .body(ErrorResponse.fail(ErrorType.INVALID_PATH_ERROR, e.getConstraintViolations()));
@@ -30,7 +30,7 @@ public class GlobalExceptionHandler {
 
     // @Valid 유효성 검사 시 예외 처리
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ErrorResponse<?>> handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
+    public ResponseEntity<ErrorResponse> handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
         return ResponseEntity
                 .status(ErrorType.INVALID_FIELD_ERROR.getHttpStatus())
                 .body(ErrorResponse.fail(ErrorType.INVALID_FIELD_ERROR, e.getBindingResult()));
@@ -38,7 +38,7 @@ public class GlobalExceptionHandler {
 
     // 필수 요청 파라미터(@RequestParam)가 요청에서 누락됐을 시 예외 처리
     @ExceptionHandler(MissingServletRequestParameterException.class)
-    public ResponseEntity<ErrorResponse<?>> handleMissingServletRequestParameterException(
+    public ResponseEntity<ErrorResponse> handleMissingServletRequestParameterException(
             MissingServletRequestParameterException e
     ) {
         return ResponseEntity
@@ -48,7 +48,7 @@ public class GlobalExceptionHandler {
 
     // 필수 요청 헤더(@RequestHeader)가 요청에서 누락됐을 시 예외 처리
     @ExceptionHandler(MissingRequestHeaderException.class)
-    public ResponseEntity<ErrorResponse<?>> handleMissingRequestHeaderException(MissingRequestHeaderException e) {
+    public ResponseEntity<ErrorResponse> handleMissingRequestHeaderException(MissingRequestHeaderException e) {
         return ResponseEntity
                 .status(ErrorType.NO_REQUEST_HEADER_ERROR.getHttpStatus())
                 .body(ErrorResponse.fail(ErrorType.NO_REQUEST_HEADER_ERROR, e.getHeaderName()));
@@ -56,7 +56,7 @@ public class GlobalExceptionHandler {
 
     // 컨트롤러 메서드에 전달된 값의 타입 변환 시 예외 처리
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
-    public ResponseEntity<ErrorResponse<?>> handleTypeMismatchException(MethodArgumentTypeMismatchException e) {
+    public ResponseEntity<ErrorResponse> handleTypeMismatchException(MethodArgumentTypeMismatchException e) {
         String paramName = e.getParameter().getParameterName();
         String errorDetail = e.getRequiredType() != null
                 ? String.format("'%s'은(는) %s 타입이어야 합니다.", paramName, e.getRequiredType().getSimpleName())
@@ -69,7 +69,7 @@ public class GlobalExceptionHandler {
 
     // 잘못된 Request Body로 인해 발생하는 예외 처리
     @ExceptionHandler(HttpMessageNotReadableException.class)
-    public ResponseEntity<ErrorResponse<?>> handleHttpMessageNotReadableException(HttpMessageNotReadableException e) {
+    public ResponseEntity<ErrorResponse> handleHttpMessageNotReadableException(HttpMessageNotReadableException e) {
         return ResponseEntity
                 .status(ErrorType.INVALID_REQUEST_BODY_ERROR.getHttpStatus())
                 .body(ErrorResponse.fail(ErrorType.INVALID_REQUEST_BODY_ERROR));
@@ -77,7 +77,7 @@ public class GlobalExceptionHandler {
 
     // 데이터 무결성 위반 시 예외 처리
     @ExceptionHandler(DataIntegrityViolationException.class)
-    public ResponseEntity<ErrorResponse<?>> handleDataIntegrityViolationException(DataIntegrityViolationException e) {
+    public ResponseEntity<ErrorResponse> handleDataIntegrityViolationException(DataIntegrityViolationException e) {
         return ResponseEntity
                 .status(ErrorType.DATA_INTEGRITY_VIOLATION_ERROR.getHttpStatus())
                 .body(ErrorResponse.fail(ErrorType.DATA_INTEGRITY_VIOLATION_ERROR));
@@ -85,7 +85,7 @@ public class GlobalExceptionHandler {
 
     // 존재하지 않는 경로로 요청이 들어왔을 시 예외 처리
     @ExceptionHandler(NoHandlerFoundException.class)
-    public ResponseEntity<ErrorResponse<?>> handleNoHandlerFoundException(NoHandlerFoundException e) {
+    public ResponseEntity<ErrorResponse> handleNoHandlerFoundException(NoHandlerFoundException e) {
         return ResponseEntity
                 .status(ErrorType.NOT_FOUND_PATH_ERROR.getHttpStatus())
                 .body(ErrorResponse.fail(ErrorType.NOT_FOUND_PATH_ERROR, e.getRequestURL()));
@@ -93,7 +93,7 @@ public class GlobalExceptionHandler {
 
     // 비즈니스 로직에서 발생하는 예외 처리
     @ExceptionHandler(BusinessException.class)
-    public ResponseEntity<ErrorResponse<?>> handleCustomException(BusinessException e) {
+    public ResponseEntity<ErrorResponse> handleCustomException(BusinessException e) {
         return ResponseEntity
                 .status(e.getErrorType().getHttpStatus())
                 .body(ErrorResponse.fail(e.getErrorType()));
@@ -101,7 +101,7 @@ public class GlobalExceptionHandler {
 
     // 기타 에러 발생 시 예외 처리
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErrorResponse<?>> handleGeneralException(Exception e) {
+    public ResponseEntity<ErrorResponse> handleGeneralException(Exception e) {
         log.error("알 수 없는 예외 발생: {}", e.getClass().getName());
         log.error("에러 메시지: {}", e.getMessage());
 
