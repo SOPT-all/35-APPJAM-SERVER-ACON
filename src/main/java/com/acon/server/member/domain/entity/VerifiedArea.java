@@ -15,7 +15,7 @@ public class VerifiedArea {
     private final String name;
 
     private List<LocalDate> verifiedDate;
-    private boolean certified;
+    private boolean certifiedForThreeMonths;
     private boolean hasCertificationMark;
 
     @Builder
@@ -24,14 +24,14 @@ public class VerifiedArea {
             Long memberId,
             String name,
             List<LocalDate> verifiedDate,
-            boolean certified,
+            boolean certifiedForThreeMonths,
             boolean hasCertificationMark
     ) {
         this.id = id;
         this.memberId = memberId;
         this.name = name;
         this.verifiedDate = verifiedDate;
-        this.certified = certified;
+        this.certifiedForThreeMonths = certifiedForThreeMonths;
         this.hasCertificationMark = hasCertificationMark;
     }
 }

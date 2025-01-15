@@ -35,10 +35,10 @@ public class VerifiedAreaEntity {
     @Column(name = "verified_date", nullable = false)
     private List<LocalDate> verifiedDate;
 
-    @Column(name = "certified", nullable = false, columnDefinition = "boolean default false")
-    private boolean certified;
+    @Column(name = "certified_for_three_months", nullable = false)
+    private boolean certifiedForThreeMonths;
 
-    @Column(name = "has_certification_mark", nullable = false, columnDefinition = "boolean default false")
+    @Column(name = "has_certification_mark", nullable = false)
     private boolean hasCertificationMark;
 
     @Builder
@@ -46,15 +46,13 @@ public class VerifiedAreaEntity {
             Long id,
             Long memberId,
             String name,
-            List<LocalDate> verifiedDate,
-            boolean certified,
-            boolean hasCertificationMark
+            List<LocalDate> verifiedDate
     ) {
         this.id = id;
         this.memberId = memberId;
         this.name = name;
         this.verifiedDate = verifiedDate;
-        this.certified = certified;
-        this.hasCertificationMark = hasCertificationMark;
+        this.certifiedForThreeMonths = false;
+        this.hasCertificationMark = false;
     }
 }
