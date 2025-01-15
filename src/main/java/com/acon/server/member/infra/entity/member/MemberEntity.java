@@ -51,7 +51,7 @@ public class MemberEntity extends BaseTimeEntity {
     @Column(name = "birth_date")
     private LocalDate birthDate;
 
-    @Column(name = "left_acorn_count", nullable = false, columnDefinition = "integer default 0")
+    @Column(name = "left_acorn_count", nullable = false)
     private int leftAcornCount;
 
     @Builder
@@ -65,7 +65,7 @@ public class MemberEntity extends BaseTimeEntity {
             String nickname,
             LocalDate nicknameUpdatedAt,
             LocalDate birthDate,
-            int leftAcornCount
+            Integer leftAcornCount
     ) {
         this.id = id;
         this.socialType = socialType;
@@ -76,6 +76,6 @@ public class MemberEntity extends BaseTimeEntity {
         this.nickname = nickname;
         this.nicknameUpdatedAt = nicknameUpdatedAt;
         this.birthDate = birthDate;
-        this.leftAcornCount = leftAcornCount;
+        this.leftAcornCount = leftAcornCount != null ? leftAcornCount : 5;
     }
 }

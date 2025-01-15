@@ -28,10 +28,10 @@ public class ReviewEntity extends BaseTimeEntity {
     @Column(name = "member_id", nullable = false)
     private Long memberId;
 
-    @Column(name = "acorn_count", nullable = false, columnDefinition = "integer default 0")
+    @Column(name = "acorn_count", nullable = false)
     private int acornCount;
 
-    @Column(name = "local_acorn", nullable = false, columnDefinition = "boolean default false")
+    @Column(name = "local_acorn", nullable = false)
     private boolean localAcorn;
 
     @Builder
