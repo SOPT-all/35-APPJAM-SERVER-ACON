@@ -24,18 +24,20 @@ import org.springframework.web.bind.annotation.RestController;
 public class PreferenceController {
 
     private final PreferenceService preferenceService;
+    private static final int FAVORITE_CUISINE_RANK_SIZE = 3;
+    private static final int FAVORITE_SPOT_RANK_SIZE = 4;
 
     @PostMapping
     public ResponseEntity<Void> postPreference(@Valid @RequestBody final PreferenceRequest request) {
         // ToDo 토큰으로 memberId 가져오기
         List<DislikeFood> dislikeFoodList = request.dislikeFoodList().stream().map(DislikeFood::fromValue).toList();
-        if (request.favoriteCuisineRank().size() != 3) {
+        if (request.favoriteCuisineRank().size() != FAVORITE_CUISINE_RANK_SIZE) {
             throw new BusinessException(ErrorType.INVALID_CUISINE_ERROR);
         }
         List<Cuisine> favoriteCuisineList = request.favoriteCuisineRank().stream().map(Cuisine::fromValue).toList();
         SpotType favoriteSpotType = SpotType.fromValue(request.favoriteSpotType());
         SpotStyle favoriteSpotStyle = SpotStyle.fromValue(request.favoriteSpotStyle());
-        if (request.favoriteSpotRank().size() != 4) {
+        if (request.favoriteSpotRank().size() != FAVORITE_SPOT_RANK_SIZE) {
             throw new BusinessException(ErrorType.INVALID_FAVORITE_SPOT_ERROR);
         }
         List<FavoriteSpot> favoriteSpotRank = request.favoriteSpotRank().stream().map(FavoriteSpot::fromValue).toList();
