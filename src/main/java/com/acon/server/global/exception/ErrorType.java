@@ -38,6 +38,10 @@ public enum ErrorType {
     INVALID_SPOT_TYPE_ERROR(HttpStatus.BAD_REQUEST, 40015, "유효하지 않은 spotType입니다."),
     INVALID_FAVORITE_SPOT_ERROR(HttpStatus.BAD_REQUEST, 40016, "유효하지 않은 spotStyle입니다."),
     INVALID_SPOT_STYLE_ERROR(HttpStatus.BAD_REQUEST, 40017, "유효하지 않은 favoriteSpot입니다."),
+
+    /* Spot Error */
+    /* 400 Bad Request */
+    INVALID_DAY_ERROR(HttpStatus.BAD_REQUEST, 40099, "유효하지 않은 day입니다."),
     ;
 
     private final HttpStatus httpStatus;
