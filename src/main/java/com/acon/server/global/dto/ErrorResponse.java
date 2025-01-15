@@ -9,28 +9,26 @@ import java.util.Set;
 import org.springframework.validation.BindingResult;
 
 @JsonInclude(Include.NON_NULL)
-public record ErrorResponse<T>(
+public record ErrorResponse(
         int code,
-        T data,
         String message,
         Object errors
 ) {
 
-    public static <T> ErrorResponse<T> fail(final ErrorType errorType) {
-        return new ErrorResponse<>(errorType.getCode(), null, errorType.getMessage(), null);
+    public static ErrorResponse fail(final ErrorType errorType) {
+        return new ErrorResponse(errorType.getCode(), errorType.getMessage(), null);
     }
 
-    public static <T> ErrorResponse<T> fail(final ErrorType errorType, final String errorDetail) {
-        return new ErrorResponse<>(errorType.getCode(), null, errorType.getMessage() + "(" + errorDetail + ")", null);
+    public static ErrorResponse fail(final ErrorType errorType, final String errorDetail) {
+        return new ErrorResponse(errorType.getCode(), errorType.getMessage() + "(" + errorDetail + ")", null);
     }
 
-    public static <T> ErrorResponse<T> fail(final ErrorType errorType, final BindingResult bindingResult) {
-        return new ErrorResponse<>(errorType.getCode(), null, errorType.getMessage(),
-                ValidationError.of(bindingResult));
+    public static ErrorResponse fail(final ErrorType errorType, final BindingResult bindingResult) {
+        return new ErrorResponse(errorType.getCode(), errorType.getMessage(), ValidationError.of(bindingResult));
     }
 
-    public static <T> ErrorResponse<T> fail(final ErrorType errorType, final Set<ConstraintViolation<?>> violations) {
-        return new ErrorResponse<>(errorType.getCode(), null, errorType.getMessage(), ValidationError.of(violations));
+    public static ErrorResponse fail(final ErrorType errorType, final Set<ConstraintViolation<?>> violations) {
+        return new ErrorResponse(errorType.getCode(), errorType.getMessage(), ValidationError.of(violations));
     }
 
     @JsonInclude(Include.NON_NULL)
