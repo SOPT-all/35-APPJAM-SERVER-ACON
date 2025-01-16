@@ -19,7 +19,7 @@ public class SpotService {
     private final MenuRepository menuRepository;
 
     public MenuListResponse fetchMenus(Long spotId) {
-        spotRepository.findById(spotId).orElseThrow(() -> new BusinessException(ErrorType.NOT_FOUND_MEMBER_ERROR));
+        spotRepository.findById(spotId).orElseThrow(() -> new BusinessException(ErrorType.NOT_FOUND_SPOT_ERROR));
         List<MenuEntity> menuEntityList = menuRepository.findAllBySpotId(spotId);
         List<MenuResponse> menuList = menuEntityList.stream()
                 .map(menu -> MenuResponse.builder().id(menu.getId()).name(menu.getName()).price(menu.getPrice())
