@@ -2,6 +2,7 @@ package com.acon.server.member.application.service;
 
 import com.acon.server.common.auth.jwt.JwtUtils;
 import com.acon.server.member.api.request.LoginRequest;
+import com.acon.server.member.api.response.AcornCountResponse;
 import com.acon.server.member.api.response.LoginResponse;
 import com.acon.server.member.application.mapper.MemberMapper;
 import com.acon.server.member.application.mapper.PreferenceMapper;
@@ -59,6 +60,13 @@ public class MemberService {
         Long memberId = fetchMemberId(request.socialType(), socialId);
         List<String> tokens = jwtUtils.createToken(memberId);
         return LoginResponse.of(tokens.get(0), tokens.get(1));
+    }
+
+    public AcornCountResponse fetchAcornCount(final Long memberId) {
+        MemberEntity memberEntity = memberRepository.findByIdOrElseThrow(memberId);
+        int acornCount = memberEntity.getLeftAcornCount();
+
+        return new AcornCountResponse(acornCount);
     }
 
     private boolean isExistingMember(
