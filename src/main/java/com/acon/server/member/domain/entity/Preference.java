@@ -48,13 +48,13 @@ public class Preference {
 
     private void validateFavoriteSpotRank(List<FavoriteSpot> favoriteSpotRank) {
         if (favoriteSpotRank.size() != FAVORITE_SPOT_RANK_SIZE) {
-            throw new BusinessException(ErrorType.INVALID_CUISINE_ERROR);
+            throw new BusinessException(ErrorType.INVALID_FAVORITE_SPOT_RANK_SIZE_ERROR);
         }
     }
 
     private void validateFavoriteCuisineRank(List<Cuisine> favoriteCuisineRank) {
         if (favoriteCuisineRank.size() != FAVORITE_CUISINE_RANK_SIZE) {
-            throw new BusinessException(ErrorType.INVALID_CUISINE_ERROR);
+            throw new BusinessException(ErrorType.INVALID_FAVORITE_CUISINE_RANK_SIZE_ERROR);
         }
     }
 }
