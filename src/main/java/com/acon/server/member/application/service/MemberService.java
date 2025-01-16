@@ -33,13 +33,23 @@ public class MemberService {
     private final PreferenceMapper preferenceMapper;
     private final PreferenceRepository preferenceRepository;
 
-    public void createPreference(List<DislikeFood> dislikeFoodList, List<Cuisine> favoriteCuisineList,
-                                 SpotType favoriteSpotType,
-                                 SpotStyle favoriteSpotStyle, List<FavoriteSpot> favoriteSpotRank, Long memberId) {
-        Preference preference = Preference.builder().memberId(memberId).dislikeFoodList(dislikeFoodList)
-                .favoriteCuisineRank(favoriteCuisineList).favoriteSpotType(favoriteSpotType)
+    public void createPreference(
+            List<DislikeFood> dislikeFoodList,
+            List<Cuisine> favoriteCuisineList,
+            SpotType favoriteSpotType,
+            SpotStyle favoriteSpotStyle,
+            List<FavoriteSpot> favoriteSpotRank,
+            Long memberId
+    ) {
+        Preference preference = Preference.builder()
+                .memberId(memberId)
+                .dislikeFoodList(dislikeFoodList)
+                .favoriteCuisineRank(favoriteCuisineList)
+                .favoriteSpotType(favoriteSpotType)
                 .favoriteSpotStyle(favoriteSpotStyle)
-                .favoriteSpotRank(favoriteSpotRank).build();
+                .favoriteSpotRank(favoriteSpotRank)
+                .build();
+
         preferenceRepository.save(preferenceMapper.toEntity(preference));
     }
 
