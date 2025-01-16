@@ -19,11 +19,18 @@ public class SpotService {
     private final MenuRepository menuRepository;
 
     public MenuListResponse fetchMenus(Long spotId) {
-        spotRepository.findById(spotId).orElseThrow(() -> new BusinessException(ErrorType.NOT_FOUND_SPOT_ERROR));
+        if (spotRepository.existsById(spotId)) {
+            throw new BusinessException(ErrorType.NOT_FOUND_SPOT_ERROR);
+        }
         List<MenuEntity> menuEntityList = menuRepository.findAllBySpotId(spotId);
         List<MenuResponse> menuList = menuEntityList.stream()
-                .map(menu -> MenuResponse.builder().id(menu.getId()).name(menu.getName()).price(menu.getPrice())
-                        .image(menu.getImage()).build()).toList();
+                .map(menu -> MenuResponse.builder()
+                        .id(menu.getId())
+                        .name(menu.getName())
+                        .price(menu.getPrice())
+                        .image(menu.getImage())
+                        .build())
+                .toList();
 
         return new MenuListResponse(menuList);
     }
