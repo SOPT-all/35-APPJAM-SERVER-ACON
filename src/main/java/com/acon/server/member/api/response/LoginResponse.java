@@ -11,5 +11,4 @@ public record LoginResponse(
     ) {
         return new LoginResponse(accessToken, refreshToken);
     }
-
 }
