@@ -10,6 +10,7 @@ public class Menu {
 
     private final Long id;
     private final Long spotId;
+
     private String image;
     private String name;
     private String price;

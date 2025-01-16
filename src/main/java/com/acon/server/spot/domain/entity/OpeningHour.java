@@ -12,6 +12,7 @@ public class OpeningHour {
 
     private final Long id;
     private final Long spotId;
+
     private Day day;
     private LocalDateTime startTime;
     private LocalDateTime endTime;
