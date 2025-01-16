@@ -1,4 +1,4 @@
-package com.acon.server.review.domain.entity;
+package com.acon.server.spot.domain.entity;
 
 import lombok.Builder;
 import lombok.Getter;
@@ -6,23 +6,20 @@ import lombok.ToString;
 
 @Getter
 @ToString
-public class ReviewImage {
+public class SpotImage {
 
     private final Long id;
     private final Long spotId;
-    private final Long reviewId;
     private final String image;
 
     @Builder
-    public ReviewImage(
+    public SpotImage(
             Long id,
             Long spotId,
-            Long reviewId,
             String image
     ) {
         this.id = id;
         this.spotId = spotId;
-        this.reviewId = reviewId;
         this.image = image;
     }
 }

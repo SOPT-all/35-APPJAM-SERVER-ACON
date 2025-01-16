@@ -4,7 +4,7 @@ import com.acon.server.member.domain.enums.Cuisine;
 import com.acon.server.member.domain.enums.DislikeFood;
 import com.acon.server.member.domain.enums.FavoriteSpot;
 import com.acon.server.member.domain.enums.SpotStyle;
-import com.acon.server.member.domain.enums.SpotType;
+import com.acon.server.spot.domain.enums.SpotType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;

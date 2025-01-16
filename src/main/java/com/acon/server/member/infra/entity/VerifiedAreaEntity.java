@@ -5,6 +5,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.Table;
 import java.time.LocalDate;
 import java.util.List;
@@ -18,7 +19,11 @@ import org.hibernate.type.SqlTypes;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "verified_area")
+@Table(
+        name = "verified_area", indexes = @Index(
+                name = "idx_member_id", columnList = "member_id"
+        )
+)
 public class VerifiedAreaEntity {
 
     @Id

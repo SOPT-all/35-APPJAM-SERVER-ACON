@@ -15,7 +15,7 @@ public class Review {
     private final boolean localAcorn;
 
     @Builder
-    private Review(
+    public Review(
             Long id,
             Long spotId,
             Long memberId,

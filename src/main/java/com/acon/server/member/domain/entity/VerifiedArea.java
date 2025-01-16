@@ -19,7 +19,7 @@ public class VerifiedArea {
     private boolean hasCertificationMark;
 
     @Builder
-    private VerifiedArea(
+    public VerifiedArea(
             Long id,
             Long memberId,
             String name,
