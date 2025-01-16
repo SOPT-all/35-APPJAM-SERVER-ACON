@@ -29,7 +29,7 @@ public class MenuEntity {
     @Column(name = "spot_id", nullable = false)
     private Long spotId;
 
-    @Column(name = "image", nullable = false)
+    @Column(name = "image")
     private String image;
 
     @Column(name = "name", nullable = false)
