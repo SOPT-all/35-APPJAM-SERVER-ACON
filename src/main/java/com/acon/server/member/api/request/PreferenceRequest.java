@@ -1,18 +1,19 @@
 package com.acon.server.member.api.request;
 
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import java.util.List;
 
 public record PreferenceRequest(
-        @NotNull
+        @NotEmpty(message = "dislikeFoodList가 빈 값입니다.")
         List<String> dislikeFoodList,
-        @NotNull
+        @NotEmpty(message = "favoriteCuisineRank가 빈 값입니다.")
         List<String> favoriteCuisineRank,
-        @NotNull
+        @NotBlank(message = "favoriteSpotType가 빈 값입니다.")
         String favoriteSpotType,
-        @NotNull
+        @NotBlank(message = "favoriteSpotStyle가 빈 값입니다.")
         String favoriteSpotStyle,
-        @NotNull
+        @NotEmpty(message = "favoriteSpotRank가 빈 값입니다.")
         List<String> favoriteSpotRank
 ) {
 

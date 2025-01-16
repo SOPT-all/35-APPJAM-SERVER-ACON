@@ -5,11 +5,19 @@ import com.acon.server.member.api.request.LoginRequest;
 import com.acon.server.member.api.response.AcornCountResponse;
 import com.acon.server.member.api.response.LoginResponse;
 import com.acon.server.member.application.mapper.MemberMapper;
+import com.acon.server.member.application.mapper.PreferenceMapper;
 import com.acon.server.member.domain.entity.Member;
+import com.acon.server.member.domain.entity.Preference;
+import com.acon.server.member.domain.enums.Cuisine;
+import com.acon.server.member.domain.enums.DislikeFood;
+import com.acon.server.member.domain.enums.FavoriteSpot;
 import com.acon.server.member.domain.enums.SocialType;
+import com.acon.server.member.domain.enums.SpotStyle;
+import com.acon.server.member.domain.enums.SpotType;
 import com.acon.server.member.infra.entity.MemberEntity;
 import com.acon.server.member.infra.external.google.GoogleSocialService;
 import com.acon.server.member.infra.repository.MemberRepository;
+import com.acon.server.member.infra.repository.PreferenceRepository;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -23,6 +31,28 @@ public class MemberService {
     private final MemberRepository memberRepository;
     private final MemberMapper memberMapper;
     private final JwtUtils jwtUtils;
+    private final PreferenceMapper preferenceMapper;
+    private final PreferenceRepository preferenceRepository;
+
+    public void createPreference(
+            List<DislikeFood> dislikeFoodList,
+            List<Cuisine> favoriteCuisineList,
+            SpotType favoriteSpotType,
+            SpotStyle favoriteSpotStyle,
+            List<FavoriteSpot> favoriteSpotRank,
+            Long memberId
+    ) {
+        Preference preference = Preference.builder()
+                .memberId(memberId)
+                .dislikeFoodList(dislikeFoodList)
+                .favoriteCuisineRank(favoriteCuisineList)
+                .favoriteSpotType(favoriteSpotType)
+                .favoriteSpotStyle(favoriteSpotStyle)
+                .favoriteSpotRank(favoriteSpotRank)
+                .build();
+
+        preferenceRepository.save(preferenceMapper.toEntity(preference));
+    }
 
     @Transactional
     public LoginResponse login(final LoginRequest request) {
