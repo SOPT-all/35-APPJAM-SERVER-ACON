@@ -13,7 +13,7 @@ public class Menu {
 
     private String image;
     private String name;
-    private String price;
+    private int price;
     private boolean mainMenu;
 
     @Builder
@@ -22,7 +22,7 @@ public class Menu {
             Long spotId,
             String image,
             String name,
-            String price,
+            int price,
             boolean mainMenu
     ) {
         this.id = id;
