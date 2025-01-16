@@ -27,9 +27,9 @@ public class MemberController {
         );
     }
 
-    @GetMapping("/acorn")
+    @GetMapping("/member/acorn")
     public ResponseEntity<AcornCountResponse> getAcornCount() {
-        // TODO 토큰으로 memberId 가져오기
+        // TODO: 토큰으로 memberId 가져오기
         return ResponseEntity.ok(
                 memberService.fetchAcornCount(1L)
         );

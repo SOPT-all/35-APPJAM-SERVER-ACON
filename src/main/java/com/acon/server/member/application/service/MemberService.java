@@ -1,8 +1,6 @@
 package com.acon.server.member.application.service;
 
 import com.acon.server.common.auth.jwt.JwtUtils;
-import com.acon.server.global.exception.BusinessException;
-import com.acon.server.global.exception.ErrorType;
 import com.acon.server.member.api.request.LoginRequest;
 import com.acon.server.member.api.response.AcornCountResponse;
 import com.acon.server.member.api.response.LoginResponse;
@@ -35,10 +33,9 @@ public class MemberService {
     }
 
     public AcornCountResponse fetchAcornCount(final Long memberId) {
-        MemberEntity memberEntity = memberRepository.findById(memberId).orElseThrow(
-                () -> new BusinessException(ErrorType.NOT_FOUND_MEMBER_ERROR)
-        );
+        MemberEntity memberEntity = memberRepository.findByIdOrElseThrow(memberId);
         int acornCount = memberEntity.getLeftAcornCount();
+
         return new AcornCountResponse(acornCount);
     }
 
