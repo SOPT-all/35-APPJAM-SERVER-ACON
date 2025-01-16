@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/v1")
 public class MemberController {
 
-    MemberService memberService;
+    private final MemberService memberService;
 
     @PostMapping("/member/guided-spot")
     public ResponseEntity<Void> postGuidedSpot(@Valid @RequestBody final SpotRequest request) {
