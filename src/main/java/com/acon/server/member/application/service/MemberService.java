@@ -16,8 +16,14 @@ public class MemberService {
     private final SpotRepository spotRepository;
 
     public void createGuidedSpot(final Long spotId, final Long memberId) {
-        spotRepository.findById(spotId).orElseThrow(() -> new BusinessException(ErrorType.NOT_FOUND_SPOT_ERROR));
-        recentGuidedSpotRepository.save(RecentGuidedSpotEntity.builder().memberId(memberId).spotId(spotId).build());
-    }
+        if (spotRepository.existsById(spotId)) {
+            throw new BusinessException(ErrorType.NOT_FOUND_SPOT_ERROR);
+        }
 
+        RecentGuidedSpotEntity recentGuidedSpotEntity = RecentGuidedSpotEntity.builder()
+                .memberId(memberId)
+                .spotId(spotId)
+                .build();
+        recentGuidedSpotRepository.save(recentGuidedSpotEntity);
+    }
 }

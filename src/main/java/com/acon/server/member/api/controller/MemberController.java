@@ -18,9 +18,12 @@ public class MemberController {
     private final MemberService memberService;
 
     @PostMapping("/member/guided-spot")
-    public ResponseEntity<Void> postGuidedSpot(@Valid @RequestBody final SpotRequest request) {
-        //TODO 토큰 검증 이후 MemberID 추출 필요
+    public ResponseEntity<Void> postGuidedSpot(
+            @Valid @RequestBody final SpotRequest request
+    ) {
+        // TODO: 토큰 검증 이후 MemberID 추출 필요
         memberService.createGuidedSpot(request.spotId(), 1L);
+
         return ResponseEntity.ok().build();
     }
 }
