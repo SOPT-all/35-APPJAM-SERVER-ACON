@@ -1,7 +1,7 @@
 package com.acon.server.member.api.controller;
 
+import com.acon.server.member.api.request.GuidedSpotRequest;
 import com.acon.server.member.application.service.MemberService;
-import com.acon.server.spot.api.request.SpotRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -19,7 +19,7 @@ public class MemberController {
 
     @PostMapping("/member/guided-spot")
     public ResponseEntity<Void> postGuidedSpot(
-            @Valid @RequestBody final SpotRequest request
+            @Valid @RequestBody final GuidedSpotRequest request
     ) {
         // TODO: 토큰 검증 이후 MemberID 추출 필요
         memberService.createGuidedSpot(request.spotId(), 1L);
