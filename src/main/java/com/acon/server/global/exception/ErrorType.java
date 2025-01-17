@@ -42,7 +42,10 @@ public enum ErrorType {
     /* Spot Error */
     /* 400 Bad Request */
     INVALID_DAY_ERROR(HttpStatus.BAD_REQUEST, 40099, "유효하지 않은 day입니다."),
-    NOT_FOUND_SPOT_ERROR(HttpStatus.NOT_FOUND, 40402, "유효한 장소가 없습니다");
+    
+    /* 404 Not Found */
+    NOT_FOUND_SPOT_ERROR(HttpStatus.NOT_FOUND, 40402, "유효한 장소가 없습니다"),
+    ;
 
     private final HttpStatus httpStatus;
     private final int code;
