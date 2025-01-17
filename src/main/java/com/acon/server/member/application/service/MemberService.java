@@ -22,17 +22,29 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.acon.server.global.exception.BusinessException;
+import com.acon.server.global.exception.ErrorType;
+import com.acon.server.member.infra.entity.RecentGuidedSpotEntity;
+import com.acon.server.member.infra.repository.RecentGuidedSpotRepository;
+import com.acon.server.spot.infra.repository.SpotRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
 public class MemberService {
 
-    private final GoogleSocialService googleSocialService;
     private final MemberRepository memberRepository;
-    private final MemberMapper memberMapper;
-    private final JwtUtils jwtUtils;
-    private final PreferenceMapper preferenceMapper;
+    private final SpotRepository spotRepository;
     private final PreferenceRepository preferenceRepository;
+    private final RecentGuidedSpotRepository recentGuidedSpotRepository;
+  
+    private final MemberMapper memberMapper;
+    private final PreferenceMapper preferenceMapper;
+  
+    private final JwtUtils jwtUtils;
+    private final GoogleSocialService googleSocialService;
+   
 
     public void createPreference(
             List<DislikeFood> dislikeFoodList,
@@ -94,4 +106,16 @@ public class MemberService {
         return member.getId();
     }
 
+
+    public void createGuidedSpot(final Long spotId, final Long memberId) {
+        if (spotRepository.existsById(spotId)) {
+            throw new BusinessException(ErrorType.NOT_FOUND_SPOT_ERROR);
+        }
+
+        RecentGuidedSpotEntity recentGuidedSpotEntity = RecentGuidedSpotEntity.builder()
+                .memberId(memberId)
+                .spotId(spotId)
+                .build();
+        recentGuidedSpotRepository.save(recentGuidedSpotEntity);
+    }
 }
