@@ -17,8 +17,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(
         name = "menu", indexes = @Index(
-                name = "idx_spot_id", columnList = "spot_id"
-        )
+        name = "idx_spot_id", columnList = "spot_id"
+)
 )
 public class MenuEntity {
 
@@ -29,14 +29,14 @@ public class MenuEntity {
     @Column(name = "spot_id", nullable = false)
     private Long spotId;
 
-    @Column(name = "image", nullable = false)
+    @Column(name = "image")
     private String image;
 
     @Column(name = "name", nullable = false)
     private String name;
 
     @Column(name = "price", nullable = false)
-    private String price;
+    private int price;
 
     @Column(name = "main_menu", nullable = false)
     private boolean mainMenu;
@@ -47,7 +47,7 @@ public class MenuEntity {
             Long spotId,
             String image,
             String name,
-            String price,
+            int price,
             boolean mainMenu
     ) {
         this.id = id;
