@@ -4,7 +4,10 @@ import com.acon.server.global.exception.BusinessException;
 import com.acon.server.global.exception.ErrorType;
 import com.acon.server.spot.api.response.MenuListResponse;
 import com.acon.server.spot.api.response.MenuResponse;
+import com.acon.server.spot.api.response.SearchSpotListResponse;
+import com.acon.server.spot.api.response.SearchSpotResponse;
 import com.acon.server.spot.infra.entity.MenuEntity;
+import com.acon.server.spot.infra.entity.SpotEntity;
 import com.acon.server.spot.infra.repository.MenuRepository;
 import com.acon.server.spot.infra.repository.SpotRepository;
 import java.util.List;
@@ -33,5 +36,20 @@ public class SpotService {
                 .toList();
 
         return new MenuListResponse(menuList);
+    }
+
+    public SearchSpotListResponse searchSpot(final String keyword) {
+        List<SpotEntity> spotEntityList = spotRepository.findTop10ByNameContainsIgnoreCase(keyword);
+        List<SearchSpotResponse> spotList = spotEntityList.stream()
+                .map(spotEntity -> SearchSpotResponse.builder()
+                        .spotId(spotEntity.getId())
+                        .name(spotEntity.getName())
+                        .address(spotEntity.getAddress())
+                        .spotType(spotEntity.getSpotType())
+                        .build())
+                .toList();
+        
+        return new SearchSpotListResponse(spotList);
+
     }
 }
