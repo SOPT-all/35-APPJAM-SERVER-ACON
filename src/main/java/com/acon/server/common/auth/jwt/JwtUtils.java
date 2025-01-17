@@ -3,7 +3,6 @@ package com.acon.server.common.auth.jwt;
 import com.acon.server.common.auth.jwt.config.JwtConfig;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import java.util.Date;
 import java.util.List;
@@ -19,7 +18,7 @@ public class JwtUtils {
     private static final String JWT_KEY = "memberId";
 
     public JwtUtils(JwtConfig jwtConfig) {
-        byte[] keyBytes = Decoders.BASE64.decode(jwtConfig.getSecretKey());
+        byte[] keyBytes = jwtConfig.getSecretKey().getBytes();
         this.secretKey = Keys.hmacShaKeyFor(keyBytes);
     }
 
