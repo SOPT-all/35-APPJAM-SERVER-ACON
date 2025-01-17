@@ -1,6 +1,8 @@
 package com.acon.server.member.application.service;
 
 import com.acon.server.common.auth.jwt.JwtUtils;
+import com.acon.server.global.exception.BusinessException;
+import com.acon.server.global.exception.ErrorType;
 import com.acon.server.member.api.request.LoginRequest;
 import com.acon.server.member.api.response.AcornCountResponse;
 import com.acon.server.member.api.response.LoginResponse;
@@ -13,22 +15,18 @@ import com.acon.server.member.domain.enums.DislikeFood;
 import com.acon.server.member.domain.enums.FavoriteSpot;
 import com.acon.server.member.domain.enums.SocialType;
 import com.acon.server.member.domain.enums.SpotStyle;
-import com.acon.server.member.domain.enums.SpotType;
 import com.acon.server.member.infra.entity.MemberEntity;
+import com.acon.server.member.infra.entity.RecentGuidedSpotEntity;
 import com.acon.server.member.infra.external.google.GoogleSocialService;
 import com.acon.server.member.infra.repository.MemberRepository;
 import com.acon.server.member.infra.repository.PreferenceRepository;
+import com.acon.server.member.infra.repository.RecentGuidedSpotRepository;
+import com.acon.server.spot.domain.enums.SpotType;
+import com.acon.server.spot.infra.repository.SpotRepository;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import com.acon.server.global.exception.BusinessException;
-import com.acon.server.global.exception.ErrorType;
-import com.acon.server.member.infra.entity.RecentGuidedSpotEntity;
-import com.acon.server.member.infra.repository.RecentGuidedSpotRepository;
-import com.acon.server.spot.infra.repository.SpotRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
@@ -38,13 +36,12 @@ public class MemberService {
     private final SpotRepository spotRepository;
     private final PreferenceRepository preferenceRepository;
     private final RecentGuidedSpotRepository recentGuidedSpotRepository;
-  
+
     private final MemberMapper memberMapper;
     private final PreferenceMapper preferenceMapper;
-  
+
     private final JwtUtils jwtUtils;
     private final GoogleSocialService googleSocialService;
-   
 
     public void createPreference(
             List<DislikeFood> dislikeFoodList,
@@ -105,7 +102,6 @@ public class MemberService {
         Member member = memberMapper.toDomain(memberEntity);
         return member.getId();
     }
-
 
     public void createGuidedSpot(final Long spotId, final Long memberId) {
         if (spotRepository.existsById(spotId)) {

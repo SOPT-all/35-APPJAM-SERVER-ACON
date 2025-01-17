@@ -1,26 +1,22 @@
 package com.acon.server.member.api.controller;
 
+import com.acon.server.member.api.request.GuidedSpotRequest;
 import com.acon.server.member.api.request.LoginRequest;
-import com.acon.server.member.api.response.AcornCountResponse;
 import com.acon.server.member.api.request.PreferenceRequest;
+import com.acon.server.member.api.response.AcornCountResponse;
 import com.acon.server.member.api.response.LoginResponse;
 import com.acon.server.member.application.service.MemberService;
 import com.acon.server.member.domain.enums.Cuisine;
 import com.acon.server.member.domain.enums.DislikeFood;
 import com.acon.server.member.domain.enums.FavoriteSpot;
 import com.acon.server.member.domain.enums.SpotStyle;
-import com.acon.server.member.domain.enums.SpotType;
+import com.acon.server.spot.domain.enums.SpotType;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
-import com.acon.server.member.api.request.GuidedSpotRequest;
-import com.acon.server.member.application.service.MemberService;
-import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -46,7 +42,7 @@ public class MemberController {
 
         memberService.createPreference(dislikeFoodList, favoriteCuisineList, favoriteSpotType, favoriteSpotStyle,
                 favoriteSpotRank, 1L);
-      
+
         return ResponseEntity.ok().build();
     }
 
@@ -66,6 +62,7 @@ public class MemberController {
                 memberService.fetchAcornCount(1L)
         );
     }
+
     @PostMapping("/member/guided-spot")
     public ResponseEntity<Void> postGuidedSpot(
             @Valid @RequestBody final GuidedSpotRequest request
