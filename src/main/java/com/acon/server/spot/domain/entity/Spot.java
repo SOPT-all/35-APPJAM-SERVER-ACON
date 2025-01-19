@@ -49,4 +49,9 @@ public class Spot {
         this.longitude = longitude;
         this.adminDong = adminDong;
     }
+
+    public void updateCoordinates(Double latitude, Double longitude) {
+        this.latitude = latitude;
+        this.longitude = longitude;
+    }
 }
