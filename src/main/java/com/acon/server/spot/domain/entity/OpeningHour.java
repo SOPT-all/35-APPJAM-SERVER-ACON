@@ -1,6 +1,6 @@
 package com.acon.server.spot.domain.entity;
 
-import com.acon.server.spot.domain.enums.Day;
+import java.time.DayOfWeek;
 import java.time.LocalDateTime;
 import lombok.Builder;
 import lombok.Getter;
@@ -13,7 +13,7 @@ public class OpeningHour {
     private final Long id;
     private final Long spotId;
 
-    private Day day;
+    private DayOfWeek dayOfWeek;
     private LocalDateTime startTime;
     private LocalDateTime endTime;
 
@@ -21,13 +21,13 @@ public class OpeningHour {
     public OpeningHour(
             Long id,
             Long spotId,
-            Day day,
+            DayOfWeek dayOfWeek,
             LocalDateTime startTime,
             LocalDateTime endTime
     ) {
         this.id = id;
         this.spotId = spotId;
-        this.day = day;
+        this.dayOfWeek = dayOfWeek;
         this.startTime = startTime;
         this.endTime = endTime;
     }
