@@ -1,6 +1,8 @@
 package com.acon.server.member.api.controller;
 
 import com.acon.server.member.api.request.GuidedSpotRequest;
+import com.acon.server.member.api.request.MemberAreaRequest;
+import com.acon.server.member.api.response.MemberAreaResponse;
 import com.acon.server.member.application.service.MemberService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -25,5 +27,15 @@ public class MemberController {
         memberService.createGuidedSpot(request.spotId(), 1L);
 
         return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/member/area")
+    public ResponseEntity<MemberAreaResponse> postArea(
+            @Valid @RequestBody final MemberAreaRequest request
+    ) {
+        // TODO: 토큰 검증 이후 MemberID 추출 필요
+        String area = memberService.createMemberArea(request.latitude(), request.longitude(), 1L);
+
+        return ResponseEntity.ok(new MemberAreaResponse(area));
     }
 }
