@@ -1,5 +1,6 @@
 package com.acon.server.spot.api.controller;
 
+import com.acon.server.spot.api.response.MenuDetailResponse;
 import com.acon.server.spot.api.response.MenuListResponse;
 import com.acon.server.spot.application.service.SpotService;
 import jakarta.validation.constraints.Positive;
@@ -17,6 +18,16 @@ import org.springframework.web.bind.annotation.RestController;
 public class SpotController {
 
     private final SpotService spotService;
+
+    @GetMapping("/spot/{spotId}")
+    public ResponseEntity<MenuDetailResponse> getSpotDetail(
+            @Positive(message = "spotId는 양수여야 합니다.")
+            @Validated @PathVariable(name = "spotId") Long spotId
+    ) {
+        return ResponseEntity.ok(
+                spotService.fetchSpotDetail(spotId)
+        );
+    }
 
     @GetMapping("/spot/{spotId}/menus")
     public ResponseEntity<MenuListResponse> getMenus(
