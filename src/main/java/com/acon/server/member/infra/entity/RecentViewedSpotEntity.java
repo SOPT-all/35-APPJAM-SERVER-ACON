@@ -17,8 +17,10 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(
-        name = "recent_viewed_spot", uniqueConstraints = @UniqueConstraint(
-                name = "unique_recent_viewed_spot_member_id_spot_id", columnNames = {"member_id", "spot_id"}
+        name = "recent_viewed_spot",
+        uniqueConstraints = @UniqueConstraint(
+                name = "unique_recent_viewed_spot_member_id_spot_id",
+                columnNames = {"member_id", "spot_id"}
         )
 )
 public class RecentViewedSpotEntity extends BaseTimeEntity {
