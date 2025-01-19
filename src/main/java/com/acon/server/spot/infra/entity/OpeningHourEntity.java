@@ -20,8 +20,10 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(
-        name = "opening_hour", indexes = @Index(
-                name = "idx_spot_id", columnList = "spot_id"
+        name = "opening_hour",
+        indexes = @Index(
+                name = "idx_opening_hour_spot_id_day_of_week",
+                columnList = "spot_id, day_of_week"
         )
 )
 public class OpeningHourEntity {
