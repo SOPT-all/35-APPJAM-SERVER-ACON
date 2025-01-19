@@ -44,10 +44,12 @@ dependencies {
     // Database
     implementation 'org.postgresql:postgresql:42.7.4'
 
-    // MapStruct
     implementation 'org.mapstruct:mapstruct:1.6.3'
     annotationProcessor 'org.mapstruct:mapstruct-processor:1.6.3'
     testAnnotationProcessor 'org.mapstruct:mapstruct-processor:1.6.3'
+
+    // FeignClient
+    implementation "org.springframework.cloud:spring-cloud-starter-openfeign:4.2.0"
 }
 
 tasks.named('test') {
