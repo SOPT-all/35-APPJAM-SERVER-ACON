@@ -42,9 +42,12 @@ public enum ErrorType {
     /* Spot Error */
     /* 400 Bad Request */
     INVALID_DAY_ERROR(HttpStatus.BAD_REQUEST, 40099, "유효하지 않은 day입니다."),
-    
+
     /* 404 Not Found */
     NOT_FOUND_SPOT_ERROR(HttpStatus.NOT_FOUND, 40402, "유효한 장소가 없습니다"),
+
+    /* 500 Internal Server Error */
+    NAVER_MAPS_GEOCODING_API_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, 50003, "Naver Maps GeoCoding API 호출에 실패했습니다."),
     ;
 
     private final HttpStatus httpStatus;
