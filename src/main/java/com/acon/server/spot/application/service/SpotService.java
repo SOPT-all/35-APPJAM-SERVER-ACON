@@ -23,11 +23,13 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class SpotService {
 
     private final SpotRepository spotRepository;
@@ -40,7 +42,42 @@ public class SpotService {
 
     private final NaverMapsAdapter naverMapsAdapter;
 
+    // 메서드 설명: 위도, 경도 정보가 없는 Spot들의 좌표를 업데이트한다.
+    @Transactional
+    public void updateNullCoordinatesForSpots() {
+        List<SpotEntity> spotEntityList = spotRepository.findAllByLatitudeIsNullOrLongitudeIsNull();
+
+        if (spotEntityList.isEmpty()) {
+            log.info("위도 또는 경도 정보가 비어 있는 Spot 데이터가 없습니다.");
+            return;
+        }
+
+        log.info("위도 또는 경도 정보가 비어 있는 Spot 데이터를 {}건 찾았습니다.", spotEntityList.size());
+
+        List<SpotEntity> updatedEntities = spotEntityList.stream()
+                .map(spotEntity -> {
+                    Spot spot = spotMapper.toDomain(spotEntity);
+                    updateSpotCoordinate(spot);
+                    return spotMapper.toEntity(spot);
+                })
+                .toList();
+        spotRepository.saveAll(updatedEntities);
+
+        log.info("위도 또는 경도 정보가 비어 있는 Spot 데이터 {}건을 업데이트 했습니다.", updatedEntities.size());
+    }
+
+    // 메서드 설명: spotId에 해당하는 Spot의 좌표를 업데이트한다. (주소 -> 좌표)
+    private void updateSpotCoordinate(final Spot spot) {
+        GeoCodingResponse geoCodingResponse = naverMapsAdapter.getGeoCodingResult(spot.getAddress());
+
+        spot.updateCoordinate(
+                Double.parseDouble(geoCodingResponse.latitude()),
+                Double.parseDouble(geoCodingResponse.longitude())
+        );
+    }
+
     // TODO: 트랜잭션 범위 고민하기
+    // 메서드 설명: spotId에 해당하는 Spot의 상세 정보를 조회한다. (메뉴, 이미지, 영업 여부 등)
     @Transactional
     public MenuDetailResponse fetchSpotDetail(final Long spotId) {
         SpotEntity spotEntity = spotRepository.findByIdOrThrow(spotId);
@@ -52,22 +89,14 @@ public class SpotService {
                 .toList();
 
         if (spot.getLatitude() == null || spot.getLongitude() == null) {
-            updateSpotCoordinates(spot);
+            updateSpotCoordinate(spot);
             spotEntity = spotRepository.save(spotMapper.toEntity(spot));
         }
 
         return spotDtoMapper.toMenuDetailResponse(spotEntity, imageList, isSpotOpen(spotId));
     }
 
-    private void updateSpotCoordinates(final Spot spot) {
-        GeoCodingResponse geoCodingResponse = naverMapsAdapter.getGeoCodingResult(spot.getAddress());
-
-        spot.updateCoordinates(
-                Double.parseDouble(geoCodingResponse.latitude()),
-                Double.parseDouble(geoCodingResponse.longitude())
-        );
-    }
-
+    // 메서드 설명: spotId에 해당하는 Spot이 현재 영업 중인지 확인한다. (영업 시간에 속하는지)
     private boolean isSpotOpen(final Long spotId) {
         LocalDateTime now = LocalDateTime.now();
         DayOfWeek today = now.getDayOfWeek();
@@ -90,6 +119,7 @@ public class SpotService {
                 .anyMatch(openingHour -> isBeforeMidnight(currentTime, openingHour));
     }
 
+    // 메서드 설명: currentTime이 영업 시간에 속하는지 확인한다. (자정이 지난 후)
     private boolean isAfterMidnight(final LocalTime currentTime, final OpeningHourEntity openingHour) {
         LocalTime startTime = openingHour.getStartTime();
         LocalTime endTime = openingHour.getEndTime();
@@ -97,6 +127,7 @@ public class SpotService {
         return endTime.isBefore(startTime) && currentTime.isAfter(LocalTime.MIDNIGHT) && currentTime.isBefore(endTime);
     }
 
+    // 메서드 설명: currentTime이 영업 시간에 속하는지 확인한다. (자정이 지나기 전)
     private boolean isBeforeMidnight(final LocalTime currentTime, final OpeningHourEntity openingHour) {
         LocalTime startTime = openingHour.getStartTime();
         LocalTime endTime = openingHour.getEndTime();

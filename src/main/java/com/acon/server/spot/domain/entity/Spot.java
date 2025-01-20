@@ -50,7 +50,7 @@ public class Spot {
         this.adminDong = adminDong;
     }
 
-    public void updateCoordinates(Double latitude, Double longitude) {
+    public void updateCoordinate(Double latitude, Double longitude) {
         this.latitude = latitude;
         this.longitude = longitude;
     }
