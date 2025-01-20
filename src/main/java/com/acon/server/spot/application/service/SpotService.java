@@ -95,6 +95,7 @@ public class SpotService {
             spotEntity = spotRepository.save(spotMapper.toEntity(spot));
         }
 
+    public MenuListResponse fetchMenus(Long spotId) {
         return spotDtoMapper.toSpotDetailResponse(spotEntity, imageList, isSpotOpen(spotId));
     }
 
@@ -158,7 +159,5 @@ public class SpotService {
                         .image(menu.getImage())
                         .build())
                 .toList();
-    }
-
     }
 }

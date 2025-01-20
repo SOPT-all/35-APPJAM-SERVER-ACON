@@ -36,11 +36,17 @@ public enum ErrorType {
     /* Member Error */
     /* 400 Bad Request */
     INVALID_SOCIAL_TYPE_ERROR(HttpStatus.BAD_REQUEST, 40009, "유효하지 않은 socialType입니다."),
+    INVALID_ID_TOKEN_ERROR(HttpStatus.BAD_REQUEST, 40010, "ID 토큰의 서명이 올바르지 않습니다."),
     INVALID_DISLIKE_FOOD_ERROR(HttpStatus.BAD_REQUEST, 40013, "유효하지 않은 dislikeFood입니다."),
     INVALID_CUISINE_ERROR(HttpStatus.BAD_REQUEST, 40014, "유효하지 않은 cuisine입니다."),
     INVALID_SPOT_TYPE_ERROR(HttpStatus.BAD_REQUEST, 40015, "유효하지 않은 spotType입니다."),
-    INVALID_FAVORITE_SPOT_ERROR(HttpStatus.BAD_REQUEST, 40016, "유효하지 않은 spotStyle입니다."),
-    INVALID_SPOT_STYLE_ERROR(HttpStatus.BAD_REQUEST, 40017, "유효하지 않은 favoriteSpot입니다."),
+    INVALID_SPOT_STYLE_ERROR(HttpStatus.BAD_REQUEST, 40016, "유효하지 않은 spotStyle입니다."),
+    INVALID_FAVORITE_SPOT_ERROR(HttpStatus.BAD_REQUEST, 40017, "유효하지 않은 favoriteSpot입니다."),
+    INVALID_FAVORITE_SPOT_RANK_SIZE_ERROR(HttpStatus.BAD_REQUEST, 40030, "favoriteSpotRank의 사이즈가 잘못되었습니다."),
+    INVALID_FAVORITE_CUISINE_RANK_SIZE_ERROR(HttpStatus.BAD_REQUEST, 40031, "favoriteCuisineRank의 사이즈가 잘못되었습니다."),
+
+    /* 500 Internal Server Error */
+    FAILED_DOWNLOAD_GOOGLE_PUBLIC_KEY_ERROR(HttpStatus.BAD_REQUEST, 50002, "구글 공개키 다운로드에 실패하였습니다."),
 
     /* Spot Error */
     /* 400 Bad Request */
