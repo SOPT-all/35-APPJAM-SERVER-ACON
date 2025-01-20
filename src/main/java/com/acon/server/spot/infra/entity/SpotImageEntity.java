@@ -16,8 +16,10 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(
-        name = "spot_image", indexes = @Index(
-                name = "idx_spot_id", columnList = "spot_id"
+        name = "spot_image",
+        indexes = @Index(
+                name = "idx_spot_image_spot_id",
+                columnList = "spot_id"
         )
 )
 public class SpotImageEntity {

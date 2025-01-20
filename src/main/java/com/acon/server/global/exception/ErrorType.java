@@ -9,6 +9,8 @@ import org.springframework.http.HttpStatus;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public enum ErrorType {
 
+    // TODO: ErrorType code 한 번 싹 정리
+
     /* Common Error */
     /* 400 Bad Request */
     INVALID_PATH_ERROR(HttpStatus.BAD_REQUEST, 40001, "요청 경로의 변수 값이 허용된 형식과 다릅니다."),
@@ -19,6 +21,7 @@ public enum ErrorType {
     INVALID_REQUEST_BODY_ERROR(HttpStatus.BAD_REQUEST, 40006, "유효하지 않은 Request Body입니다. 요청 형식 또는 필드를 확인하세요."),
     DATA_INTEGRITY_VIOLATION_ERROR(HttpStatus.BAD_REQUEST, 40007, "데이터 무결성 제약 조건을 위반했습니다."),
     INVALID_ACCESS_TOKEN_ERROR(HttpStatus.BAD_REQUEST, 40008, "유효하지 않은 accessToken입니다."),
+    // TODO: NonNull 필드에 null 값이 입력되었을 때 발생하는 예외 처리 추가
 
     /* 401 Unauthorized */
     EXPIRED_ACCESS_TOKEN_ERROR(HttpStatus.UNAUTHORIZED, 40101, "만료된 accessToken입니다."),
@@ -33,18 +36,27 @@ public enum ErrorType {
     /* Member Error */
     /* 400 Bad Request */
     INVALID_SOCIAL_TYPE_ERROR(HttpStatus.BAD_REQUEST, 40009, "유효하지 않은 socialType입니다."),
+    INVALID_ID_TOKEN_ERROR(HttpStatus.BAD_REQUEST, 40010, "ID 토큰의 서명이 올바르지 않습니다."),
     INVALID_DISLIKE_FOOD_ERROR(HttpStatus.BAD_REQUEST, 40013, "유효하지 않은 dislikeFood입니다."),
     INVALID_CUISINE_ERROR(HttpStatus.BAD_REQUEST, 40014, "유효하지 않은 cuisine입니다."),
     INVALID_SPOT_TYPE_ERROR(HttpStatus.BAD_REQUEST, 40015, "유효하지 않은 spotType입니다."),
-    INVALID_FAVORITE_SPOT_ERROR(HttpStatus.BAD_REQUEST, 40016, "유효하지 않은 spotStyle입니다."),
-    INVALID_SPOT_STYLE_ERROR(HttpStatus.BAD_REQUEST, 40017, "유효하지 않은 favoriteSpot입니다."),
+    INVALID_SPOT_STYLE_ERROR(HttpStatus.BAD_REQUEST, 40016, "유효하지 않은 spotStyle입니다."),
+    INVALID_FAVORITE_SPOT_ERROR(HttpStatus.BAD_REQUEST, 40017, "유효하지 않은 favoriteSpot입니다."),
+    INVALID_FAVORITE_SPOT_RANK_SIZE_ERROR(HttpStatus.BAD_REQUEST, 40030, "favoriteSpotRank의 사이즈가 잘못되었습니다."),
+    INVALID_FAVORITE_CUISINE_RANK_SIZE_ERROR(HttpStatus.BAD_REQUEST, 40031, "favoriteCuisineRank의 사이즈가 잘못되었습니다."),
+
+    /* 500 Internal Server Error */
+    FAILED_DOWNLOAD_GOOGLE_PUBLIC_KEY_ERROR(HttpStatus.BAD_REQUEST, 50002, "구글 공개키 다운로드에 실패하였습니다."),
 
     /* Spot Error */
     /* 400 Bad Request */
     INVALID_DAY_ERROR(HttpStatus.BAD_REQUEST, 40099, "유효하지 않은 day입니다."),
-    
+
     /* 404 Not Found */
-    NOT_FOUND_SPOT_ERROR(HttpStatus.NOT_FOUND, 40402, "유효한 장소가 없습니다"),
+    NOT_FOUND_SPOT_ERROR(HttpStatus.NOT_FOUND, 40402, "존재하지 않는 장소입니다."),
+
+    /* 500 Internal Server Error */
+    NAVER_MAPS_GEOCODING_API_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, 50003, "Naver Maps GeoCoding API 호출에 실패했습니다."),
     ;
 
     private final HttpStatus httpStatus;

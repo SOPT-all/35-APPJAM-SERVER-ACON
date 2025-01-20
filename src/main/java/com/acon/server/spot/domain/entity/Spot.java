@@ -22,6 +22,8 @@ public class Spot {
     private Double latitude;
     private Double longitude;
     private String adminDong;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 
     @Builder
     public Spot(
@@ -35,7 +37,9 @@ public class Spot {
             LocalDateTime basicAcornUpdatedAt,
             Double latitude,
             Double longitude,
-            String adminDong
+            String adminDong,
+            LocalDateTime createdAt,
+            LocalDateTime updatedAt
     ) {
         this.id = id;
         this.name = name;
@@ -48,5 +52,12 @@ public class Spot {
         this.latitude = latitude;
         this.longitude = longitude;
         this.adminDong = adminDong;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
+    }
+
+    public void updateCoordinate(Double latitude, Double longitude) {
+        this.latitude = latitude;
+        this.longitude = longitude;
     }
 }
