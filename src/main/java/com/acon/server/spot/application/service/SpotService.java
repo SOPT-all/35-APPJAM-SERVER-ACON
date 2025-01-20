@@ -3,7 +3,7 @@ package com.acon.server.spot.application.service;
 import com.acon.server.global.exception.BusinessException;
 import com.acon.server.global.exception.ErrorType;
 import com.acon.server.global.external.GeoCodingResponse;
-import com.acon.server.global.external.NaverMapsService;
+import com.acon.server.global.external.NaverMapsAdapter;
 import com.acon.server.spot.api.response.MenuDetailResponse;
 import com.acon.server.spot.api.response.MenuListResponse;
 import com.acon.server.spot.api.response.MenuResponse;
@@ -37,7 +37,7 @@ public class SpotService {
     private final SpotMapper spotMapper;
     private final SpotDtoMapper spotDtoMapper;
 
-    private final NaverMapsService naverMapsService;
+    private final NaverMapsAdapter naverMapsAdapter;
 
     public MenuDetailResponse fetchSpotDetail(Long spotId) {
         SpotEntity spotEntity = spotRepository.findByIdOrThrow(spotId);
@@ -56,8 +56,8 @@ public class SpotService {
         return spotDtoMapper.toMenuDetailResponse(spotEntity, imageList, isSpotOpen(spotId));
     }
 
-    private void updateSpotCoordinates(Spot spot) {
-        GeoCodingResponse geoCodingResponse = naverMapsService.getGeoCodingResult(spot.getAddress());
+    private void updateSpotCoordinates(final Spot spot) {
+        GeoCodingResponse geoCodingResponse = naverMapsAdapter.getGeoCodingResult(spot.getAddress());
 
         spot.updateCoordinates(
                 Double.parseDouble(geoCodingResponse.latitude()),

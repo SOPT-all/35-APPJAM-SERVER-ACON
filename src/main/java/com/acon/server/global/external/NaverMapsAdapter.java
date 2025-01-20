@@ -10,11 +10,12 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class NaverMapsService {
+public class NaverMapsAdapter {
 
     private final NaverMapsClient naverMapsClient;
 
     public GeoCodingResponse getGeoCodingResult(String address) {
+        // TODO: try-catch로 감싸기
         return Optional.ofNullable(naverMapsClient.getGeoCode(address))
                 .map(response -> (List<Map<String, Object>>) response.get("addresses"))
                 .filter(addresses -> !addresses.isEmpty())
