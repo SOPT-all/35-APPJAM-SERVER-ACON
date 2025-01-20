@@ -19,7 +19,7 @@ public class SpotService {
     private final MenuRepository menuRepository;
 
     public MenuListResponse fetchMenus(Long spotId) {
-        if (spotRepository.existsById(spotId)) {
+        if (!spotRepository.existsById(spotId)) {
             throw new BusinessException(ErrorType.NOT_FOUND_SPOT_ERROR);
         }
         List<MenuEntity> menuEntityList = menuRepository.findAllBySpotId(spotId);
