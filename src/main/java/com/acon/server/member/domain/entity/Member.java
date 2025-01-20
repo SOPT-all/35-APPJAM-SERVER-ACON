@@ -2,6 +2,7 @@ package com.acon.server.member.domain.entity;
 
 import com.acon.server.member.domain.enums.SocialType;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.ToString;
@@ -21,6 +22,8 @@ public class Member {
     private LocalDate nicknameUpdatedAt;
     private LocalDate birthDate;
     private int leftAcornCount;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 
     @Builder
     public Member(
@@ -33,7 +36,9 @@ public class Member {
             String nickname,
             LocalDate nicknameUpdatedAt,
             LocalDate birthDate,
-            int leftAcornCount
+            int leftAcornCount,
+            LocalDateTime createdAt,
+            LocalDateTime updatedAt
     ) {
         this.id = id;
         this.socialType = socialType;
@@ -45,5 +50,7 @@ public class Member {
         this.nicknameUpdatedAt = nicknameUpdatedAt;
         this.birthDate = birthDate;
         this.leftAcornCount = leftAcornCount;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
     }
 }

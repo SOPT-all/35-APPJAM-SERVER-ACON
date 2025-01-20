@@ -4,9 +4,9 @@ import com.acon.server.global.exception.BusinessException;
 import com.acon.server.global.exception.ErrorType;
 import com.acon.server.global.external.GeoCodingResponse;
 import com.acon.server.global.external.NaverMapsAdapter;
-import com.acon.server.spot.api.response.MenuDetailResponse;
-import com.acon.server.spot.api.response.MenuListResponse;
+import com.acon.server.member.infra.repository.GuidedSpotRepository;
 import com.acon.server.spot.api.response.MenuResponse;
+import com.acon.server.spot.api.response.SpotDetailResponse;
 import com.acon.server.spot.application.mapper.SpotDtoMapper;
 import com.acon.server.spot.application.mapper.SpotMapper;
 import com.acon.server.spot.domain.entity.Spot;
@@ -21,6 +21,7 @@ import com.acon.server.spot.infra.repository.SpotRepository;
 import java.time.DayOfWeek;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,13 +33,14 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 public class SpotService {
 
-    private final SpotRepository spotRepository;
+    private final GuidedSpotRepository guidedSpotRepository;
     private final MenuRepository menuRepository;
-    private final SpotImageRepository spotImageRepository;
     private final OpeningHourRepository openingHourRepository;
+    private final SpotImageRepository spotImageRepository;
+    private final SpotRepository spotRepository;
 
-    private final SpotMapper spotMapper;
     private final SpotDtoMapper spotDtoMapper;
+    private final SpotMapper spotMapper;
 
     private final NaverMapsAdapter naverMapsAdapter;
 
@@ -79,7 +81,7 @@ public class SpotService {
     // TODO: 트랜잭션 범위 고민하기
     // 메서드 설명: spotId에 해당하는 Spot의 상세 정보를 조회한다. (메뉴, 이미지, 영업 여부 등)
     @Transactional
-    public MenuDetailResponse fetchSpotDetail(final Long spotId) {
+    public SpotDetailResponse fetchSpotDetail(final Long spotId) {
         SpotEntity spotEntity = spotRepository.findByIdOrThrow(spotId);
         Spot spot = spotMapper.toDomain(spotEntity);
 
@@ -93,7 +95,7 @@ public class SpotService {
             spotEntity = spotRepository.save(spotMapper.toEntity(spot));
         }
 
-        return spotDtoMapper.toMenuDetailResponse(spotEntity, imageList, isSpotOpen(spotId));
+        return spotDtoMapper.toSpotDetailResponse(spotEntity, imageList, isSpotOpen(spotId));
     }
 
     // 메서드 설명: spotId에 해당하는 Spot이 현재 영업 중인지 확인한다. (영업 시간에 속하는지)
@@ -140,14 +142,14 @@ public class SpotService {
     }
 
     @Transactional(readOnly = true)
-    public MenuListResponse fetchMenus(final Long spotId) {
+    public List<MenuResponse> fetchMenus(final Long spotId) {
         if (spotRepository.existsById(spotId)) {
             throw new BusinessException(ErrorType.NOT_FOUND_SPOT_ERROR);
         }
 
         List<MenuEntity> menuEntityList = menuRepository.findAllBySpotId(spotId);
 
-        List<MenuResponse> menuList = menuEntityList.stream()
+        return menuEntityList.stream()
                 .map(menu -> MenuResponse.builder()
                         .id(menu.getId())
                         .name(menu.getName())
@@ -155,7 +157,7 @@ public class SpotService {
                         .image(menu.getImage())
                         .build())
                 .toList();
+    }
 
-        return new MenuListResponse(menuList);
     }
 }

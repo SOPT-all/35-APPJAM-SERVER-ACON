@@ -17,13 +17,13 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(
-        name = "recent_viewed_spot",
+        name = "guided_spot",
         uniqueConstraints = @UniqueConstraint(
-                name = "unique_recent_viewed_spot_member_id_spot_id",
+                name = "unique_guided_spot_member_id_spot_id",
                 columnNames = {"member_id", "spot_id"}
         )
 )
-public class RecentViewedSpotEntity extends BaseTimeEntity {
+public class GuidedSpotEntity extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -36,7 +36,7 @@ public class RecentViewedSpotEntity extends BaseTimeEntity {
     private Long spotId;
 
     @Builder
-    public RecentViewedSpotEntity(
+    public GuidedSpotEntity(
             Long id,
             Long memberId,
             Long spotId

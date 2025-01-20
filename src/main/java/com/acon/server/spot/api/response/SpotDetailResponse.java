@@ -4,7 +4,7 @@ import com.acon.server.spot.domain.enums.SpotType;
 import java.util.List;
 import lombok.NonNull;
 
-public record MenuDetailResponse(
+public record SpotDetailResponse(
         @NonNull
         Long id,
         @NonNull
