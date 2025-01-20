@@ -6,6 +6,10 @@ import com.acon.server.global.external.GeoCodingResponse;
 import com.acon.server.global.external.NaverMapsAdapter;
 import com.acon.server.member.infra.repository.GuidedSpotRepository;
 import com.acon.server.spot.api.response.MenuResponse;
+import com.acon.server.spot.api.response.SearchSpotListResponse;
+import com.acon.server.spot.api.response.SearchSpotResponse;
+import com.acon.server.spot.infra.entity.MenuEntity;
+import com.acon.server.spot.infra.entity.SpotEntity;
 import com.acon.server.spot.api.response.SpotDetailResponse;
 import com.acon.server.spot.application.mapper.SpotDtoMapper;
 import com.acon.server.spot.application.mapper.SpotMapper;
@@ -159,5 +163,20 @@ public class SpotService {
                         .image(menu.getImage())
                         .build())
                 .toList();
+    }
+
+    public SearchSpotListResponse searchSpot(final String keyword) {
+        List<SpotEntity> spotEntityList = spotRepository.findTop10ByNameContainsIgnoreCase(keyword);
+        List<SearchSpotResponse> spotList = spotEntityList.stream()
+                .map(spotEntity -> SearchSpotResponse.builder()
+                        .spotId(spotEntity.getId())
+                        .name(spotEntity.getName())
+                        .address(spotEntity.getAddress())
+                        .spotType(spotEntity.getSpotType())
+                        .build())
+                .toList();
+        
+        return new SearchSpotListResponse(spotList);
+
     }
 }

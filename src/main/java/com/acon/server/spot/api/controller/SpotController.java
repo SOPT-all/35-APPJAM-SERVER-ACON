@@ -2,6 +2,7 @@ package com.acon.server.spot.api.controller;
 
 import com.acon.server.spot.api.response.MenuResponse;
 import com.acon.server.spot.api.response.MenuListResponse;
+import com.acon.server.spot.api.response.SearchSpotListResponse;
 import com.acon.server.spot.api.response.SpotDetailResponse;
 import com.acon.server.spot.application.service.SpotService;
 import jakarta.validation.constraints.Positive;
@@ -12,6 +13,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -38,6 +40,15 @@ public class SpotController {
     ) {
         return ResponseEntity.ok(
                 spotService.fetchMenus(spotId)
+        );
+    }
+
+    @GetMapping("/spots/search")
+    public ResponseEntity<SearchSpotListResponse> searchSpot(
+            @RequestParam(value = "keyword", required = false) final String keyword
+    ) {
+        return ResponseEntity.ok(
+                spotService.searchSpot(keyword)
         );
     }
 }
