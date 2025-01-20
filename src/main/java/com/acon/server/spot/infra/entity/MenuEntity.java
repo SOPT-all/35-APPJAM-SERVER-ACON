@@ -16,9 +16,11 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(
-        name = "menu", indexes = @Index(
-        name = "idx_spot_id", columnList = "spot_id"
-)
+        name = "menu",
+        indexes = @Index(
+                name = "idx_menu_spot_id",
+                columnList = "spot_id"
+        )
 )
 public class MenuEntity {
 

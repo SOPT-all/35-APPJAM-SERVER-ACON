@@ -7,7 +7,7 @@ CURRENT_BRANCH_NAME=$(git rev-parse --abbrev-ref HEAD)
 
 ISSUE_NUMBER=$(echo "$CURRENT_BRANCH_NAME" | grep -o '/#.*' | sed 's/\///')
 
-if [[ "$DEFAULT_COMMIT_MSG" =~ ^[Mm]erge ]]; then
+if [[ "$DEFAULT_COMMIT_MSG" =~ ^[Mm]erge || "$DEFAULT_COMMIT_MSG" =~ ^[Hh]otfix ]]; then
   SUFFIX=""
 else
   SUFFIX="($ISSUE_NUMBER)"

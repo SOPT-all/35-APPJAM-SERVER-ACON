@@ -20,8 +20,10 @@ import org.hibernate.type.SqlTypes;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(
-        name = "verified_area", indexes = @Index(
-                name = "idx_member_id", columnList = "member_id"
+        name = "verified_area",
+        indexes = @Index(
+                name = "idx_verified_area_member_id",
+                columnList = "member_id"
         )
 )
 public class VerifiedAreaEntity {

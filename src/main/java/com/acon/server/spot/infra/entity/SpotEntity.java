@@ -74,6 +74,7 @@ public class SpotEntity extends BaseTimeEntity {
         this.id = id;
         this.name = name;
         this.spotType = spotType;
+        // TODO: 영속성 엔티티에서 기본값을 설정하는 로직을 도메인 엔티티로 이동
         this.localAcornCount = localAcornCount != null ? localAcornCount : 0;
         this.localAcornUpdatedAt = localAcornUpdatedAt;
         this.basicAcornCount = basicAcornCount != null ? basicAcornCount : 0;
