@@ -16,8 +16,10 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(
-        name = "spot_option", uniqueConstraints = @UniqueConstraint(
-                name = "unique_spot_option_spot_id_option_id", columnNames = {"spot_id", "option_id"}
+        name = "spot_option",
+        uniqueConstraints = @UniqueConstraint(
+                name = "unique_spot_option_spot_id_option_id",
+                columnNames = {"spot_id", "option_id"}
         )
 )
 public class SpotOptionEntity {
