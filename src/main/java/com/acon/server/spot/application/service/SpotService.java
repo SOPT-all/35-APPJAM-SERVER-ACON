@@ -24,6 +24,7 @@ import java.time.LocalTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -39,7 +40,9 @@ public class SpotService {
 
     private final NaverMapsAdapter naverMapsAdapter;
 
-    public MenuDetailResponse fetchSpotDetail(Long spotId) {
+    // TODO: 트랜잭션 범위 고민하기
+    @Transactional
+    public MenuDetailResponse fetchSpotDetail(final Long spotId) {
         SpotEntity spotEntity = spotRepository.findByIdOrThrow(spotId);
         Spot spot = spotMapper.toDomain(spotEntity);
 
@@ -105,7 +108,7 @@ public class SpotService {
         return currentTime.isAfter(startTime) && currentTime.isBefore(endTime);
     }
 
-    public MenuListResponse fetchMenus(Long spotId) {
+    @Transactional(readOnly = true)
         if (spotRepository.existsById(spotId)) {
             throw new BusinessException(ErrorType.NOT_FOUND_SPOT_ERROR);
         }
