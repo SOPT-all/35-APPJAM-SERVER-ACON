@@ -133,8 +133,8 @@ public class MemberService {
             GuidedSpotEntity guidedSpotEntity = optionalGuidedSpotEntity.get();
             GuidedSpot guidedSpot = guidedSpotMapper.toDomain(guidedSpotEntity);
             guidedSpot.setUpdatedAt(LocalDateTime.now());
-            GuidedSpotEntity updatedRecentGuidedSpotEntity = guidedSpotMapper.toEntity(guidedSpot);
-            guidedSpotRepository.save(updatedRecentGuidedSpotEntity);
+            GuidedSpotEntity updateGuidedSpotEntity = guidedSpotMapper.toEntity(guidedSpot);
+            guidedSpotRepository.save(updateGuidedSpotEntity);
         } else {
             GuidedSpotEntity newGuidedSpotEntity = GuidedSpotEntity.builder()
                     .memberId(memberId)
