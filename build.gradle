@@ -50,6 +50,9 @@ dependencies {
 
     // FeignClient
     implementation "org.springframework.cloud:spring-cloud-starter-openfeign:4.2.0"
+
+    //PostGIS
+    implementation 'org.hibernate:hibernate-spatial:6.2.0.Final'
 }
 
 tasks.named('test') {
