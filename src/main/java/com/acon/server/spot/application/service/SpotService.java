@@ -37,6 +37,9 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 public class SpotService {
 
+    private final static int DISTANCE_RANGE = 250;
+
+    private final SpotRepository spotRepository;
     private final GuidedSpotRepository guidedSpotRepository;
     private final MenuRepository menuRepository;
     private final OpeningHourRepository openingHourRepository;
@@ -178,5 +181,15 @@ public class SpotService {
         
         return new SearchSpotListResponse(spotList);
 
+    }
+
+    @Transactional(readOnly = true)
+    public boolean verifySpot(Long spotId, Double memberLongitude, Double memberLatitude) {
+        SpotEntity spotEntity = spotRepository.findByIdOrElseThrow(spotId);
+        Double spotLongitude = spotEntity.getLongitude();
+        Double spotLatitude = spotEntity.getLatitude();
+        Double distance = spotRepository.calculateDistance(memberLongitude, memberLatitude, spotLongitude,
+                spotLatitude);
+        return distance < DISTANCE_RANGE;
     }
 }
