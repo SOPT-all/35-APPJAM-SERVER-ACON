@@ -7,8 +7,10 @@ import com.acon.server.global.external.NaverMapsClient;
 import com.acon.server.member.api.request.LoginRequest;
 import com.acon.server.member.api.response.AcornCountResponse;
 import com.acon.server.member.api.response.LoginResponse;
+import com.acon.server.member.application.mapper.GuidedSpotMapper;
 import com.acon.server.member.application.mapper.MemberMapper;
 import com.acon.server.member.application.mapper.PreferenceMapper;
+import com.acon.server.member.domain.entity.GuidedSpot;
 import com.acon.server.member.domain.entity.Member;
 import com.acon.server.member.domain.entity.Preference;
 import com.acon.server.member.domain.enums.Cuisine;
@@ -27,9 +29,11 @@ import com.acon.server.member.infra.repository.VerifiedAreaRepository;
 import com.acon.server.spot.domain.enums.SpotType;
 import com.acon.server.spot.infra.repository.SpotRepository;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -49,6 +53,7 @@ public class MemberService {
 
     private final MemberMapper memberMapper;
     private final PreferenceMapper preferenceMapper;
+    private final GuidedSpotMapper guidedSpotMapper;
 
     private final JwtUtils jwtUtils;
     private final GoogleSocialService googleSocialService;
@@ -121,11 +126,22 @@ public class MemberService {
             throw new BusinessException(ErrorType.NOT_FOUND_SPOT_ERROR);
         }
 
-        GuidedSpotEntity guidedSpotEntity = GuidedSpotEntity.builder()
-                .memberId(memberId)
-                .spotId(spotId)
-                .build();
-        guidedSpotRepository.save(guidedSpotEntity);
+        Optional<GuidedSpotEntity> optionalGuidedSpotEntity = guidedSpotRepository.findByMemberIdAndSpotId(
+                memberId, spotId);
+
+        if (optionalGuidedSpotEntity.isPresent()) {
+            GuidedSpotEntity guidedSpotEntity = optionalGuidedSpotEntity.get();
+            GuidedSpot guidedSpot = guidedSpotMapper.toDomain(guidedSpotEntity);
+            guidedSpot.setUpdatedAt(LocalDateTime.now());
+            GuidedSpotEntity updatedRecentGuidedSpotEntity = guidedSpotMapper.toEntity(guidedSpot);
+            guidedSpotRepository.save(updatedRecentGuidedSpotEntity);
+        } else {
+            GuidedSpotEntity newGuidedSpotEntity = GuidedSpotEntity.builder()
+                    .memberId(memberId)
+                    .spotId(spotId)
+                    .build();
+            guidedSpotRepository.save(newGuidedSpotEntity);
+        }
     }
 
     public String createMemberArea(final Double latitude, final Double longitude, final Long memberId) {
