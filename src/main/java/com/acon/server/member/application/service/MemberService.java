@@ -4,15 +4,6 @@ import com.acon.server.common.auth.jwt.JwtUtils;
 import com.acon.server.global.exception.BusinessException;
 import com.acon.server.global.exception.ErrorType;
 import com.acon.server.global.external.NaverMapsClient;
-import com.acon.server.member.infra.entity.RecentGuidedSpotEntity;
-import com.acon.server.member.infra.entity.VerifiedAreaEntity;
-import com.acon.server.member.infra.repository.RecentGuidedSpotRepository;
-import com.acon.server.member.infra.repository.VerifiedAreaRepository;
-import com.acon.server.spot.infra.repository.SpotRepository;
-import java.time.LocalDate;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
 import com.acon.server.member.api.request.LoginRequest;
 import com.acon.server.member.api.response.AcornCountResponse;
 import com.acon.server.member.api.response.LoginResponse;
@@ -25,19 +16,21 @@ import com.acon.server.member.domain.enums.DislikeFood;
 import com.acon.server.member.domain.enums.FavoriteSpot;
 import com.acon.server.member.domain.enums.SocialType;
 import com.acon.server.member.domain.enums.SpotStyle;
+import com.acon.server.member.infra.entity.GuidedSpotEntity;
 import com.acon.server.member.infra.entity.MemberEntity;
-import com.acon.server.member.infra.entity.RecentGuidedSpotEntity;
+import com.acon.server.member.infra.entity.VerifiedAreaEntity;
 import com.acon.server.member.infra.external.google.GoogleSocialService;
+import com.acon.server.member.infra.repository.GuidedSpotRepository;
 import com.acon.server.member.infra.repository.MemberRepository;
 import com.acon.server.member.infra.repository.PreferenceRepository;
-import com.acon.server.member.infra.repository.RecentGuidedSpotRepository;
+import com.acon.server.member.infra.repository.VerifiedAreaRepository;
 import com.acon.server.spot.domain.enums.SpotType;
-import com.acon.server.member.infra.entity.GuidedSpotEntity;
-import com.acon.server.member.infra.repository.GuidedSpotRepository;
 import com.acon.server.spot.infra.repository.SpotRepository;
+import java.time.LocalDate;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -45,21 +38,22 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class MemberService {
 
-    private final RecentGuidedSpotRepository recentGuidedSpotRepository;
-    private final SpotRepository spotRepository;
-    private final VerifiedAreaRepository verifiedAreaRepository;
+    // TODO: NaverAdapter로 옮기기
     private final NaverMapsClient naverMapsClient;
-    private final MemberRepository memberRepository;
+
     private final GuidedSpotRepository guidedSpotRepository;
-    private final SpotRepository spotRepository;
+    private final MemberRepository memberRepository;
     private final PreferenceRepository preferenceRepository;
-    private final RecentGuidedSpotRepository recentGuidedSpotRepository;
+    private final VerifiedAreaRepository verifiedAreaRepository;
+    private final SpotRepository spotRepository;
 
     private final MemberMapper memberMapper;
     private final PreferenceMapper preferenceMapper;
 
     private final JwtUtils jwtUtils;
     private final GoogleSocialService googleSocialService;
+
+    // TODO: 메서드 순서 정리, TRANSACTION 설정, mapper 사용
 
     public void createPreference(
             List<DislikeFood> dislikeFoodList,
@@ -135,9 +129,7 @@ public class MemberService {
     }
 
     public String createMemberArea(final Double latitude, final Double longitude, final Long memberId) {
-        Map<String, Object> response = naverMapsClient.getReverseGeocode(apiKeyId,
-                apiKey,
-                longitude + "," + latitude, "admcode", "json");
+        Map<String, Object> response = naverMapsClient.getReverseGeocode(longitude + "," + latitude, "admcode", "json");
         String adminDong = extractAreaName(response);
         verifiedAreaRepository.save(
                 VerifiedAreaEntity.builder()

@@ -3,7 +3,6 @@ package com.acon.server.global.external;
 import java.util.Map;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 
 @FeignClient(
@@ -17,10 +16,11 @@ public interface NaverMapsClient {
     Map<String, Object> getGeoCode(
             @RequestParam("query") String query
     );
-  
+
     @GetMapping(value = "/map-reversegeocode/v2/gc")
     Map<String, Object> getReverseGeocode(
             @RequestParam("coords") String coords,
             @RequestParam("orders") String orders,
             @RequestParam("output") String output
+    );
 }

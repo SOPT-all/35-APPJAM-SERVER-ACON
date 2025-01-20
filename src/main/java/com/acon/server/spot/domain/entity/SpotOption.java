@@ -13,7 +13,11 @@ public class SpotOption {
     private final Long optionId;
 
     @Builder
-    public SpotOption(Long id, Long spotId, Long optionId) {
+    public SpotOption(
+            Long id,
+            Long spotId,
+            Long optionId
+    ) {
         this.id = id;
         this.spotId = spotId;
         this.optionId = optionId;

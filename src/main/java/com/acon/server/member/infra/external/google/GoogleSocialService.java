@@ -11,9 +11,12 @@ import jakarta.annotation.PostConstruct;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.Collections;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.stereotype.Service;
 
+// TODO: 전체적으로 구조 점검
 @Service
+@EnableConfigurationProperties(GoogleConfig.class)
 public class GoogleSocialService {
 
     private final String CLIENT_ID;
@@ -24,7 +27,6 @@ public class GoogleSocialService {
 
     public GoogleSocialService(GoogleConfig googleConfig) {
         CLIENT_ID = googleConfig.getClientId();
-
     }
 
     @PostConstruct
@@ -37,6 +39,7 @@ public class GoogleSocialService {
     public String login(String unverifiedIdToken) {
         GoogleIdToken idToken = verifyIdToken(unverifiedIdToken);
         GoogleIdToken.Payload payload = idToken.getPayload();
+
         return payload.getSubject();
     }
 
@@ -46,10 +49,10 @@ public class GoogleSocialService {
             if (idToken == null) {
                 throw new BusinessException(ErrorType.INVALID_ID_TOKEN_ERROR);
             }
+
             return idToken;
         } catch (GeneralSecurityException | IOException error) {
             throw new BusinessException(ErrorType.FAILED_DOWNLOAD_GOOGLE_PUBLIC_KEY_ERROR);
         }
-
     }
 }
