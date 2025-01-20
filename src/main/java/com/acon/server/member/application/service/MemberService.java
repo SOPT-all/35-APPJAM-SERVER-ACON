@@ -22,6 +22,8 @@ import com.acon.server.member.infra.repository.MemberRepository;
 import com.acon.server.member.infra.repository.PreferenceRepository;
 import com.acon.server.member.infra.repository.RecentGuidedSpotRepository;
 import com.acon.server.spot.domain.enums.SpotType;
+import com.acon.server.member.infra.entity.GuidedSpotEntity;
+import com.acon.server.member.infra.repository.GuidedSpotRepository;
 import com.acon.server.spot.infra.repository.SpotRepository;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -33,6 +35,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class MemberService {
 
     private final MemberRepository memberRepository;
+    private final GuidedSpotRepository guidedSpotRepository;
     private final SpotRepository spotRepository;
     private final PreferenceRepository preferenceRepository;
     private final RecentGuidedSpotRepository recentGuidedSpotRepository;
@@ -103,15 +106,16 @@ public class MemberService {
         return member.getId();
     }
 
+    @Transactional
     public void createGuidedSpot(final Long spotId, final Long memberId) {
-        if (spotRepository.existsById(spotId)) {
+        if (!spotRepository.existsById(spotId)) {
             throw new BusinessException(ErrorType.NOT_FOUND_SPOT_ERROR);
         }
 
-        RecentGuidedSpotEntity recentGuidedSpotEntity = RecentGuidedSpotEntity.builder()
+        GuidedSpotEntity guidedSpotEntity = GuidedSpotEntity.builder()
                 .memberId(memberId)
                 .spotId(spotId)
                 .build();
-        recentGuidedSpotRepository.save(recentGuidedSpotEntity);
+        guidedSpotRepository.save(guidedSpotEntity);
     }
 }
