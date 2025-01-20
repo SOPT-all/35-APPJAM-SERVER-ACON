@@ -68,7 +68,7 @@ public class SpotService {
         );
     }
 
-    private boolean isSpotOpen(Long spotId) {
+    private boolean isSpotOpen(final Long spotId) {
         LocalDateTime now = LocalDateTime.now();
         DayOfWeek today = now.getDayOfWeek();
         DayOfWeek yesterday = today.minus(1);
@@ -90,25 +90,26 @@ public class SpotService {
                 .anyMatch(openingHour -> isBeforeMidnight(currentTime, openingHour));
     }
 
-    private boolean isAfterMidnight(LocalTime currentTime, OpeningHourEntity openingHour) {
+    private boolean isAfterMidnight(final LocalTime currentTime, final OpeningHourEntity openingHour) {
         LocalTime startTime = openingHour.getStartTime();
         LocalTime endTime = openingHour.getEndTime();
 
         return endTime.isBefore(startTime) && currentTime.isAfter(LocalTime.MIDNIGHT) && currentTime.isBefore(endTime);
     }
 
-    private boolean isBeforeMidnight(LocalTime currentTime, OpeningHourEntity openingHour) {
+    private boolean isBeforeMidnight(final LocalTime currentTime, final OpeningHourEntity openingHour) {
         LocalTime startTime = openingHour.getStartTime();
         LocalTime endTime = openingHour.getEndTime();
 
         if (endTime.isBefore(startTime)) {
             return currentTime.isAfter(startTime) && currentTime.isBefore(LocalTime.MIDNIGHT);
         }
-        
+
         return currentTime.isAfter(startTime) && currentTime.isBefore(endTime);
     }
 
     @Transactional(readOnly = true)
+    public MenuListResponse fetchMenus(final Long spotId) {
         if (spotRepository.existsById(spotId)) {
             throw new BusinessException(ErrorType.NOT_FOUND_SPOT_ERROR);
         }

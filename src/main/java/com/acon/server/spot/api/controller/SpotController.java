@@ -22,7 +22,7 @@ public class SpotController {
     @GetMapping("/spot/{spotId}")
     public ResponseEntity<MenuDetailResponse> getSpotDetail(
             @Positive(message = "spotId는 양수여야 합니다.")
-            @Validated @PathVariable(name = "spotId") Long spotId
+            @Validated @PathVariable(name = "spotId") final Long spotId
     ) {
         return ResponseEntity.ok(
                 spotService.fetchSpotDetail(spotId)
@@ -32,7 +32,7 @@ public class SpotController {
     @GetMapping("/spot/{spotId}/menus")
     public ResponseEntity<MenuListResponse> getMenus(
             @Positive(message = "spotId는 양수여야 합니다.")
-            @Validated @PathVariable(name = "spotId") Long spotId
+            @Validated @PathVariable(name = "spotId") final Long spotId
     ) {
         return ResponseEntity.ok(
                 spotService.fetchMenus(spotId)
