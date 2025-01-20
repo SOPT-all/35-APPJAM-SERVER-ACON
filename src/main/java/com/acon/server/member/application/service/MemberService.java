@@ -18,7 +18,7 @@ public class MemberService {
 
     @Transactional
     public void createGuidedSpot(final Long spotId, final Long memberId) {
-        if (spotRepository.existsById(spotId)) {
+        if (!spotRepository.existsById(spotId)) {
             throw new BusinessException(ErrorType.NOT_FOUND_SPOT_ERROR);
         }
 
