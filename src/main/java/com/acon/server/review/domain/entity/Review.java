@@ -1,5 +1,6 @@
 package com.acon.server.review.domain.entity;
 
+import java.time.LocalDateTime;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.ToString;
@@ -14,18 +15,25 @@ public class Review {
     private final int acornCount;
     private final boolean localAcorn;
 
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
+
     @Builder
     public Review(
             Long id,
             Long spotId,
             Long memberId,
             int acornCount,
-            boolean localAcorn
+            boolean localAcorn,
+            LocalDateTime createdAt,
+            LocalDateTime updatedAt
     ) {
         this.id = id;
         this.spotId = spotId;
         this.memberId = memberId;
         this.acornCount = acornCount;
         this.localAcorn = localAcorn;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
     }
 }

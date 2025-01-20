@@ -12,10 +12,8 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public enum SpotStyle {
 
-    SENSE,
-    NEW_FOOD,
-    REASONABLE,
-    LUXURY,
+    TRADITIONAL,
+    MODERN,
     ;
 
     private static final Map<String, SpotStyle> SPOT_STYLE_MAP = new HashMap<>();

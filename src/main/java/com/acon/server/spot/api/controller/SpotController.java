@@ -1,9 +1,13 @@
 package com.acon.server.spot.api.controller;
 
+import com.acon.server.spot.api.response.MenuResponse;
 import com.acon.server.spot.api.response.MenuListResponse;
 import com.acon.server.spot.api.response.VerifiedSpotResponse;
+import com.acon.server.spot.api.response.SearchSpotListResponse;
+import com.acon.server.spot.api.response.SpotDetailResponse;
 import com.acon.server.spot.application.service.SpotService;
 import jakarta.validation.constraints.Positive;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -20,10 +24,20 @@ public class SpotController {
 
     private final SpotService spotService;
 
-    @GetMapping("/spot/{spotId}/menus")
-    public ResponseEntity<MenuListResponse> getMenus(
+    @GetMapping("/spot/{spotId}")
+    public ResponseEntity<SpotDetailResponse> getSpotDetail(
             @Positive(message = "spotId는 양수여야 합니다.")
-            @Validated @PathVariable(name = "spotId") Long spotId
+            @Validated @PathVariable(name = "spotId") final Long spotId
+    ) {
+        return ResponseEntity.ok(
+                spotService.fetchSpotDetail(spotId)
+        );
+    }
+
+    @GetMapping("/spot/{spotId}/menus")
+    public ResponseEntity<List<MenuResponse>> getMenus(
+            @Positive(message = "spotId는 양수여야 합니다.")
+            @Validated @PathVariable(name = "spotId") final Long spotId
     ) {
         return ResponseEntity.ok(
                 spotService.fetchMenus(spotId)
@@ -39,6 +53,15 @@ public class SpotController {
     ) {
         return ResponseEntity.ok(
                 new VerifiedSpotResponse(spotService.verifySpot(spotId, longitude, latitude))
+        );
+    }
+  
+    @GetMapping("/spots/search")
+    public ResponseEntity<SearchSpotListResponse> searchSpot(
+            @RequestParam(value = "keyword", required = false) final String keyword
+    ) {
+        return ResponseEntity.ok(
+                spotService.searchSpot(keyword)
         );
     }
 }
