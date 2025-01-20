@@ -49,12 +49,16 @@ public class MemberService {
                 longitude + "," + latitude, "admcode", "json");
         String adminDong = extractAreaName(response);
         verifiedAreaRepository.save(
-                VerifiedAreaEntity.builder().name(adminDong).memberId(memberId)
-                        .verifiedDate(Collections.singletonList(LocalDate.now())).build()
+                VerifiedAreaEntity.builder()
+                        .name(adminDong)
+                        .memberId(memberId)
+                        .verifiedDate(Collections.singletonList(LocalDate.now()))
+                        .build()
         );
         return adminDong;
     }
 
+    // TODO: NaverAdapter로 옮기기
     private String extractAreaName(Map<String, Object> response) {
         try {
             List<Map<String, Object>> results = (List<Map<String, Object>>) response.get("results");
