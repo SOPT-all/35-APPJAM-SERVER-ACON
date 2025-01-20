@@ -141,12 +141,13 @@ public class SpotService {
 
     @Transactional(readOnly = true)
     public MenuListResponse fetchMenus(final Long spotId) {
-        if (spotRepository.existsById(spotId)) {
+        if (!spotRepository.existsById(spotId)) {
             throw new BusinessException(ErrorType.NOT_FOUND_SPOT_ERROR);
         }
 
         List<MenuEntity> menuEntityList = menuRepository.findAllBySpotId(spotId);
 
+        // TODO: mapper로 변경
         List<MenuResponse> menuList = menuEntityList.stream()
                 .map(menu -> MenuResponse.builder()
                         .id(menu.getId())
