@@ -4,12 +4,9 @@ import com.acon.server.global.exception.BusinessException;
 import com.acon.server.global.exception.ErrorType;
 import com.acon.server.global.external.GeoCodingResponse;
 import com.acon.server.global.external.NaverMapsAdapter;
-import com.acon.server.member.infra.repository.GuidedSpotRepository;
 import com.acon.server.spot.api.response.MenuResponse;
 import com.acon.server.spot.api.response.SearchSpotListResponse;
 import com.acon.server.spot.api.response.SearchSpotResponse;
-import com.acon.server.spot.infra.entity.MenuEntity;
-import com.acon.server.spot.infra.entity.SpotEntity;
 import com.acon.server.spot.api.response.SpotDetailResponse;
 import com.acon.server.spot.application.mapper.SpotDtoMapper;
 import com.acon.server.spot.application.mapper.SpotMapper;
@@ -25,7 +22,6 @@ import com.acon.server.spot.infra.repository.SpotRepository;
 import java.time.DayOfWeek;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -40,11 +36,9 @@ public class SpotService {
     private final static int DISTANCE_RANGE = 250;
 
     private final SpotRepository spotRepository;
-    private final GuidedSpotRepository guidedSpotRepository;
     private final MenuRepository menuRepository;
     private final OpeningHourRepository openingHourRepository;
     private final SpotImageRepository spotImageRepository;
-    private final SpotRepository spotRepository;
 
     private final SpotDtoMapper spotDtoMapper;
     private final SpotMapper spotMapper;
@@ -102,7 +96,6 @@ public class SpotService {
             spotEntity = spotRepository.save(spotMapper.toEntity(spot));
         }
 
-    public MenuListResponse fetchMenus(Long spotId) {
         return spotDtoMapper.toSpotDetailResponse(spotEntity, imageList, isSpotOpen(spotId));
     }
 
@@ -178,18 +171,18 @@ public class SpotService {
                         .spotType(spotEntity.getSpotType())
                         .build())
                 .toList();
-        
-        return new SearchSpotListResponse(spotList);
 
+        return new SearchSpotListResponse(spotList);
     }
 
     @Transactional(readOnly = true)
     public boolean verifySpot(Long spotId, Double memberLongitude, Double memberLatitude) {
-        SpotEntity spotEntity = spotRepository.findByIdOrElseThrow(spotId);
+        SpotEntity spotEntity = spotRepository.findByIdOrThrow(spotId);
         Double spotLongitude = spotEntity.getLongitude();
         Double spotLatitude = spotEntity.getLatitude();
         Double distance = spotRepository.calculateDistance(memberLongitude, memberLatitude, spotLongitude,
                 spotLatitude);
+
         return distance < DISTANCE_RANGE;
     }
 }

@@ -7,9 +7,11 @@ import io.jsonwebtoken.security.Keys;
 import java.util.Date;
 import java.util.List;
 import javax.crypto.SecretKey;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.stereotype.Component;
 
 @Component
+@EnableConfigurationProperties(JwtConfig.class)
 public class JwtUtils {
 
     private final SecretKey secretKey;

@@ -1,10 +1,9 @@
 package com.acon.server.spot.api.controller;
 
 import com.acon.server.spot.api.response.MenuResponse;
-import com.acon.server.spot.api.response.MenuListResponse;
-import com.acon.server.spot.api.response.VerifiedSpotResponse;
 import com.acon.server.spot.api.response.SearchSpotListResponse;
 import com.acon.server.spot.api.response.SpotDetailResponse;
+import com.acon.server.spot.api.response.VerifiedSpotResponse;
 import com.acon.server.spot.application.service.SpotService;
 import jakarta.validation.constraints.Positive;
 import java.util.List;
@@ -44,6 +43,17 @@ public class SpotController {
         );
     }
 
+    // TODO: 메서드 네이밍 수정 필요
+    @GetMapping("/spots/search")
+    public ResponseEntity<SearchSpotListResponse> searchSpot(
+            @RequestParam(value = "keyword", required = false) final String keyword
+    ) {
+        return ResponseEntity.ok(
+                spotService.searchSpot(keyword)
+        );
+    }
+
+    // TODO: 메서드 네이밍 수정 필요
     @GetMapping("/spot/verify")
     public ResponseEntity<VerifiedSpotResponse> verifySpot(
             @Positive(message = "spotId는 양수여야 합니다.")
@@ -53,15 +63,6 @@ public class SpotController {
     ) {
         return ResponseEntity.ok(
                 new VerifiedSpotResponse(spotService.verifySpot(spotId, longitude, latitude))
-        );
-    }
-  
-    @GetMapping("/spots/search")
-    public ResponseEntity<SearchSpotListResponse> searchSpot(
-            @RequestParam(value = "keyword", required = false) final String keyword
-    ) {
-        return ResponseEntity.ok(
-                spotService.searchSpot(keyword)
         );
     }
 }

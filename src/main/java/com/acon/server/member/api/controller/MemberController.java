@@ -1,12 +1,12 @@
 package com.acon.server.member.api.controller;
 
 import com.acon.server.member.api.request.GuidedSpotRequest;
-import com.acon.server.member.api.request.MemberAreaRequest;
-import com.acon.server.member.api.response.MemberAreaResponse;
 import com.acon.server.member.api.request.LoginRequest;
+import com.acon.server.member.api.request.MemberAreaRequest;
 import com.acon.server.member.api.request.PreferenceRequest;
 import com.acon.server.member.api.response.AcornCountResponse;
 import com.acon.server.member.api.response.LoginResponse;
+import com.acon.server.member.api.response.MemberAreaResponse;
 import com.acon.server.member.application.service.MemberService;
 import com.acon.server.member.domain.enums.Cuisine;
 import com.acon.server.member.domain.enums.DislikeFood;
@@ -31,6 +31,15 @@ public class MemberController {
 
     private final MemberService memberService;
 
+    @PostMapping(path = "/auth/login", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<LoginResponse> login(
+            @Valid @RequestBody final LoginRequest request
+    ) {
+        return ResponseEntity.ok(
+                memberService.login(request)
+        );
+    }
+
     @PostMapping(path = "/member/preference", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Void> postPreference(
             @Valid @RequestBody final PreferenceRequest request
@@ -48,24 +57,17 @@ public class MemberController {
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping(path = "/auth/login", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<LoginResponse> login(
-            @Valid @RequestBody final LoginRequest request
+    @PostMapping(path = "/member/area", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<MemberAreaResponse> postArea(
+            @Valid @RequestBody final MemberAreaRequest request
     ) {
-        return ResponseEntity.ok(
-                memberService.login(request)
-        );
+        // TODO: 토큰 검증 이후 MemberID 추출 필요
+        String area = memberService.createMemberArea(request.latitude(), request.longitude(), 1L);
+
+        return ResponseEntity.ok(new MemberAreaResponse(area));
     }
 
-    @GetMapping("/member/acorn")
-    public ResponseEntity<AcornCountResponse> getAcornCount() {
-        // TODO: 토큰으로 memberId 가져오기
-        return ResponseEntity.ok(
-                memberService.fetchAcornCount(1L)
-        );
-    }
-
-    @PostMapping("/member/guided-spot")
+    @PostMapping(path = "/member/guided-spot", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Void> postGuidedSpot(
             @Valid @RequestBody final GuidedSpotRequest request
     ) {
@@ -75,13 +77,11 @@ public class MemberController {
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping("/member/area")
-    public ResponseEntity<MemberAreaResponse> postArea(
-            @Valid @RequestBody final MemberAreaRequest request
-    ) {
-        // TODO: 토큰 검증 이후 MemberID 추출 필요
-        String area = memberService.createMemberArea(request.latitude(), request.longitude(), 1L);
-
-        return ResponseEntity.ok(new MemberAreaResponse(area));
+    @GetMapping(path = "/member/acorn", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<AcornCountResponse> getAcornCount() {
+        // TODO: 토큰으로 memberId 가져오기
+        return ResponseEntity.ok(
+                memberService.fetchAcornCount(1L)
+        );
     }
 }

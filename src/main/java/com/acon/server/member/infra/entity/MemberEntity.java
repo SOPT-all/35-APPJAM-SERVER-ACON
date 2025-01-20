@@ -76,6 +76,7 @@ public class MemberEntity extends BaseTimeEntity {
         this.nickname = nickname;
         this.nicknameUpdatedAt = nicknameUpdatedAt;
         this.birthDate = birthDate;
+        // TODO: 도메인 로직으로 이동
         this.leftAcornCount = leftAcornCount != null ? leftAcornCount : 5;
     }
 }

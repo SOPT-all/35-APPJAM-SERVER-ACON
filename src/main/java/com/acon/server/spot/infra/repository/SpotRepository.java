@@ -12,27 +12,25 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface SpotRepository extends JpaRepository<SpotEntity, Long> {
 
-    default SpotEntity findByIdOrElseThrow(Long id) {
-        return findById(id)
-                .orElseThrow(() -> new BusinessException(ErrorType.NOT_FOUND_SPOT_ERROR));
-    }
-
-    // TODO: 함수 위치에 대한 고민 필요
-    @Query(value = "SELECT ST_DistanceSphere(" +
-            "ST_SetSRID(ST_MakePoint(:lon1, :lat1), 4326), " +
-            "ST_SetSRID(ST_MakePoint(:lon2, :lat2), 4326))",
-            nativeQuery = true)
-    Double calculateDistance(@Param("lon1") Double lon1,
-                             @Param("lat1") Double lat1,
-                             @Param("lon2") Double lon2,
-                             @Param("lat2") Double lat2);
     List<SpotEntity> findTop10ByNameContainsIgnoreCase(String keyword);
-  
+
+    List<SpotEntity> findAllByLatitudeIsNullOrLongitudeIsNull();
+
     default SpotEntity findByIdOrThrow(Long id) {
         return findById(id).orElseThrow(
                 () -> new BusinessException(ErrorType.NOT_FOUND_SPOT_ERROR)
         );
     }
-
-    List<SpotEntity> findAllByLatitudeIsNullOrLongitudeIsNull();
+    
+    // TODO: 함수 위치에 대한 고민 필요
+    @Query(value = """
+            SELECT ST_DistanceSphere(
+                ST_SetSRID(ST_MakePoint(:lon1, :lat1), 4326),
+                ST_SetSRID(ST_MakePoint(:lon2, :lat2), 4326)
+            )
+            """, nativeQuery = true)
+    Double calculateDistance(@Param("lon1") Double lon1,
+                             @Param("lat1") Double lat1,
+                             @Param("lon2") Double lon2,
+                             @Param("lat2") Double lat2);
 }
