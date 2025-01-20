@@ -48,7 +48,7 @@ dependencies {
     implementation 'org.mapstruct:mapstruct:1.6.3'
     annotationProcessor 'org.mapstruct:mapstruct-processor:1.6.3'
     testAnnotationProcessor 'org.mapstruct:mapstruct-processor:1.6.3'
-
+    
     // TODO: 버전 확인하기
     // Google
     implementation 'com.google.api-client:google-api-client:2.7.0'
