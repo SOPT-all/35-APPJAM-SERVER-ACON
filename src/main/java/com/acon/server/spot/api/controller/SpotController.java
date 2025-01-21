@@ -1,12 +1,11 @@
 package com.acon.server.spot.api.controller;
 
-import com.acon.server.spot.api.response.MenuResponse;
+import com.acon.server.spot.api.response.MenuListResponse;
 import com.acon.server.spot.api.response.SearchSpotListResponse;
 import com.acon.server.spot.api.response.SpotDetailResponse;
 import com.acon.server.spot.api.response.VerifiedSpotResponse;
 import com.acon.server.spot.application.service.SpotService;
 import jakarta.validation.constraints.Positive;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -34,7 +33,7 @@ public class SpotController {
     }
 
     @GetMapping("/spot/{spotId}/menus")
-    public ResponseEntity<List<MenuResponse>> getMenus(
+    public ResponseEntity<MenuListResponse> getMenus(
             @Positive(message = "spotId는 양수여야 합니다.")
             @Validated @PathVariable(name = "spotId") final Long spotId
     ) {

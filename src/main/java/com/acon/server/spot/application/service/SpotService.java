@@ -4,6 +4,7 @@ import com.acon.server.global.exception.BusinessException;
 import com.acon.server.global.exception.ErrorType;
 import com.acon.server.global.external.GeoCodingResponse;
 import com.acon.server.global.external.NaverMapsAdapter;
+import com.acon.server.spot.api.response.MenuListResponse;
 import com.acon.server.spot.api.response.MenuResponse;
 import com.acon.server.spot.api.response.SearchSpotListResponse;
 import com.acon.server.spot.api.response.SearchSpotResponse;
@@ -143,7 +144,7 @@ public class SpotService {
     }
 
     @Transactional(readOnly = true)
-    public List<MenuResponse> fetchMenus(final Long spotId) {
+    public MenuListResponse fetchMenus(final Long spotId) {
         if (!spotRepository.existsById(spotId)) {
             throw new BusinessException(ErrorType.NOT_FOUND_SPOT_ERROR);
         }
@@ -151,7 +152,7 @@ public class SpotService {
         List<MenuEntity> menuEntityList = menuRepository.findAllBySpotId(spotId);
 
         // TODO: mapper로 변경
-        return menuEntityList.stream()
+        List<MenuResponse> menuResponseList = menuEntityList.stream()
                 .map(menu -> MenuResponse.builder()
                         .id(menu.getId())
                         .name(menu.getName())
@@ -159,6 +160,8 @@ public class SpotService {
                         .image(menu.getImage())
                         .build())
                 .toList();
+
+        return new MenuListResponse(menuResponseList);
     }
 
     public SearchSpotListResponse searchSpot(final String keyword) {
