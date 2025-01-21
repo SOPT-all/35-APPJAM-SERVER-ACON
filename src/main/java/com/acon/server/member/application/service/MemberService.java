@@ -3,7 +3,7 @@ package com.acon.server.member.application.service;
 import com.acon.server.common.auth.jwt.JwtUtils;
 import com.acon.server.global.exception.BusinessException;
 import com.acon.server.global.exception.ErrorType;
-import com.acon.server.global.external.NaverMapsClient;
+import com.acon.server.global.external.NaverMapsAdapter;
 import com.acon.server.member.api.request.LoginRequest;
 import com.acon.server.member.api.response.AcornCountResponse;
 import com.acon.server.member.api.response.LoginResponse;
@@ -32,7 +32,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -41,9 +40,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 public class MemberService {
-
-    // TODO: NaverAdapter로 옮기기
-    private final NaverMapsClient naverMapsClient;
 
     private final GuidedSpotRepository guidedSpotRepository;
     private final MemberRepository memberRepository;
@@ -57,6 +53,8 @@ public class MemberService {
 
     private final JwtUtils jwtUtils;
     private final GoogleSocialService googleSocialService;
+
+    private final NaverMapsAdapter naverMapsAdapter;
 
     // TODO: 메서드 순서 정리, TRANSACTION 설정, mapper 사용
 
@@ -145,8 +143,8 @@ public class MemberService {
     }
 
     public String createMemberArea(final Double latitude, final Double longitude, final Long memberId) {
-        Map<String, Object> response = naverMapsClient.getReverseGeocode(longitude + "," + latitude, "admcode", "json");
-        String adminDong = extractAreaName(response);
+        String adminDong = naverMapsAdapter.getReverseGeoCodingResult(latitude, longitude);
+        
         verifiedAreaRepository.save(
                 VerifiedAreaEntity.builder()
                         .name(adminDong)
@@ -154,26 +152,8 @@ public class MemberService {
                         .verifiedDate(Collections.singletonList(LocalDate.now()))
                         .build()
         );
-        return adminDong;
-    }
 
-    // TODO: NaverAdapter로 옮기기
-    private String extractAreaName(Map<String, Object> response) {
-        try {
-            List<Map<String, Object>> results = (List<Map<String, Object>>) response.get("results");
-            if (results != null && !results.isEmpty()) {
-                Map<String, Object> region = (Map<String, Object>) results.get(0).get("region");
-                if (region != null) {
-                    Map<String, Object> area3 = (Map<String, Object>) region.get("area3");
-                    if (area3 != null) {
-                        return (String) area3.get("name");
-                    }
-                }
-            }
-        } catch (Exception e) {
-            throw new BusinessException(ErrorType.INTERNAL_SERVER_ERROR);
-        }
-        throw new BusinessException(ErrorType.INTERNAL_SERVER_ERROR);
+        return adminDong;
     }
 
     // TODO: 최근 길 안내 장소 지우는 스케줄러 추가
