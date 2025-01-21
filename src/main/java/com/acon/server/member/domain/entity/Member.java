@@ -53,4 +53,11 @@ public class Member {
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
+
+    // TODO: 에러 처리
+    public void useAcorn(int acornCount) {
+        if (leftAcornCount >= acornCount) {
+            this.leftAcornCount -= acornCount;
+        }
+    }
 }
