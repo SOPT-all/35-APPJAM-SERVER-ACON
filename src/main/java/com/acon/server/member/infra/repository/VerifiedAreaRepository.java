@@ -5,4 +5,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface VerifiedAreaRepository extends JpaRepository<VerifiedAreaEntity, Long> {
 
+    boolean existsByMemberIdAndName(Long memberId, String name);
 }
