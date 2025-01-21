@@ -126,22 +126,23 @@ public class MemberService {
             throw new BusinessException(ErrorType.NOT_FOUND_SPOT_ERROR);
         }
 
-        Optional<GuidedSpotEntity> optionalGuidedSpotEntity = guidedSpotRepository.findByMemberIdAndSpotId(
-                memberId, spotId);
+        Optional<GuidedSpotEntity> optionalGuidedSpotEntity = guidedSpotRepository.findByMemberIdAndSpotId(memberId,
+                spotId);
 
-        if (optionalGuidedSpotEntity.isPresent()) {
-            GuidedSpotEntity guidedSpotEntity = optionalGuidedSpotEntity.get();
-            GuidedSpot guidedSpot = guidedSpotMapper.toDomain(guidedSpotEntity);
-            guidedSpot.setUpdatedAt(LocalDateTime.now());
-            GuidedSpotEntity updateGuidedSpotEntity = guidedSpotMapper.toEntity(guidedSpot);
-            guidedSpotRepository.save(updateGuidedSpotEntity);
-        } else {
-            GuidedSpotEntity newGuidedSpotEntity = GuidedSpotEntity.builder()
-                    .memberId(memberId)
-                    .spotId(spotId)
-                    .build();
-            guidedSpotRepository.save(newGuidedSpotEntity);
-        }
+        optionalGuidedSpotEntity.ifPresentOrElse(
+                guidedSpotEntity -> {
+                    GuidedSpot guidedSpot = guidedSpotMapper.toDomain(guidedSpotEntity);
+                    guidedSpot.setUpdatedAt(LocalDateTime.now());
+                    guidedSpotRepository.save(guidedSpotMapper.toEntity(guidedSpot));
+                },
+                () -> guidedSpotRepository.save(
+                        GuidedSpotEntity.builder()
+                                .memberId(memberId)
+                                .spotId(spotId)
+                                .build()
+                )
+        );
+
     }
 
     public String createMemberArea(final Double latitude, final Double longitude, final Long memberId) {
