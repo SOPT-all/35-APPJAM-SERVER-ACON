@@ -10,6 +10,7 @@ import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -25,7 +26,7 @@ public class SpotController {
 
     private final SpotService spotService;
 
-    @GetMapping("/spot/{spotId}")
+    @GetMapping(path = "/spot/{spotId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<SpotDetailResponse> getSpotDetail(
             @Positive(message = "spotId는 양수여야 합니다.")
             @Validated @PathVariable(name = "spotId") final Long spotId
@@ -35,7 +36,7 @@ public class SpotController {
         );
     }
 
-    @GetMapping("/spot/{spotId}/menus")
+    @GetMapping(path = "/spot/{spotId}/menus", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<MenuListResponse> getMenus(
             @Positive(message = "spotId는 양수여야 합니다.")
             @Validated @PathVariable(name = "spotId") final Long spotId
@@ -45,7 +46,7 @@ public class SpotController {
         );
     }
 
-    @GetMapping("/search-suggestions")
+    @GetMapping(path = "/search-suggestions", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<SearchSuggestionListResponse> getSearchSuggestions(
             @DecimalMin(value = "33.1", message = "위도는 최소 33.1°N 이상이어야 합니다.(대한민국 기준)")
             @DecimalMax(value = "38.6", message = "위도는 최대 38.6°N 이하이어야 합니다.(대한민국 기준)")
@@ -60,7 +61,7 @@ public class SpotController {
     }
 
     // TODO: 메서드 네이밍 수정 필요
-    @GetMapping("/spots/search")
+    @GetMapping(path = "/spots/search", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<SearchSpotListResponse> searchSpot(
             @RequestParam(value = "keyword", required = false) final String keyword
     ) {
@@ -70,12 +71,12 @@ public class SpotController {
     }
 
     // TODO: 메서드 네이밍 수정 필요
-    @GetMapping("/spot/verify")
+    @GetMapping(path = "/spot/verify", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<VerifiedSpotResponse> verifySpot(
             @Positive(message = "spotId는 양수여야 합니다.")
-            @Validated @RequestParam(name = "spotId") Long spotId,
-            @Validated @RequestParam(name = "longitude") Double longitude,
-            @Validated @RequestParam(name = "latitude") Double latitude
+            @Validated @RequestParam(name = "spotId") final Long spotId,
+            @Validated @RequestParam(name = "longitude") final Double longitude,
+            @Validated @RequestParam(name = "latitude") final Double latitude
     ) {
         return ResponseEntity.ok(
                 new VerifiedSpotResponse(spotService.verifySpot(spotId, longitude, latitude))

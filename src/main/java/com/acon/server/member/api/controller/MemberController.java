@@ -31,7 +31,11 @@ public class MemberController {
 
     private final MemberService memberService;
 
-    @PostMapping(path = "/auth/login", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(
+            path = "/auth/login",
+            consumes = MediaType.APPLICATION_JSON_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
     public ResponseEntity<LoginResponse> login(
             @Valid @RequestBody final LoginRequest request
     ) {
@@ -40,7 +44,20 @@ public class MemberController {
         );
     }
 
-    @PostMapping(path = "/member/preference", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(path = "/member/area",
+            consumes = MediaType.APPLICATION_JSON_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    public ResponseEntity<MemberAreaResponse> postArea(
+            @Valid @RequestBody final MemberAreaRequest request
+    ) {
+        // TODO: 토큰 검증 이후 MemberID 추출 필요
+        String area = memberService.createMemberArea(request.latitude(), request.longitude(), 1L);
+
+        return ResponseEntity.ok(new MemberAreaResponse(area));
+    }
+
+    @PostMapping(path = "/member/preference", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Void> postPreference(
             @Valid @RequestBody final PreferenceRequest request
     ) {
@@ -57,18 +74,8 @@ public class MemberController {
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping(path = "/member/area", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<MemberAreaResponse> postArea(
-            @Valid @RequestBody final MemberAreaRequest request
-    ) {
-        // TODO: 토큰 검증 이후 MemberID 추출 필요
-        String area = memberService.createMemberArea(request.latitude(), request.longitude(), 1L);
-
-        return ResponseEntity.ok(new MemberAreaResponse(area));
-    }
-
     // TODO: Member 도메인에 있어야 할까? 고민 필요
-    @PostMapping(path = "/member/guided-spot", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(path = "/member/guided-spot", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Void> postGuidedSpot(
             @Valid @RequestBody final GuidedSpotRequest request
     ) {

@@ -40,6 +40,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 public class SpotService {
 
+    // TODO: 매직 넘버 yml로 옮기기, 250m로 바꾸고 변수명 수정
     private static final int WALKING_RADIUS_30_MIN = 2000;
     private static final int SUGGESTION_LIMIT = 5;
     private static final int VERIFICATION_DISTANCE = 250;
@@ -55,17 +56,17 @@ public class SpotService {
 
     private final NaverMapsAdapter naverMapsAdapter;
 
-    // 메서드 설명: 위도, 경도 정보가 없는 Spot들의 좌표를 업데이트한다.
+    // 메서드 설명: 위치 정보가 없는 Spot들의 위치 정보를 업데이트한다.
     @Transactional
     public void updateNullCoordinatesForSpots() {
-        List<SpotEntity> spotEntityList = spotRepository.findAllByLatitudeIsNullOrLongitudeIsNullOrGeomIsNull();
+        List<SpotEntity> spotEntityList = spotRepository.findAllByLatitudeIsNullOrLongitudeIsNullOrGeomIsNullOrAdminDongIsNull();
 
         if (spotEntityList.isEmpty()) {
-            log.info("위도 또는 경도 정보가 비어 있는 Spot 데이터가 없습니다.");
+            log.info("위치 정보가 비어 있는 Spot 데이터가 없습니다.");
             return;
         }
 
-        log.info("위도 또는 경도 정보가 비어 있는 Spot 데이터를 {}건 찾았습니다.", spotEntityList.size());
+        log.info("위치 정보가 비어 있는 Spot 데이터를 {}건 찾았습니다.", spotEntityList.size());
 
         List<SpotEntity> updatedEntityList = spotEntityList.stream()
                 .map(spotEntity -> {
@@ -76,10 +77,11 @@ public class SpotService {
                 .toList();
         spotRepository.saveAll(updatedEntityList);
 
-        log.info("위도 또는 경도 정보가 비어 있는 Spot 데이터 {}건을 업데이트 했습니다.", updatedEntityList.size());
+        log.info("위치 정보가 비어 있는 Spot 데이터 {}건을 업데이트 했습니다.", updatedEntityList.size());
     }
 
-    // 메서드 설명: spotId에 해당하는 Spot의 좌표를 업데이트한다. (주소 -> 좌표)
+    // TODO: 로직 정리
+    // 메서드 설명: 도로명 주소를 바탕으로 spotId에 해당하는 Spot의 위치 정보를 업데이트한다.
     private void updateSpotCoordinate(final Spot spot) {
         GeoCodingResponse geoCodingResponse = naverMapsAdapter.getGeoCodingResult(spot.getAddress());
 
@@ -87,7 +89,10 @@ public class SpotService {
                 Double.parseDouble(geoCodingResponse.latitude()),
                 Double.parseDouble(geoCodingResponse.longitude())
         );
-        spot.updateLocation();
+        spot.updateGeom();
+        spot.updateAdminDong(
+                naverMapsAdapter.getReverseGeoCodingResult(spot.getLatitude(), spot.getLongitude())
+        );
     }
 
     // TODO: 장소 추천 시 메뉴 가격 변동이면 메인 메뉴 X 처리
@@ -96,7 +101,7 @@ public class SpotService {
     // 메서드 설명: spotId에 해당하는 Spot의 상세 정보를 조회한다. (메뉴, 이미지, 영업 여부 등)
     @Transactional
     public SpotDetailResponse fetchSpotDetail(final Long spotId) {
-        SpotEntity spotEntity = spotRepository.findByIdOrThrow(spotId);
+        SpotEntity spotEntity = spotRepository.findByIdOrElseThrow(spotId);
         Spot spot = spotMapper.toDomain(spotEntity);
 
         List<SpotImageEntity> spotImageEntityList = spotImageRepository.findAllBySpotId(spotId);
@@ -180,6 +185,7 @@ public class SpotService {
     public SearchSuggestionListResponse fetchSearchSuggestions(final Double latitude, final Double longitude) {
         // TODO: 토큰 검증 이후 MemberID 추출 로직 필요
         List<SearchSuggestionResponse> recentSpotSuggestion =
+                // TODO: 250m 범위 내의 TOP5로 수정
                 guidedSpotRepository.findTopByMemberIdOrderByUpdatedAtDesc(1L)
                         .flatMap(recentGuidedSpot -> spotRepository.findById(recentGuidedSpot.getSpotId()))
                         .map(spotDtoMapper::toSearchSuggestionResponse)

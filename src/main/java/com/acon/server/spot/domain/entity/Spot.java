@@ -64,15 +64,45 @@ public class Spot {
         this.updatedAt = updatedAt;
     }
 
+    public void addAcorn(int acornCount, boolean isLocal) {
+        if (isLocal) {
+            addLocalAcorn(acornCount);
+        } else {
+            addBasicAcorn(acornCount);
+        }
+    }
+
+    private void addLocalAcorn(int acornCount) {
+        this.localAcornCount += acornCount;
+
+        if (acornCount >= 4) { // TODO: 매직 넘버 yml로 관리
+            this.localAcornUpdatedAt = LocalDateTime.now();
+        }
+    }
+
+    private void addBasicAcorn(int acornCount) {
+        this.basicAcornCount += acornCount;
+
+        if (acornCount >= 4) {
+            this.basicAcornUpdatedAt = LocalDateTime.now();
+        }
+    }
+
     public void updateCoordinate(Double latitude, Double longitude) {
         this.latitude = latitude;
         this.longitude = longitude;
     }
 
-    public void updateLocation() {
+    public void updateGeom() {
         if (latitude != null && longitude != null) {
             this.geom = geometryFactory.createPoint(new Coordinate(longitude, latitude));
             this.geom.setSRID(4326);
+        }
+    }
+
+    public void updateAdminDong(String adminDong) {
+        if (latitude != null && longitude != null) {
+            this.adminDong = adminDong;
         }
     }
 }

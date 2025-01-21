@@ -27,4 +27,25 @@ public class NaverMapsAdapter {
                 .orElseThrow(
                         () -> new BusinessException(ErrorType.NAVER_MAPS_GEOCODING_API_ERROR));
     }
+
+    // TODO: 코드 정리하기
+    public String getReverseGeoCodingResult(final Double latitude, final Double longitude) {
+        Map<String, Object> response = naverMapsClient.getReverseGeocode(longitude + "," + latitude, "admcode", "json");
+        
+        try {
+            List<Map<String, Object>> results = (List<Map<String, Object>>) response.get("results");
+            if (results != null && !results.isEmpty()) {
+                Map<String, Object> region = (Map<String, Object>) results.get(0).get("region");
+                if (region != null) {
+                    Map<String, Object> area3 = (Map<String, Object>) region.get("area3");
+                    if (area3 != null) {
+                        return (String) area3.get("name");
+                    }
+                }
+            }
+        } catch (Exception e) {
+            throw new BusinessException(ErrorType.INTERNAL_SERVER_ERROR);
+        }
+        throw new BusinessException(ErrorType.INTERNAL_SERVER_ERROR);
+    }
 }
