@@ -74,9 +74,9 @@ public class SpotController {
     @GetMapping(path = "/spot/verify", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<VerifiedSpotResponse> verifySpot(
             @Positive(message = "spotId는 양수여야 합니다.")
-            @Validated @RequestParam(name = "spotId") Long spotId,
-            @Validated @RequestParam(name = "longitude") Double longitude,
-            @Validated @RequestParam(name = "latitude") Double latitude
+            @Validated @RequestParam(name = "spotId") final Long spotId,
+            @Validated @RequestParam(name = "longitude") final Double longitude,
+            @Validated @RequestParam(name = "latitude") final Double latitude
     ) {
         return ResponseEntity.ok(
                 new VerifiedSpotResponse(spotService.verifySpot(spotId, longitude, latitude))
