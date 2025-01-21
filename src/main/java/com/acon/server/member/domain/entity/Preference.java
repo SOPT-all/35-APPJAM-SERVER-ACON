@@ -16,6 +16,7 @@ import lombok.ToString;
 @ToString
 public class Preference {
 
+    // TODO: 매직 넘버 yml로 옮기기
     private static final int FAVORITE_CUISINE_RANK_SIZE = 3;
     private static final int FAVORITE_SPOT_RANK_SIZE = 4;
 

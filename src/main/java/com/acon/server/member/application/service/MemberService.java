@@ -57,6 +57,7 @@ public class MemberService {
     private final NaverMapsAdapter naverMapsAdapter;
 
     // TODO: 메서드 순서 정리, TRANSACTION 설정, mapper 사용
+    // TODO: @Valid 거친 건 원시타입으로 받기
 
     public void createPreference(
             List<DislikeFood> dislikeFoodList,

@@ -40,6 +40,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 public class SpotService {
 
+    // TODO: 매직 넘버 yml로 옮기기, 250m로 바꾸고 변수명 수정
     private static final int WALKING_RADIUS_30_MIN = 2000;
     private static final int SUGGESTION_LIMIT = 5;
     private static final int VERIFICATION_DISTANCE = 250;
@@ -79,7 +80,7 @@ public class SpotService {
         log.info("위도 또는 경도 정보가 비어 있는 Spot 데이터 {}건을 업데이트 했습니다.", updatedEntityList.size());
     }
 
-    // 메서드 설명: spotId에 해당하는 Spot의 좌표를 업데이트한다. (주소 -> 좌표)
+    // TODO: 로직 정리
     private void updateSpotCoordinate(final Spot spot) {
         GeoCodingResponse geoCodingResponse = naverMapsAdapter.getGeoCodingResult(spot.getAddress());
 
@@ -180,6 +181,7 @@ public class SpotService {
     public SearchSuggestionListResponse fetchSearchSuggestions(final Double latitude, final Double longitude) {
         // TODO: 토큰 검증 이후 MemberID 추출 로직 필요
         List<SearchSuggestionResponse> recentSpotSuggestion =
+                // TODO: 250m 범위 내의 TOP5로 수정
                 guidedSpotRepository.findTopByMemberIdOrderByUpdatedAtDesc(1L)
                         .flatMap(recentGuidedSpot -> spotRepository.findById(recentGuidedSpot.getSpotId()))
                         .map(spotDtoMapper::toSearchSuggestionResponse)
