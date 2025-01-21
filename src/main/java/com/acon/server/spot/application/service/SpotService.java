@@ -90,6 +90,8 @@ public class SpotService {
         spot.updateLocation();
     }
 
+    // TODO: 장소 추천 시 메뉴 가격 변동이면 메인 메뉴 X 처리
+
     // TODO: 트랜잭션 범위 고민하기
     // 메서드 설명: spotId에 해당하는 Spot의 상세 정보를 조회한다. (메뉴, 이미지, 영업 여부 등)
     @Transactional
