@@ -209,11 +209,13 @@ public class SpotService {
     }
 
     // TODO: limit 없는 메서드로부터 분기하도록 리팩토링
+    private List<SearchSuggestionResponse> findNearestSpotList(
             double longitude,
             double latitude,
             double radius,
-            int limit) {
-        List<Object[]> rawFindResults = spotRepository.findNearestSpots(longitude, latitude, radius, limit);
+            int limit
+    ) {
+        List<Object[]> rawFindResults = spotRepository.findNearestSpotList(longitude, latitude, radius, limit);
 
         return rawFindResults.stream()
                 .map(result -> new SearchSuggestionResponse((Long) result[0], (String) result[1]))
@@ -238,11 +240,12 @@ public class SpotService {
 
     @Transactional(readOnly = true)
     public boolean verifySpot(Long spotId, Double memberLongitude, Double memberLatitude) {
-        SpotEntity spotEntity = spotRepository.findByIdOrThrow(spotId);
-        Double spotLongitude = spotEntity.getLongitude();
-        Double spotLatitude = spotEntity.getLatitude();
+        if (!spotRepository.existsById(spotId)) {
+            throw new BusinessException(ErrorType.NOT_FOUND_SPOT_ERROR);
+        }
+
         Double distance =
-                spotRepository.calculateDistance(spotLongitude, spotLatitude, memberLongitude, memberLatitude);
+                spotRepository.calculateDistanceFromSpot(spotId, memberLongitude, memberLatitude);
 
         return distance < VERIFICATION_DISTANCE;
     }
