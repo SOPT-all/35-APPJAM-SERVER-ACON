@@ -2,9 +2,12 @@ package com.acon.server.spot.api.controller;
 
 import com.acon.server.spot.api.response.MenuListResponse;
 import com.acon.server.spot.api.response.SearchSpotListResponse;
+import com.acon.server.spot.api.response.SearchSuggestionListResponse;
 import com.acon.server.spot.api.response.SpotDetailResponse;
 import com.acon.server.spot.api.response.VerifiedSpotResponse;
 import com.acon.server.spot.application.service.SpotService;
+import jakarta.validation.constraints.DecimalMax;
+import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -39,6 +42,20 @@ public class SpotController {
     ) {
         return ResponseEntity.ok(
                 spotService.fetchMenus(spotId)
+        );
+    }
+
+    @GetMapping("/search-suggestions")
+    public ResponseEntity<SearchSuggestionListResponse> getSearchSuggestions(
+            @DecimalMin(value = "33.1", message = "위도는 최소 33.1°N 이상이어야 합니다.(대한민국 기준)")
+            @DecimalMax(value = "38.6", message = "위도는 최대 38.6°N 이하이어야 합니다.(대한민국 기준)")
+            @Validated @RequestParam(name = "latitude") final Double latitude,
+            @DecimalMin(value = "124.6", message = "경도는 최소 124.6°E 이상이어야 합니다.(대한민국 기준)")
+            @DecimalMax(value = "131.9", message = "경도는 최대 131.9°E 이하이어야 합니다.(대한민국 기준)")
+            @Validated @RequestParam(name = "longitude") final Double longitude
+    ) {
+        return ResponseEntity.ok(
+                spotService.fetchSearchSuggestions(latitude, longitude)
         );
     }
 
