@@ -202,6 +202,7 @@ public class SpotService {
                         recentSpotSuggestion.stream(),
                         filteredNearestSpotList.stream()
                 )
+                .limit(SUGGESTION_LIMIT)
                 .toList();
 
         return new SearchSuggestionListResponse(combinedSuggestionList);
