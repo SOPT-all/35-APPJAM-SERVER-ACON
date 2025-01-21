@@ -75,4 +75,10 @@ public class Spot {
             this.geom.setSRID(4326);
         }
     }
+
+    public void updateAdminDong(String adminDong) {
+        if (latitude != null && longitude != null) {
+            this.adminDong = adminDong;
+        }
+    }
 }

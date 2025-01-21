@@ -56,17 +56,17 @@ public class SpotService {
 
     private final NaverMapsAdapter naverMapsAdapter;
 
-    // 메서드 설명: 위도, 경도 정보가 없는 Spot들의 좌표를 업데이트한다.
+    // 메서드 설명: 위치 정보가 없는 Spot들의 위치 정보를 업데이트한다.
     @Transactional
     public void updateNullCoordinatesForSpots() {
-        List<SpotEntity> spotEntityList = spotRepository.findAllByLatitudeIsNullOrLongitudeIsNullOrGeomIsNull();
+        List<SpotEntity> spotEntityList = spotRepository.findAllByLatitudeIsNullOrLongitudeIsNullOrGeomIsNullOrAdminDongIsNull();
 
         if (spotEntityList.isEmpty()) {
-            log.info("위도 또는 경도 정보가 비어 있는 Spot 데이터가 없습니다.");
+            log.info("위치 정보가 비어 있는 Spot 데이터가 없습니다.");
             return;
         }
 
-        log.info("위도 또는 경도 정보가 비어 있는 Spot 데이터를 {}건 찾았습니다.", spotEntityList.size());
+        log.info("위치 정보가 비어 있는 Spot 데이터를 {}건 찾았습니다.", spotEntityList.size());
 
         List<SpotEntity> updatedEntityList = spotEntityList.stream()
                 .map(spotEntity -> {
@@ -77,10 +77,11 @@ public class SpotService {
                 .toList();
         spotRepository.saveAll(updatedEntityList);
 
-        log.info("위도 또는 경도 정보가 비어 있는 Spot 데이터 {}건을 업데이트 했습니다.", updatedEntityList.size());
+        log.info("위치 정보가 비어 있는 Spot 데이터 {}건을 업데이트 했습니다.", updatedEntityList.size());
     }
 
     // TODO: 로직 정리
+    // 메서드 설명: 도로명 주소를 바탕으로 spotId에 해당하는 Spot의 위치 정보를 업데이트한다.
     private void updateSpotCoordinate(final Spot spot) {
         GeoCodingResponse geoCodingResponse = naverMapsAdapter.getGeoCodingResult(spot.getAddress());
 
@@ -89,6 +90,9 @@ public class SpotService {
                 Double.parseDouble(geoCodingResponse.longitude())
         );
         spot.updateGeom();
+        spot.updateAdminDong(
+                naverMapsAdapter.getReverseGeoCodingResult(spot.getLatitude(), spot.getLongitude())
+        );
     }
 
     // TODO: 장소 추천 시 메뉴 가격 변동이면 메인 메뉴 X 처리
