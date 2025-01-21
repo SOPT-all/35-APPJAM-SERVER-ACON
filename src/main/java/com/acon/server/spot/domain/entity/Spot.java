@@ -69,7 +69,7 @@ public class Spot {
         this.longitude = longitude;
     }
 
-    public void updateLocation() {
+    public void updateGeom() {
         if (latitude != null && longitude != null) {
             this.geom = geometryFactory.createPoint(new Coordinate(longitude, latitude));
             this.geom.setSRID(4326);

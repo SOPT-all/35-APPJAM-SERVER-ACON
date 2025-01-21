@@ -87,7 +87,7 @@ public class SpotService {
                 Double.parseDouble(geoCodingResponse.latitude()),
                 Double.parseDouble(geoCodingResponse.longitude())
         );
-        spot.updateLocation();
+        spot.updateGeom();
     }
 
     // TODO: 장소 추천 시 메뉴 가격 변동이면 메인 메뉴 X 처리
@@ -96,7 +96,7 @@ public class SpotService {
     // 메서드 설명: spotId에 해당하는 Spot의 상세 정보를 조회한다. (메뉴, 이미지, 영업 여부 등)
     @Transactional
     public SpotDetailResponse fetchSpotDetail(final Long spotId) {
-        SpotEntity spotEntity = spotRepository.findByIdOrThrow(spotId);
+        SpotEntity spotEntity = spotRepository.findByIdOrElseThrow(spotId);
         Spot spot = spotMapper.toDomain(spotEntity);
 
         List<SpotImageEntity> spotImageEntityList = spotImageRepository.findAllBySpotId(spotId);

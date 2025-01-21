@@ -16,7 +16,7 @@ public interface SpotRepository extends JpaRepository<SpotEntity, Long> {
 
     List<SpotEntity> findAllByLatitudeIsNullOrLongitudeIsNullOrGeomIsNull();
 
-    default SpotEntity findByIdOrThrow(Long id) {
+    default SpotEntity findByIdOrElseThrow(Long id) {
         return findById(id).orElseThrow(
                 () -> new BusinessException(ErrorType.NOT_FOUND_SPOT_ERROR)
         );
