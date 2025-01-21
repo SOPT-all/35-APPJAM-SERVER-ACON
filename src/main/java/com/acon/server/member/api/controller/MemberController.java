@@ -67,6 +67,7 @@ public class MemberController {
         return ResponseEntity.ok(new MemberAreaResponse(area));
     }
 
+    // TODO: Member 도메인에 있어야 할까? 고민 필요
     @PostMapping(path = "/member/guided-spot", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Void> postGuidedSpot(
             @Valid @RequestBody final GuidedSpotRequest request

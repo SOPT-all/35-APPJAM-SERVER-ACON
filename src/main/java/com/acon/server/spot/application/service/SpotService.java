@@ -208,7 +208,7 @@ public class SpotService {
         return new SearchSuggestionListResponse(combinedSuggestionList);
     }
 
-    public List<SearchSuggestionResponse> findNearestSpotList(
+    // TODO: limit 없는 메서드로부터 분기하도록 리팩토링
             double longitude,
             double latitude,
             double radius,

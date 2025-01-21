@@ -175,4 +175,6 @@ public class MemberService {
         }
         throw new BusinessException(ErrorType.INTERNAL_SERVER_ERROR);
     }
+
+    // TODO: 최근 길 안내 장소 지우는 스케줄러 추가
 }

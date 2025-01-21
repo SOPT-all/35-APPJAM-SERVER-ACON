@@ -43,7 +43,6 @@ public interface SpotRepository extends JpaRepository<SpotEntity, Long> {
             @Param("limit") int limit
     );
 
-    // TODO: 함수 위치에 대한 고민 필요
     @Query(value = """
             SELECT ST_DistanceSphere(
                 ST_SetSRID(ST_MakePoint(:lon1, :lat1), 4326),
