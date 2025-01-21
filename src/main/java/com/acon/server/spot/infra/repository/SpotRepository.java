@@ -14,7 +14,7 @@ public interface SpotRepository extends JpaRepository<SpotEntity, Long> {
 
     List<SpotEntity> findTop10ByNameContainsIgnoreCase(String keyword);
 
-    List<SpotEntity> findAllByLatitudeIsNullOrLongitudeIsNull();
+    List<SpotEntity> findAllByLatitudeIsNullOrLongitudeIsNullOrGeomIsNull();
 
     default SpotEntity findByIdOrThrow(Long id) {
         return findById(id).orElseThrow(

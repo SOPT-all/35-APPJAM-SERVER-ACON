@@ -58,7 +58,7 @@ public class SpotService {
     // 메서드 설명: 위도, 경도 정보가 없는 Spot들의 좌표를 업데이트한다.
     @Transactional
     public void updateNullCoordinatesForSpots() {
-        List<SpotEntity> spotEntityList = spotRepository.findAllByLatitudeIsNullOrLongitudeIsNull();
+        List<SpotEntity> spotEntityList = spotRepository.findAllByLatitudeIsNullOrLongitudeIsNullOrGeomIsNull();
 
         if (spotEntityList.isEmpty()) {
             log.info("위도 또는 경도 정보가 비어 있는 Spot 데이터가 없습니다.");
