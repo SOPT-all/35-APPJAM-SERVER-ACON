@@ -5,7 +5,4 @@ public record SearchSuggestionResponse(
         String spotName
 ) {
 
-    public static SearchSuggestionResponse of(Long spotId, String spotName) {
-        return new SearchSuggestionResponse(spotId, spotName);
-    }
 }
