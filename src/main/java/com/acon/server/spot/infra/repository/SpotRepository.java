@@ -21,16 +21,39 @@ public interface SpotRepository extends JpaRepository<SpotEntity, Long> {
                 () -> new BusinessException(ErrorType.NOT_FOUND_SPOT_ERROR)
         );
     }
-    
-    // TODO: 함수 위치에 대한 고민 필요
+
+    @Query(value = """
+            SELECT s.id, s.name
+            FROM spot s
+            WHERE ST_DWithin(
+                s.geom,
+                ST_SetSRID(ST_MakePoint(:longitude, :latitude), 4326),
+                :radius
+            )
+            ORDER BY ST_DistanceSphere(
+                s.geom,
+                ST_SetSRID(ST_MakePoint(:longitude, :latitude), 4326)
+            )
+            LIMIT :limit
+            """, nativeQuery = true)
+    List<Object[]> findNearestSpotList(
+            @Param("longitude") double longitude,
+            @Param("latitude") double latitude,
+            @Param("radius") double radius,
+            @Param("limit") int limit
+    );
+
     @Query(value = """
             SELECT ST_DistanceSphere(
-                ST_SetSRID(ST_MakePoint(:lon1, :lat1), 4326),
-                ST_SetSRID(ST_MakePoint(:lon2, :lat2), 4326)
+                s.geom,
+                ST_SetSRID(ST_MakePoint(:longitude, :latitude), 4326)
             )
+            FROM spot s
+            WHERE s.id = :spotId
             """, nativeQuery = true)
-    Double calculateDistance(@Param("lon1") Double lon1,
-                             @Param("lat1") Double lat1,
-                             @Param("lon2") Double lon2,
-                             @Param("lat2") Double lat2);
+    Double calculateDistanceFromSpot(
+            @Param("spotId") Long spotId,
+            @Param("longitude") Double longitude,
+            @Param("latitude") Double latitude
+    );
 }

@@ -15,11 +15,15 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
+import org.locationtech.jts.geom.Point;
 
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "spot")
+// TODO: 공간 인덱스 설정
 public class SpotEntity extends BaseTimeEntity {
 
     @Id
@@ -54,6 +58,10 @@ public class SpotEntity extends BaseTimeEntity {
     @Column(name = "longitude")
     private Double longitude;
 
+    @JdbcTypeCode(SqlTypes.GEOMETRY)
+    @Column(name = "geom", columnDefinition = "geometry(Point, 4326)")
+    private Point geom;
+
     @Column(name = "admin_dong")
     private String adminDong;
 
@@ -69,6 +77,7 @@ public class SpotEntity extends BaseTimeEntity {
             String address,
             Double latitude,
             Double longitude,
+            Point geom,
             String adminDong
     ) {
         this.id = id;
@@ -82,6 +91,7 @@ public class SpotEntity extends BaseTimeEntity {
         this.address = address;
         this.latitude = latitude;
         this.longitude = longitude;
+        this.geom = geom;
         this.adminDong = adminDong;
     }
 }

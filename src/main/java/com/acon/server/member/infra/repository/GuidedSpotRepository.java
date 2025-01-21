@@ -7,4 +7,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface GuidedSpotRepository extends JpaRepository<GuidedSpotEntity, Long> {
 
     Optional<GuidedSpotEntity> findByMemberIdAndSpotId(Long memberId, Long spotId);
+
+    Optional<GuidedSpotEntity> findTopByMemberIdOrderByUpdatedAtDesc(Long memberId);
 }

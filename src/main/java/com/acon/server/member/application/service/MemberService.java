@@ -51,9 +51,9 @@ public class MemberService {
     private final VerifiedAreaRepository verifiedAreaRepository;
     private final SpotRepository spotRepository;
 
+    private final GuidedSpotMapper guidedSpotMapper;
     private final MemberMapper memberMapper;
     private final PreferenceMapper preferenceMapper;
-    private final GuidedSpotMapper guidedSpotMapper;
 
     private final JwtUtils jwtUtils;
     private final GoogleSocialService googleSocialService;
@@ -142,7 +142,6 @@ public class MemberService {
                                 .build()
                 )
         );
-
     }
 
     public String createMemberArea(final Double latitude, final Double longitude, final Long memberId) {
@@ -176,4 +175,6 @@ public class MemberService {
         }
         throw new BusinessException(ErrorType.INTERNAL_SERVER_ERROR);
     }
+
+    // TODO: 최근 길 안내 장소 지우는 스케줄러 추가
 }
