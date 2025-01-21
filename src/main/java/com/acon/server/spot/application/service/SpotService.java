@@ -4,10 +4,13 @@ import com.acon.server.global.exception.BusinessException;
 import com.acon.server.global.exception.ErrorType;
 import com.acon.server.global.external.GeoCodingResponse;
 import com.acon.server.global.external.NaverMapsAdapter;
+import com.acon.server.member.infra.repository.GuidedSpotRepository;
 import com.acon.server.spot.api.response.MenuListResponse;
 import com.acon.server.spot.api.response.MenuResponse;
 import com.acon.server.spot.api.response.SearchSpotListResponse;
 import com.acon.server.spot.api.response.SearchSpotResponse;
+import com.acon.server.spot.api.response.SearchSuggestionListResponse;
+import com.acon.server.spot.api.response.SearchSuggestionResponse;
 import com.acon.server.spot.api.response.SpotDetailResponse;
 import com.acon.server.spot.application.mapper.SpotDtoMapper;
 import com.acon.server.spot.application.mapper.SpotMapper;
@@ -24,6 +27,9 @@ import java.time.DayOfWeek;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -34,12 +40,15 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 public class SpotService {
 
-    private final static int DISTANCE_RANGE = 250;
+    private static final int WALKING_RADIUS_30_MIN = 2000;
+    private static final int SUGGESTION_LIMIT = 5;
+    private static final int VERIFICATION_DISTANCE = 250;
 
     private final SpotRepository spotRepository;
     private final MenuRepository menuRepository;
     private final OpeningHourRepository openingHourRepository;
     private final SpotImageRepository spotImageRepository;
+    private final GuidedSpotRepository guidedSpotRepository;
 
     private final SpotDtoMapper spotDtoMapper;
     private final SpotMapper spotMapper;
@@ -58,16 +67,16 @@ public class SpotService {
 
         log.info("위도 또는 경도 정보가 비어 있는 Spot 데이터를 {}건 찾았습니다.", spotEntityList.size());
 
-        List<SpotEntity> updatedEntities = spotEntityList.stream()
+        List<SpotEntity> updatedEntityList = spotEntityList.stream()
                 .map(spotEntity -> {
                     Spot spot = spotMapper.toDomain(spotEntity);
                     updateSpotCoordinate(spot);
                     return spotMapper.toEntity(spot);
                 })
                 .toList();
-        spotRepository.saveAll(updatedEntities);
+        spotRepository.saveAll(updatedEntityList);
 
-        log.info("위도 또는 경도 정보가 비어 있는 Spot 데이터 {}건을 업데이트 했습니다.", updatedEntities.size());
+        log.info("위도 또는 경도 정보가 비어 있는 Spot 데이터 {}건을 업데이트 했습니다.", updatedEntityList.size());
     }
 
     // 메서드 설명: spotId에 해당하는 Spot의 좌표를 업데이트한다. (주소 -> 좌표)
@@ -78,6 +87,7 @@ public class SpotService {
                 Double.parseDouble(geoCodingResponse.latitude()),
                 Double.parseDouble(geoCodingResponse.longitude())
         );
+        spot.updateLocation();
     }
 
     // TODO: 트랜잭션 범위 고민하기
@@ -164,8 +174,53 @@ public class SpotService {
         return new MenuListResponse(menuResponseList);
     }
 
+    @Transactional(readOnly = true)
+    public SearchSuggestionListResponse fetchSearchSuggestions(final Double latitude, final Double longitude) {
+        // TODO: 토큰 검증 이후 MemberID 추출 로직 필요
+        List<SearchSuggestionResponse> recentSpotSuggestion =
+                guidedSpotRepository.findTopByMemberIdOrderByUpdatedAtDesc(1L)
+                        .flatMap(recentGuidedSpot -> spotRepository.findById(recentGuidedSpot.getSpotId()))
+                        .map(spotDtoMapper::toSearchSuggestionResponse)
+                        .stream()
+                        .toList();
+
+        List<SearchSuggestionResponse> nearestSpotList =
+                findNearestSpotList(longitude, latitude, WALKING_RADIUS_30_MIN, SUGGESTION_LIMIT);
+
+        // Set을 통한 필터링 성능 향상
+        Set<Long> recentSpotIds = recentSpotSuggestion.stream()
+                .map(SearchSuggestionResponse::spotId)
+                .collect(Collectors.toSet());
+
+        List<SearchSuggestionResponse> filteredNearestSpotList = nearestSpotList.stream()
+                .filter(nearestSpot -> !recentSpotIds.contains(nearestSpot.spotId()))
+                .toList();
+
+        List<SearchSuggestionResponse> combinedSuggestionList = Stream.concat(
+                        recentSpotSuggestion.stream(),
+                        filteredNearestSpotList.stream()
+                )
+                .toList();
+
+        return new SearchSuggestionListResponse(combinedSuggestionList);
+    }
+
+    public List<SearchSuggestionResponse> findNearestSpotList(
+            double longitude,
+            double latitude,
+            double radius,
+            int limit) {
+        List<Object[]> rawFindResults = spotRepository.findNearestSpots(longitude, latitude, radius, limit);
+
+        return rawFindResults.stream()
+                .map(result -> new SearchSuggestionResponse((Long) result[0], (String) result[1]))
+                .toList();
+    }
+
     public SearchSpotListResponse searchSpot(final String keyword) {
         List<SpotEntity> spotEntityList = spotRepository.findTop10ByNameContainsIgnoreCase(keyword);
+
+        // TODO: mapper로 변경
         List<SearchSpotResponse> spotList = spotEntityList.stream()
                 .map(spotEntity -> SearchSpotResponse.builder()
                         .spotId(spotEntity.getId())
@@ -183,9 +238,9 @@ public class SpotService {
         SpotEntity spotEntity = spotRepository.findByIdOrThrow(spotId);
         Double spotLongitude = spotEntity.getLongitude();
         Double spotLatitude = spotEntity.getLatitude();
-        Double distance = spotRepository.calculateDistance(memberLongitude, memberLatitude, spotLongitude,
-                spotLatitude);
+        Double distance =
+                spotRepository.calculateDistance(spotLongitude, spotLatitude, memberLongitude, memberLatitude);
 
-        return distance < DISTANCE_RANGE;
+        return distance < VERIFICATION_DISTANCE;
     }
 }
