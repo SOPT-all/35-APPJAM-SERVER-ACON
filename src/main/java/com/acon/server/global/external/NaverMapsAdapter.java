@@ -21,8 +21,8 @@ public class NaverMapsAdapter {
                 .filter(addresses -> !addresses.isEmpty())
                 .map(addresses -> addresses.get(0))
                 .map(firstAddress -> new GeoCodingResponse(
-                        (String) firstAddress.get("x"),
-                        (String) firstAddress.get("y")
+                        (String) firstAddress.get("y"),
+                        (String) firstAddress.get("x")
                 ))
                 .orElseThrow(
                         () -> new BusinessException(ErrorType.NAVER_MAPS_GEOCODING_API_ERROR));
