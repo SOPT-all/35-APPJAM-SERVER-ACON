@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.ToString;
+import org.locationtech.jts.geom.Point;
 
 @Getter
 @ToString
@@ -21,6 +22,7 @@ public class Spot {
     private LocalDateTime basicAcornUpdatedAt;
     private Double latitude;
     private Double longitude;
+    private Point geom;
     private String adminDong;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
@@ -37,6 +39,7 @@ public class Spot {
             LocalDateTime basicAcornUpdatedAt,
             Double latitude,
             Double longitude,
+            Point geom,
             String adminDong,
             LocalDateTime createdAt,
             LocalDateTime updatedAt
@@ -51,6 +54,7 @@ public class Spot {
         this.basicAcornUpdatedAt = basicAcornUpdatedAt;
         this.latitude = latitude;
         this.longitude = longitude;
+        this.geom = geom;
         this.adminDong = adminDong;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
