@@ -5,11 +5,15 @@ import java.time.LocalDateTime;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.ToString;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
 
 @Getter
 @ToString
 public class Spot {
+
+    private static final GeometryFactory geometryFactory = new GeometryFactory();
 
     private final Long id;
     private final String name;
@@ -63,5 +67,12 @@ public class Spot {
     public void updateCoordinate(Double latitude, Double longitude) {
         this.latitude = latitude;
         this.longitude = longitude;
+    }
+
+    public void updateLocation() {
+        if (latitude != null && longitude != null) {
+            this.geom = geometryFactory.createPoint(new Coordinate(longitude, latitude));
+            this.geom.setSRID(4326);
+        }
     }
 }
