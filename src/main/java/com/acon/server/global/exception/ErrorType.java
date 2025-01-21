@@ -48,6 +48,10 @@ public enum ErrorType {
     /* 500 Internal Server Error */
     FAILED_DOWNLOAD_GOOGLE_PUBLIC_KEY_ERROR(HttpStatus.BAD_REQUEST, 50002, "구글 공개키 다운로드에 실패하였습니다."),
 
+    /* Review Error */
+    /* 400 Bad Request */
+    INSUFFICIENT_ACORN_COUNT_ERROR(HttpStatus.BAD_REQUEST, 40098, "사용 가능한 도토리 개수가 부족합니다."),
+
     /* Spot Error */
     /* 400 Bad Request */
     INVALID_DAY_ERROR(HttpStatus.BAD_REQUEST, 40099, "유효하지 않은 day입니다."),
