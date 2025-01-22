@@ -11,6 +11,7 @@ import com.acon.server.member.application.service.MemberService;
 import com.acon.server.member.domain.enums.Cuisine;
 import com.acon.server.member.domain.enums.DislikeFood;
 import com.acon.server.member.domain.enums.FavoriteSpot;
+import com.acon.server.member.domain.enums.SocialType;
 import com.acon.server.member.domain.enums.SpotStyle;
 import com.acon.server.spot.domain.enums.SpotType;
 import jakarta.validation.Valid;
@@ -39,8 +40,10 @@ public class MemberController {
     public ResponseEntity<LoginResponse> login(
             @Valid @RequestBody final LoginRequest request
     ) {
+        SocialType socialType = SocialType.fromValue(request.socialType());
+
         return ResponseEntity.ok(
-                memberService.login(request)
+                memberService.login(socialType, request.idToken())
         );
     }
 
@@ -51,8 +54,7 @@ public class MemberController {
     public ResponseEntity<MemberAreaResponse> postArea(
             @Valid @RequestBody final MemberAreaRequest request
     ) {
-        // TODO: 토큰 검증 이후 MemberID 추출 필요
-        String area = memberService.createMemberArea(request.latitude(), request.longitude(), 1L);
+        String area = memberService.createMemberArea(request.latitude(), request.longitude());
 
         return ResponseEntity.ok(new MemberAreaResponse(area));
     }
@@ -61,7 +63,6 @@ public class MemberController {
     public ResponseEntity<Void> postPreference(
             @Valid @RequestBody final PreferenceRequest request
     ) {
-        // TODO: 토큰으로 memberId 가져오기
         List<DislikeFood> dislikeFoodList = request.dislikeFoodList().stream().map(DislikeFood::fromValue).toList();
         List<Cuisine> favoriteCuisineList = request.favoriteCuisineRank().stream().map(Cuisine::fromValue).toList();
         SpotType favoriteSpotType = SpotType.fromValue(request.favoriteSpotType());
@@ -69,7 +70,7 @@ public class MemberController {
         List<FavoriteSpot> favoriteSpotRank = request.favoriteSpotRank().stream().map(FavoriteSpot::fromValue).toList();
 
         memberService.createPreference(dislikeFoodList, favoriteCuisineList, favoriteSpotType, favoriteSpotStyle,
-                favoriteSpotRank, 1L);
+                favoriteSpotRank);
 
         return ResponseEntity.ok().build();
     }
@@ -79,17 +80,15 @@ public class MemberController {
     public ResponseEntity<Void> postGuidedSpot(
             @Valid @RequestBody final GuidedSpotRequest request
     ) {
-        // TODO: 토큰 검증 이후 MemberID 추출 필요
-        memberService.createGuidedSpot(request.spotId(), 1L);
+        memberService.createGuidedSpot(request.spotId());
 
         return ResponseEntity.ok().build();
     }
 
     @GetMapping(path = "/member/acorn", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<AcornCountResponse> getAcornCount() {
-        // TODO: 토큰으로 memberId 가져오기
         return ResponseEntity.ok(
-                memberService.fetchAcornCount(1L)
+                memberService.fetchAcornCount()
         );
     }
 }

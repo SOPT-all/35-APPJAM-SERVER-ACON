@@ -1,10 +1,11 @@
 package com.acon.server.member.application.service;
 
-import com.acon.server.common.auth.jwt.JwtUtils;
+import com.acon.server.global.auth.MemberAuthentication;
+import com.acon.server.global.auth.PrincipalHandler;
+import com.acon.server.global.auth.jwt.JwtTokenProvider;
 import com.acon.server.global.exception.BusinessException;
 import com.acon.server.global.exception.ErrorType;
 import com.acon.server.global.external.NaverMapsAdapter;
-import com.acon.server.member.api.request.LoginRequest;
 import com.acon.server.member.api.response.AcornCountResponse;
 import com.acon.server.member.api.response.LoginResponse;
 import com.acon.server.member.application.mapper.GuidedSpotMapper;
@@ -51,7 +52,8 @@ public class MemberService {
     private final MemberMapper memberMapper;
     private final PreferenceMapper preferenceMapper;
 
-    private final JwtUtils jwtUtils;
+    private final JwtTokenProvider jwtTokenProvider;
+    private final PrincipalHandler principalHandler;
     private final GoogleSocialService googleSocialService;
 
     private final NaverMapsAdapter naverMapsAdapter;
@@ -59,39 +61,18 @@ public class MemberService {
     // TODO: 메서드 순서 정리, TRANSACTION 설정, mapper 사용
     // TODO: @Valid 거친 건 원시타입으로 받기
 
-    public void createPreference(
-            List<DislikeFood> dislikeFoodList,
-            List<Cuisine> favoriteCuisineList,
-            SpotType favoriteSpotType,
-            SpotStyle favoriteSpotStyle,
-            List<FavoriteSpot> favoriteSpotRank,
-            Long memberId
-    ) {
-        Preference preference = Preference.builder()
-                .memberId(memberId)
-                .dislikeFoodList(dislikeFoodList)
-                .favoriteCuisineRank(favoriteCuisineList)
-                .favoriteSpotType(favoriteSpotType)
-                .favoriteSpotStyle(favoriteSpotStyle)
-                .favoriteSpotRank(favoriteSpotRank)
-                .build();
-
-        preferenceRepository.save(preferenceMapper.toEntity(preference));
-    }
-
     @Transactional
-    public LoginResponse login(final LoginRequest request) {
-        String socialId = googleSocialService.login(request.idToken());
-        Long memberId = fetchMemberId(request.socialType(), socialId);
-        List<String> tokens = jwtUtils.createToken(memberId);
-        return LoginResponse.of(tokens.get(0), tokens.get(1));
-    }
+    public LoginResponse login(
+            final SocialType socialType,
+            final String idToken
+    ) {
+        String socialId = googleSocialService.login(idToken);
+        Long memberId = fetchMemberId(socialType, socialId);
+        MemberAuthentication memberAuthentication = new MemberAuthentication(memberId, null, null);
+        String accessToken = jwtTokenProvider.issueAccessToken(memberAuthentication);
+        String refreshToken = jwtTokenProvider.issueRefreshToken();
 
-    public AcornCountResponse fetchAcornCount(final Long memberId) {
-        MemberEntity memberEntity = memberRepository.findByIdOrElseThrow(memberId);
-        int acornCount = memberEntity.getLeftAcornCount();
-
-        return new AcornCountResponse(acornCount);
+        return LoginResponse.of(accessToken, refreshToken);
     }
 
     private boolean isExistingMember(
@@ -101,8 +82,12 @@ public class MemberService {
         return memberRepository.findBySocialTypeAndSocialId(socialType, socialId).isPresent();
     }
 
-    protected Long fetchMemberId(final SocialType socialType, final String socialId) {
+    protected Long fetchMemberId(
+            final SocialType socialType,
+            final String socialId
+    ) {
         MemberEntity memberEntity;
+
         if (isExistingMember(socialType, socialId)) {
             memberEntity = memberRepository.findBySocialTypeAndSocialId(
                     socialType,
@@ -115,18 +100,62 @@ public class MemberService {
                     .leftAcornCount(25)
                     .build());
         }
+
         Member member = memberMapper.toDomain(memberEntity);
+
         return member.getId();
     }
 
     @Transactional
-    public void createGuidedSpot(final Long spotId, final Long memberId) {
+    public String createMemberArea(
+            final Double latitude,
+            final Double longitude
+    ) {
+        MemberEntity memberEntity = memberRepository.findByIdOrElseThrow(principalHandler.getUserIdFromPrincipal());
+        String legalDong = naverMapsAdapter.getReverseGeoCodingResult(latitude, longitude);
+
+        verifiedAreaRepository.save(
+                VerifiedAreaEntity.builder()
+                        .name(legalDong)
+                        .memberId(memberEntity.getId())
+                        .verifiedDate(Collections.singletonList(LocalDate.now()))
+                        .build()
+        );
+
+        return legalDong;
+    }
+
+    @Transactional
+    public void createPreference(
+            final List<DislikeFood> dislikeFoodList,
+            final List<Cuisine> favoriteCuisineList,
+            final SpotType favoriteSpotType,
+            final SpotStyle favoriteSpotStyle,
+            final List<FavoriteSpot> favoriteSpotRank
+    ) {
+        MemberEntity memberEntity = memberRepository.findByIdOrElseThrow(principalHandler.getUserIdFromPrincipal());
+
+        Preference preference = Preference.builder()
+                .memberId(memberEntity.getId())
+                .dislikeFoodList(dislikeFoodList)
+                .favoriteCuisineRank(favoriteCuisineList)
+                .favoriteSpotType(favoriteSpotType)
+                .favoriteSpotStyle(favoriteSpotStyle)
+                .favoriteSpotRank(favoriteSpotRank)
+                .build();
+
+        preferenceRepository.save(preferenceMapper.toEntity(preference));
+    }
+
+    @Transactional
+    public void createGuidedSpot(final Long spotId) {
         if (!spotRepository.existsById(spotId)) {
             throw new BusinessException(ErrorType.NOT_FOUND_SPOT_ERROR);
         }
 
-        Optional<GuidedSpotEntity> optionalGuidedSpotEntity = guidedSpotRepository.findByMemberIdAndSpotId(memberId,
-                spotId);
+        MemberEntity memberEntity = memberRepository.findByIdOrElseThrow(principalHandler.getUserIdFromPrincipal());
+        Optional<GuidedSpotEntity> optionalGuidedSpotEntity =
+                guidedSpotRepository.findByMemberIdAndSpotId(memberEntity.getId(), spotId);
 
         optionalGuidedSpotEntity.ifPresentOrElse(
                 guidedSpotEntity -> {
@@ -136,25 +165,19 @@ public class MemberService {
                 },
                 () -> guidedSpotRepository.save(
                         GuidedSpotEntity.builder()
-                                .memberId(memberId)
+                                .memberId(memberEntity.getId())
                                 .spotId(spotId)
                                 .build()
                 )
         );
     }
 
-    public String createMemberArea(final Double latitude, final Double longitude, final Long memberId) {
-        String legalDong = naverMapsAdapter.getReverseGeoCodingResult(latitude, longitude);
+    @Transactional(readOnly = true)
+    public AcornCountResponse fetchAcornCount() {
+        MemberEntity memberEntity = memberRepository.findByIdOrElseThrow(principalHandler.getUserIdFromPrincipal());
+        int acornCount = memberEntity.getLeftAcornCount();
 
-        verifiedAreaRepository.save(
-                VerifiedAreaEntity.builder()
-                        .name(legalDong)
-                        .memberId(memberId)
-                        .verifiedDate(Collections.singletonList(LocalDate.now()))
-                        .build()
-        );
-
-        return legalDong;
+        return new AcornCountResponse(acornCount);
     }
 
     // TODO: 최근 길 안내 장소 지우는 스케줄러 추가

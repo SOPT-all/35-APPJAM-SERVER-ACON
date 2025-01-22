@@ -1,10 +1,13 @@
 package com.acon.server.spot.application.service;
 
+import com.acon.server.global.auth.PrincipalHandler;
 import com.acon.server.global.exception.BusinessException;
 import com.acon.server.global.exception.ErrorType;
 import com.acon.server.global.external.GeoCodingResponse;
 import com.acon.server.global.external.NaverMapsAdapter;
+import com.acon.server.member.infra.entity.MemberEntity;
 import com.acon.server.member.infra.repository.GuidedSpotRepository;
+import com.acon.server.member.infra.repository.MemberRepository;
 import com.acon.server.spot.api.request.SpotListRequest;
 import com.acon.server.spot.api.response.MenuListResponse;
 import com.acon.server.spot.api.response.MenuResponse;
@@ -49,14 +52,17 @@ public class SpotService {
     private static final int SUGGESTION_LIMIT = 5;
     private static final int VERIFICATION_DISTANCE = 250;
 
-    private final SpotRepository spotRepository;
+    private final GuidedSpotRepository guidedSpotRepository;
+    private final MemberRepository memberRepository;
     private final MenuRepository menuRepository;
     private final OpeningHourRepository openingHourRepository;
     private final SpotImageRepository spotImageRepository;
-    private final GuidedSpotRepository guidedSpotRepository;
+    private final SpotRepository spotRepository;
 
     private final SpotDtoMapper spotDtoMapper;
     private final SpotMapper spotMapper;
+
+    private final PrincipalHandler principalHandler;
 
     private final NaverMapsAdapter naverMapsAdapter;
 
@@ -249,10 +255,11 @@ public class SpotService {
 
     @Transactional(readOnly = true)
     public SearchSuggestionListResponse fetchSearchSuggestions(final Double latitude, final Double longitude) {
-        // TODO: 토큰 검증 이후 MemberID 추출 로직 필요
+        MemberEntity memberEntity = memberRepository.findByIdOrElseThrow(principalHandler.getUserIdFromPrincipal());
+
         List<SearchSuggestionResponse> recentSpotSuggestion =
                 // TODO: 250m 범위 내의 TOP5로 수정
-                guidedSpotRepository.findTopByMemberIdOrderByUpdatedAtDesc(1L)
+                guidedSpotRepository.findTopByMemberIdOrderByUpdatedAtDesc(memberEntity.getId())
                         .flatMap(recentGuidedSpot -> spotRepository.findById(recentGuidedSpot.getSpotId()))
                         .map(spotDtoMapper::toSearchSuggestionResponse)
                         .stream()
