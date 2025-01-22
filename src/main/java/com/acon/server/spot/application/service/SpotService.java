@@ -284,6 +284,7 @@ public class SpotService {
                 .toList();
     }
 
+    // TODO: 검색어 문자가 첫 문자인 가게로 정렬
     public SearchSpotListResponse searchSpot(final String keyword) {
         List<SpotEntity> spotEntityList = spotRepository.findTop10ByNameContainsIgnoreCase(keyword);
 
