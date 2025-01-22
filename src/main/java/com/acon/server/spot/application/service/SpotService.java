@@ -28,6 +28,7 @@ import com.acon.server.spot.infra.entity.SpotImageEntity;
 import com.acon.server.spot.infra.repository.MenuRepository;
 import com.acon.server.spot.infra.repository.OpeningHourRepository;
 import com.acon.server.spot.infra.repository.SpotImageRepository;
+import com.acon.server.spot.infra.repository.SpotNativeQueryRepository;
 import com.acon.server.spot.infra.repository.SpotRepository;
 import java.time.DayOfWeek;
 import java.time.LocalDateTime;
@@ -58,6 +59,7 @@ public class SpotService {
     private final OpeningHourRepository openingHourRepository;
     private final SpotImageRepository spotImageRepository;
     private final SpotRepository spotRepository;
+    private final SpotNativeQueryRepository spotNativeQueryRepository;
 
     private final SpotDtoMapper spotDtoMapper;
     private final SpotMapper spotMapper;
@@ -129,13 +131,15 @@ public class SpotService {
     }
 
     public List<Spot> filterSpotList(SpotListRequest request) {
-        // 1. SpotType ( 음식점, 카페 ) 로 필터링
-
-        // 2. filterList를 기반으로 수정 ( 음식 특성 or 카페 특성, 함께 하는 사람 or 방문 목적 )
-
-        // 3. 가격 범위
-
-        // 4. 도보 가능 거리 15분 ( 1km )
+        double distanceKm = (request.condition().walkingTime() / 60.0) * 4.0;
+        double distanceMeter = distanceKm * 1000.0;
+        List<SpotEntity> spotEntityList = spotNativeQueryRepository.findSpotsWithinDistance(
+                request.latitude(), request.longitude(), distanceMeter, request.condition().spotType(),
+                request.condition()
+                        .filterList(),
+                request.condition().priceRange()
+        );
+        return spotEntityList.stream().map(spotMapper::toDomain).toList();
     }
 
     // Spot -> RecommendedSpot 변환 메서드
