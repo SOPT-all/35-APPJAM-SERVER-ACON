@@ -23,6 +23,7 @@ import com.acon.server.member.infra.entity.GuidedSpotEntity;
 import com.acon.server.member.infra.entity.MemberEntity;
 import com.acon.server.member.infra.entity.VerifiedAreaEntity;
 import com.acon.server.member.infra.external.google.GoogleSocialService;
+import com.acon.server.member.infra.external.ios.AppleAuthAdapter;
 import com.acon.server.member.infra.repository.GuidedSpotRepository;
 import com.acon.server.member.infra.repository.MemberRepository;
 import com.acon.server.member.infra.repository.PreferenceRepository;
@@ -55,6 +56,7 @@ public class MemberService {
     private final JwtTokenProvider jwtTokenProvider;
     private final PrincipalHandler principalHandler;
     private final GoogleSocialService googleSocialService;
+    private final AppleAuthAdapter appleAuthService;
 
     private final NaverMapsAdapter naverMapsAdapter;
 
@@ -66,7 +68,16 @@ public class MemberService {
             final SocialType socialType,
             final String idToken
     ) {
-        String socialId = googleSocialService.login(idToken);
+        String socialId;
+
+        if (socialType == SocialType.GOOGLE) {
+            socialId = googleSocialService.login(idToken);
+        } else if (socialType == SocialType.APPLE) {
+            socialId = appleAuthService.getAppleAccountId(idToken);
+        } else {
+            throw new BusinessException(ErrorType.INVALID_SOCIAL_TYPE_ERROR);
+        }
+
         Long memberId = fetchMemberId(socialType, socialId);
         MemberAuthentication memberAuthentication = new MemberAuthentication(memberId, null, null);
         String accessToken = jwtTokenProvider.issueAccessToken(memberAuthentication);
