@@ -122,6 +122,16 @@ public class SpotService {
         return new SpotListResponse(spotList);
     }
 
+    public List<Spot> filterSpotList(SpotListRequest request) {
+        // 1. SpotType ( 음식점, 카페 ) 로 필터링
+
+        // 2. filterList를 기반으로 수정 ( 음식 특성 or 카페 특성, 함께 하는 사람 or 방문 목적 )
+
+        // 3. 가격 범위
+
+        // 4. 도보 가능 거리 15분 ( 1km )
+    }
+
     // Spot -> RecommendedSpot 변환 메서드
     private RecommendedSpot toRecommendedSpot(SpotEntity spotEntity) {
         return new RecommendedSpot(
