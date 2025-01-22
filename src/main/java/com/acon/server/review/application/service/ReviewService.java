@@ -41,7 +41,7 @@ public class ReviewService {
         Member member = memberMapper.toDomain(memberEntity);
         Spot spot = spotMapper.toDomain(spotEntity);
 
-        boolean isLocal = isVerifiedArea(member.getId(), spot.getAdminDong());
+        boolean isLocal = isVerifiedArea(member.getId(), spot.getLegalDong());
 
         member.useAcorn(acornCount);
         spot.addAcorn(acornCount, isLocal);

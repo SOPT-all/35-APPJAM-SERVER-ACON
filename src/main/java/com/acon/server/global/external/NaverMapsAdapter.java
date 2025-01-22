@@ -30,8 +30,9 @@ public class NaverMapsAdapter {
 
     // TODO: 코드 정리하기
     public String getReverseGeoCodingResult(final Double latitude, final Double longitude) {
-        Map<String, Object> response = naverMapsClient.getReverseGeocode(longitude + "," + latitude, "admcode", "json");
-        
+        Map<String, Object> response = naverMapsClient.getReverseGeocode(longitude + "," + latitude, "legalcode",
+                "json");
+
         try {
             List<Map<String, Object>> results = (List<Map<String, Object>>) response.get("results");
             if (results != null && !results.isEmpty()) {

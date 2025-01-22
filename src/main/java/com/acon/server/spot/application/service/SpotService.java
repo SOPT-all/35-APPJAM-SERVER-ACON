@@ -73,7 +73,7 @@ public class SpotService {
     // 메서드 설명: 위치 정보가 없는 Spot들의 위치 정보를 업데이트한다.
     @Transactional
     public void updateNullCoordinatesForSpots() {
-        List<SpotEntity> spotEntityList = spotRepository.findAllByLatitudeIsNullOrLongitudeIsNullOrGeomIsNullOrAdminDongIsNull();
+        List<SpotEntity> spotEntityList = spotRepository.findAllByLatitudeIsNullOrLongitudeIsNullOrGeomIsNullOrLegalDongIsNull();
 
         if (spotEntityList.isEmpty()) {
             log.info("위치 정보가 비어 있는 Spot 데이터가 없습니다.");
@@ -104,7 +104,7 @@ public class SpotService {
                 Double.parseDouble(geoCodingResponse.longitude())
         );
         spot.updateGeom();
-        spot.updateAdminDong(
+        spot.updateLegalDong(
                 naverMapsAdapter.getReverseGeoCodingResult(spot.getLatitude(), spot.getLongitude())
         );
     }
