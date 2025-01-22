@@ -18,17 +18,17 @@ public record SpotListRequest(
         Double longitude,
 
         @NotNull(message = "상세 조건은 필수 입력값입니다.")
-        Condition condition,
-
-        @Positive(message = "도보 가능 거리는 양수여야 합니다.")
-        Integer walkingTime
+        Condition condition
 ) {
 
     public static record Condition(
             String spotType,
             List<Filter> filterList,
             @Positive(message = "가격대는 양수여야 합니다.")
-            Integer priceRange
+            Integer priceRange,
+
+            @Positive(message = "도보 가능 거리는 양수여야 합니다.")
+            Integer walkingTime
     ) {
 
         public static record Filter(
