@@ -67,6 +67,9 @@ dependencies {
     // PostGIS
     implementation 'org.hibernate:hibernate-spatial:6.6.4.Final'
     implementation 'org.locationtech.jts:jts-core:1.19.0' // TODO: 버전 확인하기
+
+    // Spring Security
+    implementation 'org.springframework.boot:spring-boot-starter-security'
 }
 
 tasks.named('test') {

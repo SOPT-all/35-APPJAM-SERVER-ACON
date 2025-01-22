@@ -1,5 +1,6 @@
 package com.acon.server.review.application.service;
 
+import com.acon.server.global.auth.PrincipalHandler;
 import com.acon.server.global.exception.BusinessException;
 import com.acon.server.global.exception.ErrorType;
 import com.acon.server.member.application.mapper.MemberMapper;
@@ -31,9 +32,11 @@ public class ReviewService {
     private final ReviewMapper reviewMapper;
     private final SpotMapper spotMapper;
 
+    private final PrincipalHandler principalHandler;
+
     @Transactional
     public void createReview(final long spotId, final int acornCount) {
-        MemberEntity memberEntity = memberRepository.findByIdOrElseThrow(1L);
+        MemberEntity memberEntity = memberRepository.findByIdOrElseThrow(principalHandler.getUserIdFromPrincipal());
         SpotEntity spotEntity = spotRepository.findByIdOrElseThrow(spotId);
 
         validateAcornAvailability(memberEntity.getLeftAcornCount(), acornCount);
