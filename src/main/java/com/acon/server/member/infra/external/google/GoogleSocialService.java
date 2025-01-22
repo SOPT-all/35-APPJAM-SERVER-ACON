@@ -46,6 +46,7 @@ public class GoogleSocialService {
     private GoogleIdToken verifyIdToken(String unverifiedIdToken) {
         try {
             GoogleIdToken idToken = verifier.verify(unverifiedIdToken);
+
             if (idToken == null) {
                 throw new BusinessException(ErrorType.INVALID_ID_TOKEN_ERROR);
             }

@@ -1,5 +1,10 @@
 package com.acon.server.global.auth.jwt;
 
+import static org.apache.commons.codec.binary.Base64.decodeBase64;
+
+import com.acon.server.global.exception.BusinessException;
+import com.acon.server.global.exception.ErrorType;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Header;
@@ -8,9 +13,12 @@ import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.UnsupportedJwtException;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.security.PublicKey;
 import java.util.Base64;
 import java.util.Date;
+import java.util.Map;
 import javax.crypto.SecretKey;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -106,5 +114,23 @@ public class JwtTokenProvider {
         Claims claims = getBody(token);
 
         return Long.valueOf(claims.get(MEMBER_ID).toString());
+    }
+
+    public Map<String, String> parseHeaders(String token) {
+        String header = token.split("\\.")[0];
+
+        try {
+            return new ObjectMapper().readValue(decodeBase64(header), Map.class);
+        } catch (IOException e) {
+            throw new BusinessException(ErrorType.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public Claims getTokenClaims(String token, PublicKey publicKey) {
+        return Jwts.parserBuilder()
+                .setSigningKey(publicKey)
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
     }
 }
