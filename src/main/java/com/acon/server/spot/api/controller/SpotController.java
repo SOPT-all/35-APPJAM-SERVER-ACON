@@ -1,11 +1,14 @@
 package com.acon.server.spot.api.controller;
 
+import com.acon.server.spot.api.request.SpotListRequest;
 import com.acon.server.spot.api.response.MenuListResponse;
 import com.acon.server.spot.api.response.SearchSpotListResponse;
 import com.acon.server.spot.api.response.SearchSuggestionListResponse;
 import com.acon.server.spot.api.response.SpotDetailResponse;
+import com.acon.server.spot.api.response.SpotListResponse;
 import com.acon.server.spot.api.response.VerifiedSpotResponse;
 import com.acon.server.spot.application.service.SpotService;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Positive;
@@ -15,6 +18,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -25,6 +30,20 @@ import org.springframework.web.bind.annotation.RestController;
 public class SpotController {
 
     private final SpotService spotService;
+
+    // 위치 및 사용자 온보딩 결과 기반 개인화 장소 리스트 추천 API 컨트롤러 메서드
+    @PostMapping(
+            path = "/spots",
+            consumes = MediaType.APPLICATION_JSON_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    public ResponseEntity<SpotListResponse> getRecommendedSpotList(
+            @Valid @RequestBody final SpotListRequest request
+    ) {
+        return ResponseEntity.ok(
+                spotService.fetchRecommendedSpotList(request)
+        );
+    }
 
     @GetMapping(path = "/spot/{spotId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<SpotDetailResponse> getSpotDetail(

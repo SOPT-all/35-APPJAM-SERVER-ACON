@@ -5,6 +5,7 @@ import com.acon.server.global.exception.ErrorType;
 import com.acon.server.global.external.GeoCodingResponse;
 import com.acon.server.global.external.NaverMapsAdapter;
 import com.acon.server.member.infra.repository.GuidedSpotRepository;
+import com.acon.server.spot.api.request.SpotListRequest;
 import com.acon.server.spot.api.response.MenuListResponse;
 import com.acon.server.spot.api.response.MenuResponse;
 import com.acon.server.spot.api.response.SearchSpotListResponse;
@@ -12,6 +13,8 @@ import com.acon.server.spot.api.response.SearchSpotResponse;
 import com.acon.server.spot.api.response.SearchSuggestionListResponse;
 import com.acon.server.spot.api.response.SearchSuggestionResponse;
 import com.acon.server.spot.api.response.SpotDetailResponse;
+import com.acon.server.spot.api.response.SpotListResponse;
+import com.acon.server.spot.api.response.SpotListResponse.RecommendedSpot;
 import com.acon.server.spot.application.mapper.SpotDtoMapper;
 import com.acon.server.spot.application.mapper.SpotMapper;
 import com.acon.server.spot.domain.entity.Spot;
@@ -27,6 +30,7 @@ import java.time.DayOfWeek;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Random;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -55,6 +59,16 @@ public class SpotService {
     private final SpotMapper spotMapper;
 
     private final NaverMapsAdapter naverMapsAdapter;
+
+    private static final List<String> IMAGE_URLS = List.of(
+            "https://github.com/user-attachments/assets/52e88bff-2577-4f0e-ae98-9636f88afd2a",
+            "https://github.com/user-attachments/assets/3b0a61cc-7b96-45c1-ab4f-0b1b38597f4b",
+            "https://github.com/user-attachments/assets/6e4a4cad-7467-4662-83e7-3ada27c1e6e6",
+            "https://github.com/user-attachments/assets/5ce1fdc3-178f-4d54-bb00-4db97afa6b93",
+            "https://github.com/user-attachments/assets/870990b0-b414-496d-99b9-744a85ac4c9c",
+            "https://github.com/user-attachments/assets/52e15f07-4770-4f35-a6e5-65cedc737251"
+    );
+    private static final Random RANDOM = new Random();
 
     // 메서드 설명: 위치 정보가 없는 Spot들의 위치 정보를 업데이트한다.
     @Transactional
@@ -93,6 +107,48 @@ public class SpotService {
         spot.updateAdminDong(
                 naverMapsAdapter.getReverseGeoCodingResult(spot.getLatitude(), spot.getLongitude())
         );
+    }
+
+    @Transactional(readOnly = true)
+    public SpotListResponse fetchRecommendedSpotList(SpotListRequest request) {
+        // 예시: 랜덤으로 6개 Spot 도메인 엔티티 가져오기
+        List<SpotEntity> randomSpots = spotRepository.findRandomSpots(6);
+
+        // Spot 도메인 엔티티를 SpotListResponse.RecommendedSpot으로 변환
+        List<RecommendedSpot> spotList = randomSpots.stream()
+                .map(this::toRecommendedSpot)
+                .collect(Collectors.toList());
+
+        return new SpotListResponse(spotList);
+    }
+
+    // Spot -> RecommendedSpot 변환 메서드
+    private RecommendedSpot toRecommendedSpot(SpotEntity spotEntity) {
+        return new RecommendedSpot(
+                spotEntity.getId(),
+                fetchSpotImage(spotEntity.getId()),
+                generateRandomMatchingRate(), // 80~100 사이의 랜덤 값 설정
+                spotEntity.getSpotType().name(),
+                spotEntity.getName(),
+                calculateWalkingTime(spotEntity.getLatitude(), spotEntity.getLongitude())
+        );
+    }
+
+    private String fetchSpotImage(Long spotId) {
+        return spotImageRepository.findTopBySpotId(spotId)
+                .map(SpotImageEntity::getImage)
+                .orElse(IMAGE_URLS.get(RANDOM.nextInt(IMAGE_URLS.size())));
+    }
+
+    // 80~100 사이 랜덤값 생성
+    private int generateRandomMatchingRate() {
+        return (int) (Math.random() * (100 - 80 + 1)) + 80; // 80~100 사이 값
+    }
+
+    // 예시: 도보 시간 계산 (임의로 설정)
+    private int calculateWalkingTime(Double latitude, Double longitude) {
+        // 도보 시간 계산 로직 (예시로 3~10분 사이 랜덤 값 반환)
+        return (int) (Math.random() * (10 - 3 + 1)) + 3;
     }
 
     // TODO: 장소 추천 시 메뉴 가격 변동이면 메인 메뉴 X 처리

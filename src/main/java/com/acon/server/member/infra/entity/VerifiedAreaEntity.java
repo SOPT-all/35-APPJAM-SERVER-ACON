@@ -25,6 +25,7 @@ import org.hibernate.type.SqlTypes;
                 name = "idx_verified_area_member_id",
                 columnList = "member_id"
         )
+        // TODO: memberId와 name을 unique로 묶던가 verifiedDate를 위한 테이블을 분리하던가
 )
 public class VerifiedAreaEntity {
 
