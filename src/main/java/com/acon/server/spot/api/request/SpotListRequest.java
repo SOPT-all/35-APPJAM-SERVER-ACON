@@ -21,15 +21,14 @@ public record SpotListRequest(
         Condition condition,
 
         @Positive(message = "도보 가능 거리는 양수여야 합니다.")
-        Integer walkingTime,
-
-        @Positive(message = "가격대는 양수여야 합니다.")
-        Integer priceRange
+        Integer walkingTime
 ) {
 
     public static record Condition(
             String spotType,
-            List<Filter> filterList
+            List<Filter> filterList,
+            @Positive(message = "가격대는 양수여야 합니다.")
+            Integer priceRange
     ) {
 
         public static record Filter(
