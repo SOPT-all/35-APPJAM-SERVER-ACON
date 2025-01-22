@@ -5,7 +5,6 @@ import jakarta.validation.constraints.NotEmpty;
 import java.util.List;
 
 public record PreferenceRequest(
-        @NotEmpty(message = "dislikeFoodList가 빈 값입니다.")
         List<String> dislikeFoodList,
         @NotEmpty(message = "favoriteCuisineRank가 빈 값입니다.")
         List<String> favoriteCuisineRank,
