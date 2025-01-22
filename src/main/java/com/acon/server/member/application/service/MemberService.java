@@ -144,17 +144,17 @@ public class MemberService {
     }
 
     public String createMemberArea(final Double latitude, final Double longitude, final Long memberId) {
-        String adminDong = naverMapsAdapter.getReverseGeoCodingResult(latitude, longitude);
-        
+        String legalDong = naverMapsAdapter.getReverseGeoCodingResult(latitude, longitude);
+
         verifiedAreaRepository.save(
                 VerifiedAreaEntity.builder()
-                        .name(adminDong)
+                        .name(legalDong)
                         .memberId(memberId)
                         .verifiedDate(Collections.singletonList(LocalDate.now()))
                         .build()
         );
 
-        return adminDong;
+        return legalDong;
     }
 
     // TODO: 최근 길 안내 장소 지우는 스케줄러 추가

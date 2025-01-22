@@ -62,8 +62,8 @@ public class SpotEntity extends BaseTimeEntity {
     @Column(name = "geom", columnDefinition = "geometry(Point, 4326)")
     private Point geom;
 
-    @Column(name = "admin_dong")
-    private String adminDong;
+    @Column(name = "legal_dong")
+    private String legalDong;
 
     @Builder
     public SpotEntity(
@@ -78,7 +78,7 @@ public class SpotEntity extends BaseTimeEntity {
             Double latitude,
             Double longitude,
             Point geom,
-            String adminDong
+            String legalDong
     ) {
         this.id = id;
         this.name = name;
@@ -92,6 +92,6 @@ public class SpotEntity extends BaseTimeEntity {
         this.latitude = latitude;
         this.longitude = longitude;
         this.geom = geom;
-        this.adminDong = adminDong;
+        this.legalDong = legalDong;
     }
 }

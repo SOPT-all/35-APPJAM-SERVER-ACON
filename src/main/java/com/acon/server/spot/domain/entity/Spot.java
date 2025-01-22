@@ -27,7 +27,7 @@ public class Spot {
     private Double latitude;
     private Double longitude;
     private Point geom;
-    private String adminDong;
+    private String legalDong;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
@@ -44,7 +44,7 @@ public class Spot {
             Double latitude,
             Double longitude,
             Point geom,
-            String adminDong,
+            String legalDong,
             LocalDateTime createdAt,
             LocalDateTime updatedAt
     ) {
@@ -59,7 +59,7 @@ public class Spot {
         this.latitude = latitude;
         this.longitude = longitude;
         this.geom = geom;
-        this.adminDong = adminDong;
+        this.legalDong = legalDong;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
@@ -100,9 +100,9 @@ public class Spot {
         }
     }
 
-    public void updateAdminDong(String adminDong) {
+    public void updateLegalDong(String legalDong) {
         if (latitude != null && longitude != null) {
-            this.adminDong = adminDong;
+            this.legalDong = legalDong;
         }
     }
 }
