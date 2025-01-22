@@ -1,7 +1,7 @@
 package com.acon.server.global.auth;
 
 import com.acon.server.global.exception.BusinessException;
-import com.menugraphy.server.global.exception.ErrorType;
+import com.acon.server.global.exception.ErrorType;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 

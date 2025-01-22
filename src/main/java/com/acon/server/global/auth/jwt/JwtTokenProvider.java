@@ -11,7 +11,6 @@ import jakarta.annotation.PostConstruct;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.Date;
-import java.util.List;
 import javax.crypto.SecretKey;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -37,10 +36,6 @@ public class JwtTokenProvider {
     protected void init() {
         //base64 라이브러리에서 encodeToString을 이용해서 byte[] 형식을 String 형식으로 변환
         JWT_SECRET = Base64.getEncoder().encodeToString(JWT_SECRET.getBytes(StandardCharsets.UTF_8));
-    }
-
-    public List<String> issueToken(Long memberId) {
-        return List.of(issueAccessToken(memberId), issueRefreshToken(memberId));
     }
 
     public String issueAccessToken(final Authentication authentication) {

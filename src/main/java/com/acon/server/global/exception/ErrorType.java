@@ -25,6 +25,9 @@ public enum ErrorType {
 
     /* 401 Unauthorized */
     EXPIRED_ACCESS_TOKEN_ERROR(HttpStatus.UNAUTHORIZED, 40101, "만료된 accessToken입니다."),
+    EMPTY_PRINCIPAL_ERROR(HttpStatus.UNAUTHORIZED, 40102, "Principal 객체가 없습니다."),
+    UN_LOGIN_ERROR(HttpStatus.UNAUTHORIZED, 40103, "로그인 후 진행해 주세요."),
+    BEARER_LOST_ERROR(HttpStatus.UNAUTHORIZED, 40104, "요청한 토큰이 Bearer 토큰이 아닙니다."),
 
     /* 404 Not Found */
     NOT_FOUND_PATH_ERROR(HttpStatus.NOT_FOUND, 40401, "존재하지 않는 경로입니다."),

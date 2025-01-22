@@ -20,7 +20,7 @@ public class JwtUtils {
     private static final String JWT_KEY = "memberId";
 
     public JwtUtils(JwtConfig jwtConfig) {
-        byte[] keyBytes = jwtConfig.getSecretKey().getBytes();
+        byte[] keyBytes = jwtConfig.getSecret().getBytes();
         this.secretKey = Keys.hmacShaKeyFor(keyBytes);
     }
 
