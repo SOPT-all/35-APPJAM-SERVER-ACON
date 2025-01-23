@@ -131,6 +131,7 @@ public class SpotService {
         return new SpotListResponse(spotList);
     }
 
+    // TODO enum 처리 급해요 
     public List<SpotEntity> filterSpotList(SpotListRequest request) {
         return spotNativeQueryRepository.findSpotsWithinDistance(
                 request.latitude(), request.longitude(),
@@ -138,7 +139,7 @@ public class SpotService {
                 request.condition().spotType(),
                 request.condition().priceRange(),
                 request.condition()
-                        .filterList()
+                        .filterList(), 6
         );
     }
 
