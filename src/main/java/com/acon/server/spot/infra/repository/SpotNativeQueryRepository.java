@@ -23,7 +23,8 @@ public class SpotNativeQueryRepository {
             Double distanceMeter,
             String spotType,
             Integer priceRange,
-            List<Filter> filterList
+            List<Filter> filterList,
+            int limit
     ) {
         // 1) 기본 쿼리
         StringBuilder sb = new StringBuilder();
@@ -50,7 +51,7 @@ public class SpotNativeQueryRepository {
         }
 
         // 3) LIMIT
-        sb.append("LIMIT 6 ");
+        sb.append("LIMIT ").append(limit);
 
         // 4) Native Query 생성
         Query query = entityManager.createNativeQuery(sb.toString(), SpotEntity.class);
