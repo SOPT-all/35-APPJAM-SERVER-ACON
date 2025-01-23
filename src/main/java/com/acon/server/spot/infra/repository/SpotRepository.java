@@ -12,7 +12,10 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface SpotRepository extends JpaRepository<SpotEntity, Long> {
 
-    List<SpotEntity> findTop10ByNameContainsIgnoreCase(String keyword);
+    List<SpotEntity> findTop10ByNameStartingWith(String prefix);
+
+    @Query(value = "SELECT * FROM spot WHERE name LIKE %:keyword% LIMIT :limit", nativeQuery = true)
+    List<SpotEntity> findByNameContainingWithLimit(@Param("keyword") String keyword, @Param("limit") int limit);
 
     List<SpotEntity> findAllByLatitudeIsNullOrLongitudeIsNullOrGeomIsNullOrLegalDongIsNull();
 
