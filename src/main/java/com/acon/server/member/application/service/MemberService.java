@@ -133,9 +133,7 @@ public class MemberService {
         optionalVerifiedAreaEntity.ifPresentOrElse(
                 verifiedAreaEntity -> {
                     VerifiedArea verifiedArea = verifiedAreaMapper.toDomain(verifiedAreaEntity);
-                    List<LocalDate> dates = verifiedArea.getVerifiedDate();
-                    dates.add(LocalDate.now());
-                    verifiedArea.setVerifiedDate(dates);
+                    verifiedArea.updateVerifiedDate(LocalDate.now());
                     verifiedAreaRepository.save(verifiedAreaMapper.toEntity(verifiedArea));
                 },
                 () -> verifiedAreaRepository.save(

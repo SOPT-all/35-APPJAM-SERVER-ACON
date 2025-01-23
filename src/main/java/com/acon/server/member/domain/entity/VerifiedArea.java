@@ -4,11 +4,9 @@ import java.time.LocalDate;
 import java.util.List;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.Setter;
 import lombok.ToString;
 
 @Getter
-@Setter
 @ToString
 public class VerifiedArea {
 
@@ -35,5 +33,9 @@ public class VerifiedArea {
         this.verifiedDate = verifiedDate;
         this.certifiedForThreeMonths = certifiedForThreeMonths;
         this.hasCertificationMark = hasCertificationMark;
+    }
+
+    public void updateVerifiedDate(LocalDate localDate) {
+        verifiedDate.add(localDate);
     }
 }
