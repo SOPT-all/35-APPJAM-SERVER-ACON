@@ -28,6 +28,7 @@ import com.acon.server.spot.infra.entity.SpotImageEntity;
 import com.acon.server.spot.infra.repository.MenuRepository;
 import com.acon.server.spot.infra.repository.OpeningHourRepository;
 import com.acon.server.spot.infra.repository.SpotImageRepository;
+import com.acon.server.spot.infra.repository.SpotNativeQueryRepository;
 import com.acon.server.spot.infra.repository.SpotRepository;
 import java.time.DayOfWeek;
 import java.time.LocalDateTime;
@@ -58,6 +59,7 @@ public class SpotService {
     private final OpeningHourRepository openingHourRepository;
     private final SpotImageRepository spotImageRepository;
     private final SpotRepository spotRepository;
+    private final SpotNativeQueryRepository spotNativeQueryRepository;
 
     private final SpotDtoMapper spotDtoMapper;
     private final SpotMapper spotMapper;
@@ -117,15 +119,28 @@ public class SpotService {
 
     @Transactional(readOnly = true)
     public SpotListResponse fetchRecommendedSpotList(SpotListRequest request) {
-        // 예시: 랜덤으로 6개 Spot 도메인 엔티티 가져오기
         List<SpotEntity> randomSpots = spotRepository.findRandomSpots(6);
 
+        List<SpotEntity> filterSpotList = filterSpotList(request);
+
         // Spot 도메인 엔티티를 SpotListResponse.RecommendedSpot으로 변환
-        List<RecommendedSpot> spotList = randomSpots.stream()
+        List<RecommendedSpot> spotList = filterSpotList.stream()
                 .map(this::toRecommendedSpot)
                 .collect(Collectors.toList());
 
         return new SpotListResponse(spotList);
+    }
+
+    // TODO enum 처리 급해요 
+    public List<SpotEntity> filterSpotList(SpotListRequest request) {
+        return spotNativeQueryRepository.findSpotsWithinDistance(
+                request.latitude(), request.longitude(),
+                calculateDistanceFromWalkingTime(request.condition().walkingTime()),
+                request.condition().spotType(),
+                request.condition().priceRange(),
+                request.condition()
+                        .filterList(), 6
+        );
     }
 
     // Spot -> RecommendedSpot 변환 메서드
@@ -291,6 +306,7 @@ public class SpotService {
                 .toList();
     }
 
+    // TODO: 검색어 문자가 첫 문자인 가게로 정렬
     public SearchSpotListResponse searchSpot(final String keyword) {
         List<SpotEntity> spotEntityList = spotRepository.findTop10ByNameContainsIgnoreCase(keyword);
 
@@ -317,5 +333,10 @@ public class SpotService {
                 spotRepository.calculateDistanceFromSpot(spotId, memberLongitude, memberLatitude);
 
         return distance < VERIFICATION_DISTANCE;
+    }
+
+    private double calculateDistanceFromWalkingTime(int walkingTime) {
+        double distanceKm = (walkingTime / 60.0) * 4.0;
+        return distanceKm * 1000.0;
     }
 }
