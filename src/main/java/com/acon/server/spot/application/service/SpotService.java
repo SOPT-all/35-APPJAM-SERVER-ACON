@@ -119,27 +119,27 @@ public class SpotService {
 
     @Transactional(readOnly = true)
     public SpotListResponse fetchRecommendedSpotList(SpotListRequest request) {
-        // 예시: 랜덤으로 6개 Spot 도메인 엔티티 가져오기
         List<SpotEntity> randomSpots = spotRepository.findRandomSpots(6);
 
+        List<SpotEntity> filterSpotList = filterSpotList(request);
+
         // Spot 도메인 엔티티를 SpotListResponse.RecommendedSpot으로 변환
-        List<RecommendedSpot> spotList = randomSpots.stream()
+        List<RecommendedSpot> spotList = filterSpotList.stream()
                 .map(this::toRecommendedSpot)
                 .collect(Collectors.toList());
 
         return new SpotListResponse(spotList);
     }
 
-    public List<Spot> filterSpotList(SpotListRequest request) {
-        double distanceKm = (request.condition().walkingTime() / 60.0) * 4.0;
-        double distanceMeter = distanceKm * 1000.0;
-        List<SpotEntity> spotEntityList = spotNativeQueryRepository.findSpotsWithinDistance(
-                request.latitude(), request.longitude(), distanceMeter, request.condition().spotType(),
+    public List<SpotEntity> filterSpotList(SpotListRequest request) {
+        return spotNativeQueryRepository.findSpotsWithinDistance(
+                request.latitude(), request.longitude(),
+                calculateDistanceFromWalkingTime(request.condition().walkingTime()),
+                request.condition().spotType(),
+                request.condition().priceRange(),
                 request.condition()
-                        .filterList(),
-                request.condition().priceRange()
+                        .filterList()
         );
-        return spotEntityList.stream().map(spotMapper::toDomain).toList();
     }
 
     // Spot -> RecommendedSpot 변환 메서드
@@ -332,5 +332,10 @@ public class SpotService {
                 spotRepository.calculateDistanceFromSpot(spotId, memberLongitude, memberLatitude);
 
         return distance < VERIFICATION_DISTANCE;
+    }
+
+    private double calculateDistanceFromWalkingTime(int walkingTime) {
+        double distanceKm = (walkingTime / 60.0) * 4.0;
+        return distanceKm * 1000.0;
     }
 }

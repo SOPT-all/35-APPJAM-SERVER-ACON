@@ -9,6 +9,7 @@ import java.util.List;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+// TODO: 리팩토링
 @Repository
 public class SpotNativeQueryRepository {
 
@@ -21,10 +22,10 @@ public class SpotNativeQueryRepository {
             Double lng,
             Double distanceMeter,
             String spotType,
-            List<Filter> filterList,
-            Integer priceRange
+            Integer priceRange,
+            List<Filter> filterList
     ) {
-        // 1) 기본 쿼리 골격
+        // 1) 기본 쿼리
         StringBuilder sb = new StringBuilder();
         sb.append("SELECT s.* ")
                 .append("FROM spot s ")
@@ -48,9 +49,8 @@ public class SpotNativeQueryRepository {
             }
         }
 
-        // 3) ORDER BY / LIMIT
-        sb.append("ORDER BY s.matching_rate DESC ")
-                .append("LIMIT 6 ");
+        // 3) LIMIT
+        sb.append("LIMIT 6 ");
 
         // 4) Native Query 생성
         Query query = entityManager.createNativeQuery(sb.toString(), SpotEntity.class);
@@ -66,17 +66,12 @@ public class SpotNativeQueryRepository {
         if (filterList != null && !filterList.isEmpty()) {
             for (int i = 0; i < filterList.size(); i++) {
                 Filter filter = filterList.get(i);
-
-                // category 파라미터
                 query.setParameter("categoryName_" + i, filter.category());
-
-                // optionList 파라미터 (List<String>)
                 query.setParameter("optionNames_" + i, filter.optionList());
             }
         }
 
         // 6) 쿼리 실행
-        @SuppressWarnings("unchecked")
         List<SpotEntity> result = query.getResultList();
 
         return result;
