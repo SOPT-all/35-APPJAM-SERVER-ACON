@@ -183,7 +183,7 @@ public class MemberService {
         optionalGuidedSpotEntity.ifPresentOrElse(
                 guidedSpotEntity -> {
                     GuidedSpot guidedSpot = guidedSpotMapper.toDomain(guidedSpotEntity);
-                    guidedSpot.setUpdatedAt(LocalDateTime.now());
+                    guidedSpot.updateUpdatedAt(LocalDateTime.now());
                     guidedSpotRepository.save(guidedSpotMapper.toEntity(guidedSpot));
                 },
                 () -> guidedSpotRepository.save(

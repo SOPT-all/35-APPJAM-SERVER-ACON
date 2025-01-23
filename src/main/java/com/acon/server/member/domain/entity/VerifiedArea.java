@@ -36,6 +36,6 @@ public class VerifiedArea {
     }
 
     public void updateVerifiedDate(LocalDate localDate) {
-        verifiedDate.add(localDate);
+        this.verifiedDate.add(localDate);
     }
 }

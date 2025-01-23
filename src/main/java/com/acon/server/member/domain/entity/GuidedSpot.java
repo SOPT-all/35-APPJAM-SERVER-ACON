@@ -3,11 +3,9 @@ package com.acon.server.member.domain.entity;
 import java.time.LocalDateTime;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.Setter;
 import lombok.ToString;
 
 @Getter
-@Setter
 @ToString
 public class GuidedSpot {
 
@@ -31,5 +29,9 @@ public class GuidedSpot {
         this.spotId = spotId;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
+    }
+
+    public void updateUpdatedAt(LocalDateTime localDateTime) {
+        this.updatedAt = localDateTime;
     }
 }
