@@ -34,4 +34,8 @@ public class VerifiedArea {
         this.certifiedForThreeMonths = certifiedForThreeMonths;
         this.hasCertificationMark = hasCertificationMark;
     }
+
+    public void updateVerifiedDate(LocalDate localDate) {
+        this.verifiedDate.add(localDate);
+    }
 }
