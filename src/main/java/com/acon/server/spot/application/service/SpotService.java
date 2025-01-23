@@ -310,7 +310,7 @@ public class SpotService {
 
     public SearchSpotListResponse searchSpot(final String keyword) {
         System.out.println(keyword);
-        if (keyword == null || keyword.isEmpty()) {
+        if (keyword == null || keyword.trim().isEmpty()) {
             return new SearchSpotListResponse(Collections.emptyList());
         }
         List<SpotEntity> spotEntityList = spotRepository.findTop10ByNameStartingWith(keyword);
