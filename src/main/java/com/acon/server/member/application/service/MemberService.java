@@ -11,9 +11,11 @@ import com.acon.server.member.api.response.LoginResponse;
 import com.acon.server.member.application.mapper.GuidedSpotMapper;
 import com.acon.server.member.application.mapper.MemberMapper;
 import com.acon.server.member.application.mapper.PreferenceMapper;
+import com.acon.server.member.application.mapper.VerifiedAreaMapper;
 import com.acon.server.member.domain.entity.GuidedSpot;
 import com.acon.server.member.domain.entity.Member;
 import com.acon.server.member.domain.entity.Preference;
+import com.acon.server.member.domain.entity.VerifiedArea;
 import com.acon.server.member.domain.enums.Cuisine;
 import com.acon.server.member.domain.enums.DislikeFood;
 import com.acon.server.member.domain.enums.FavoriteSpot;
@@ -52,6 +54,7 @@ public class MemberService {
     private final GuidedSpotMapper guidedSpotMapper;
     private final MemberMapper memberMapper;
     private final PreferenceMapper preferenceMapper;
+    private final VerifiedAreaMapper verifiedAreaMapper;
 
     private final JwtTokenProvider jwtTokenProvider;
     private final PrincipalHandler principalHandler;
@@ -124,13 +127,24 @@ public class MemberService {
     ) {
         MemberEntity memberEntity = memberRepository.findByIdOrElseThrow(principalHandler.getUserIdFromPrincipal());
         String legalDong = naverMapsAdapter.getReverseGeoCodingResult(latitude, longitude);
+        Optional<VerifiedAreaEntity> optionalVerifiedAreaEntity = verifiedAreaRepository.findByMemberIdAndName(
+                memberEntity.getId(), legalDong);
 
-        verifiedAreaRepository.save(
-                VerifiedAreaEntity.builder()
-                        .name(legalDong)
-                        .memberId(memberEntity.getId())
-                        .verifiedDate(Collections.singletonList(LocalDate.now()))
-                        .build()
+        optionalVerifiedAreaEntity.ifPresentOrElse(
+                verifiedAreaEntity -> {
+                    VerifiedArea verifiedArea = verifiedAreaMapper.toDomain(verifiedAreaEntity);
+                    List<LocalDate> dates = verifiedArea.getVerifiedDate();
+                    dates.add(LocalDate.now());
+                    verifiedArea.setVerifiedDate(dates);
+                    verifiedAreaRepository.save(verifiedAreaMapper.toEntity(verifiedArea));
+                },
+                () -> verifiedAreaRepository.save(
+                        VerifiedAreaEntity.builder()
+                                .name(legalDong)
+                                .memberId(memberEntity.getId())
+                                .verifiedDate(Collections.singletonList(LocalDate.now()))
+                                .build()
+                )
         );
 
         return legalDong;
