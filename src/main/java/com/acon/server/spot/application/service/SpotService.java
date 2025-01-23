@@ -131,7 +131,6 @@ public class SpotService {
         return new SpotListResponse(spotList);
     }
 
-    @Transactional(readOnly = true)
     public List<SpotEntity> filterSpotList(SpotListRequest request) {
         return spotNativeQueryRepository.findSpotsWithinDistance(
                 request.latitude(), request.longitude(),
