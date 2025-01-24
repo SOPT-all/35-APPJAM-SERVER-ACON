@@ -309,7 +309,6 @@ public class SpotService {
     }
 
     public SearchSpotListResponse searchSpot(final String keyword) {
-        System.out.println(keyword);
         if (keyword == null || keyword.trim().isEmpty()) {
             return new SearchSpotListResponse(Collections.emptyList());
         }
