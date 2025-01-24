@@ -18,13 +18,12 @@ public class SpotNativeQueryRepository {
 
     @Transactional(readOnly = true)
     public List<SpotEntity> findSpotsWithinDistance(
-            Double lat,
-            Double lng,
-            Double distanceMeter,
+            double lat,
+            double lng,
+            double distanceMeter,
             String spotType,
             Integer priceRange,
-            List<Filter> filterList,
-            int limit
+            List<Filter> filterList
     ) {
         // 1) 기본 쿼리
         StringBuilder sb = new StringBuilder();
@@ -50,20 +49,17 @@ public class SpotNativeQueryRepository {
             }
         }
 
-        // 3) LIMIT
-        sb.append("LIMIT ").append(limit);
-
-        // 4) Native Query 생성
+        // 3) Native Query 생성
         Query query = entityManager.createNativeQuery(sb.toString(), SpotEntity.class);
 
-        // 5) 파라미터 바인딩
+        // 4) 파라미터 바인딩
         query.setParameter("lat", lat);
         query.setParameter("lng", lng);
         query.setParameter("distanceMeter", distanceMeter);
         query.setParameter("spotType", spotType);
         query.setParameter("priceRange", priceRange);
 
-        // filterList 파라미터 바인딩
+        // 5) filterList 파라미터 바인딩
         if (filterList != null && !filterList.isEmpty()) {
             for (int i = 0; i < filterList.size(); i++) {
                 Filter filter = filterList.get(i);

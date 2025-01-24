@@ -30,9 +30,6 @@ public interface SpotRepository extends JpaRepository<SpotEntity, Long> {
         );
     }
 
-    @Query(value = "SELECT * FROM spot ORDER BY RANDOM() LIMIT :limit", nativeQuery = true)
-    List<SpotEntity> findRandomSpots(int limit);
-
     @Query(value = """
             SELECT s.id, s.name
             FROM spot s

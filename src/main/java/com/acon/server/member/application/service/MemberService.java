@@ -148,6 +148,14 @@ public class MemberService {
         return legalDong;
     }
 
+    @Transactional(readOnly = true)
+    public String fetchMemberArea(
+            final Double latitude,
+            final Double longitude
+    ) {
+        return naverMapsAdapter.getReverseGeoCodingResult(latitude, longitude);
+    }
+
     @Transactional
     public void createPreference(
             final List<DislikeFood> dislikeFoodList,
@@ -172,11 +180,16 @@ public class MemberService {
 
     @Transactional
     public void createGuidedSpot(final Long spotId) {
+        if (principalHandler.isGuestUser()) {
+            return;
+        }
+
         if (!spotRepository.existsById(spotId)) {
             throw new BusinessException(ErrorType.NOT_FOUND_SPOT_ERROR);
         }
 
         MemberEntity memberEntity = memberRepository.findByIdOrElseThrow(principalHandler.getUserIdFromPrincipal());
+
         Optional<GuidedSpotEntity> optionalGuidedSpotEntity =
                 guidedSpotRepository.findByMemberIdAndSpotId(memberEntity.getId(), spotId);
 
