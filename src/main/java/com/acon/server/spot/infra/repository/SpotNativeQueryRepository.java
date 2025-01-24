@@ -30,9 +30,10 @@ public class SpotNativeQueryRepository {
         sb.append("SELECT s.* ")
                 .append("FROM spot s ")
                 .append("WHERE ")
-                .append("ST_DWithin(s.geom::geography, ST_SetSRID(ST_MakePoint(:lng, :lat), 4326)::geography, :distanceMeter) ")
-                .append("AND (:spotType IS NULL OR s.spot_type = :spotType) ");
-
+                .append("ST_DWithin(s.geom::geography, ST_SetSRID(ST_MakePoint(:lng, :lat), 4326)::geography, :distanceMeter) ");
+        if (spotType != null && !spotType.trim().isEmpty()) {
+            sb.append("AND s.spot_type = :spotType ");
+        }
         if (priceRange != null && priceRange != -1) {
             sb.append("AND EXISTS ( ")
                     .append("SELECT 1 FROM menu m WHERE m.spot_id = s.id AND m.main_menu = TRUE AND m.price <= :priceRange) ");
@@ -59,7 +60,10 @@ public class SpotNativeQueryRepository {
         query.setParameter("lat", lat);
         query.setParameter("lng", lng);
         query.setParameter("distanceMeter", distanceMeter);
-        query.setParameter("spotType", spotType);
+
+        if (spotType != null && !spotType.trim().isEmpty()) {
+            query.setParameter("spotType", spotType);
+        }
 
         if (priceRange != null && priceRange != -1) {
             query.setParameter("priceRange", priceRange);
