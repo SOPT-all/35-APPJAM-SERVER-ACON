@@ -141,6 +141,7 @@ public class SpotService {
                 .filter(spot -> isSpotOpen(spot.getId()))
                 .toList();
 
+        // TODO: 메서드로 분리
         // ========== [ CASE 1: preferenceEntity가 없는 사용자 ] ==========
         if (preferenceEntity == null) {
             // 가변 리스트 생성
@@ -185,6 +186,7 @@ public class SpotService {
                     LocalDateTime aCreated = a.spotEntity().getCreatedAt();
                     LocalDateTime bCreated = b.spotEntity().getCreatedAt();
 
+                    // TODO: 추후 Comparator로 분리
                     // createdAt이 null일 수도 있으니 안전 처리
                     if (bCreated == null && aCreated == null) {
                         return 0;
@@ -273,6 +275,7 @@ public class SpotService {
 
         score += calcAcornScore(spotEntity);
 
+        // TODO: 메서드로 분리
         // TODO: 매직 넘버 yml로 옮기기
         if (spotEntity.getCreatedAt() != null) {
             LocalDateTime threeMonthsAgo = LocalDateTime.now().minusMonths(3);
@@ -429,6 +432,7 @@ public class SpotService {
         );
     }
 
+    // TODO: mapper로 분리
     // SpotEntity -> RecommendedSpot 변환 메서드 (온보딩 마친 유저)
     private RecommendedSpot toRecommendedSpot(final SpotEntity spotEntity, final int matchingRate) {
         return new RecommendedSpot(
