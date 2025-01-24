@@ -37,4 +37,12 @@ public enum Cuisine {
 
         return cuisine;
     }
+
+    public static Cuisine matchCuisine(String name) {
+        try {
+            return Cuisine.fromValue(name);
+        } catch (Exception e) {
+            return null;
+        }
+    }
 }

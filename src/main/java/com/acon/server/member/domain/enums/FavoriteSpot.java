@@ -35,4 +35,12 @@ public enum FavoriteSpot {
 
         return favoriteSpot;
     }
+
+    public static FavoriteSpot matchFavoriteSpot(String name) {
+        try {
+            return FavoriteSpot.fromValue(name);
+        } catch (Exception e) {
+            return null;
+        }
+    }
 }

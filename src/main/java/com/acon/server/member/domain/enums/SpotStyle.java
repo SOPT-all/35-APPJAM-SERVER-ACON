@@ -12,7 +12,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public enum SpotStyle {
 
-    TRADITIONAL,
+    VINTAGE,
     MODERN,
     ;
 
@@ -32,5 +32,13 @@ public enum SpotStyle {
         }
 
         return spotStyle;
+    }
+
+    public static SpotStyle matchSpotStyle(String name) {
+        try {
+            return SpotStyle.fromValue(name);
+        } catch (Exception e) {
+            return null;
+        }
     }
 }

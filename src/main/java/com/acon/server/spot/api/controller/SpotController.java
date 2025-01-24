@@ -31,7 +31,6 @@ public class SpotController {
 
     private final SpotService spotService;
 
-    // 위치 및 사용자 온보딩 결과 기반 개인화 장소 리스트 추천 API 컨트롤러 메서드
     @PostMapping(
             path = "/spots",
             consumes = MediaType.APPLICATION_JSON_VALUE,

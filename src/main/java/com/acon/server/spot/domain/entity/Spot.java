@@ -105,4 +105,10 @@ public class Spot {
             this.legalDong = legalDong;
         }
     }
+
+    public void updateCreatedAt() {
+        if (this.createdAt == null) {
+            this.createdAt = this.updatedAt;
+        }
+    }
 }
