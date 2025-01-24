@@ -76,6 +76,9 @@ public class SpotNativeQueryRepository {
         if (filterList != null && !filterList.isEmpty()) {
             for (int i = 0; i < filterList.size(); i++) {
                 Filter filter = filterList.get(i);
+                if (filter.optionList().isEmpty()) {
+                    continue;
+                }
                 query.setParameter("categoryName_" + i, filter.category());
                 query.setParameter("optionNames_" + i, filter.optionList());
             }
