@@ -588,8 +588,8 @@ public class SpotService {
                 SUGGESTION_LIMIT
         );
 
-        if (recentSpotSuggestion.size() < 5) {
-            int needed = 5 - recentSpotSuggestion.size();
+        if (recentSpotSuggestion.size() < SUGGESTION_LIMIT) {
+            int needed = SUGGESTION_LIMIT - recentSpotSuggestion.size();
 
             List<SearchSuggestionResponse> nearestSpotList =
                     findNearestSpotList(longitude, latitude, SUGGESTION_RADIUS, SUGGESTION_LIMIT);
