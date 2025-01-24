@@ -1,14 +1,18 @@
 package com.acon.server.spot.infra.entity;
 
 import com.acon.server.global.entity.BaseTimeEntity;
+import com.acon.server.spot.api.response.SearchSuggestionResponse;
 import com.acon.server.spot.domain.enums.SpotType;
 import jakarta.persistence.Column;
+import jakarta.persistence.ColumnResult;
+import jakarta.persistence.ConstructorResult;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.SqlResultSetMapping;
 import jakarta.persistence.Table;
 import java.time.LocalDateTime;
 import lombok.AccessLevel;
@@ -19,6 +23,18 @@ import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 import org.locationtech.jts.geom.Point;
 
+@SqlResultSetMapping(
+        name = "SearchSuggestionResponseMapping",
+        classes = {
+                @ConstructorResult(
+                        targetClass = SearchSuggestionResponse.class,
+                        columns = {
+                                @ColumnResult(name = "spot_id", type = Long.class),
+                                @ColumnResult(name = "spot_name", type = String.class)
+                        }
+                )
+        }
+)
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
