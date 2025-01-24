@@ -42,6 +42,9 @@ public class SpotNativeQueryRepository {
         // 2) filterList가 있는 경우, 각 항목마다 AND EXISTS 서브쿼리 추가
         if (filterList != null && !filterList.isEmpty()) {
             for (int i = 0; i < filterList.size(); i++) {
+                if (filterList.get(i).optionList().isEmpty()) {
+                    continue;
+                }
                 sb.append("AND EXISTS (")
                         .append("SELECT 1 FROM spot_option so ")
                         .append("JOIN \"option\" o ON o.id = so.option_id ")
