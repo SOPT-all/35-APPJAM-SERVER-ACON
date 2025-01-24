@@ -31,9 +31,12 @@ public class SpotNativeQueryRepository {
                 .append("FROM spot s ")
                 .append("WHERE ")
                 .append("ST_DWithin(s.geom::geography, ST_SetSRID(ST_MakePoint(:lng, :lat), 4326)::geography, :distanceMeter) ")
-                .append("AND (:spotType IS NULL OR s.spot_type = :spotType) ")
-                .append("AND (:priceRange IS NULL OR EXISTS ( ")
-                .append("SELECT 1 FROM menu m WHERE m.spot_id = s.id AND m.main_menu = TRUE AND m.price <= :priceRange)) ");
+                .append("AND (:spotType IS NULL OR s.spot_type = :spotType) ");
+
+        if (priceRange != null && priceRange != -1) {
+            sb.append("AND EXISTS ( ")
+                    .append("SELECT 1 FROM menu m WHERE m.spot_id = s.id AND m.main_menu = TRUE AND m.price <= :priceRange) ");
+        }
 
         // 2) filterList가 있는 경우, 각 항목마다 AND EXISTS 서브쿼리 추가
         if (filterList != null && !filterList.isEmpty()) {
@@ -57,7 +60,10 @@ public class SpotNativeQueryRepository {
         query.setParameter("lng", lng);
         query.setParameter("distanceMeter", distanceMeter);
         query.setParameter("spotType", spotType);
-        query.setParameter("priceRange", priceRange);
+
+        if (priceRange != null && priceRange != -1) {
+            query.setParameter("priceRange", priceRange);
+        }
 
         // 5) filterList 파라미터 바인딩
         if (filterList != null && !filterList.isEmpty()) {
