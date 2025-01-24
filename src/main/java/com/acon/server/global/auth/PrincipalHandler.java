@@ -23,4 +23,10 @@ public class PrincipalHandler {
             throw new BusinessException(ErrorType.EMPTY_PRINCIPAL_ERROR);
         }
     }
+
+    public boolean isGuestUser() {
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        return principal.toString().equals(ANONYMOUS_USER);
+    }
 }

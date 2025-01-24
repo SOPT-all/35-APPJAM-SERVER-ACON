@@ -172,11 +172,16 @@ public class MemberService {
 
     @Transactional
     public void createGuidedSpot(final Long spotId) {
+        if (principalHandler.isGuestUser()) {
+            return;
+        }
+
         if (!spotRepository.existsById(spotId)) {
             throw new BusinessException(ErrorType.NOT_FOUND_SPOT_ERROR);
         }
 
         MemberEntity memberEntity = memberRepository.findByIdOrElseThrow(principalHandler.getUserIdFromPrincipal());
+
         Optional<GuidedSpotEntity> optionalGuidedSpotEntity =
                 guidedSpotRepository.findByMemberIdAndSpotId(memberEntity.getId(), spotId);
 

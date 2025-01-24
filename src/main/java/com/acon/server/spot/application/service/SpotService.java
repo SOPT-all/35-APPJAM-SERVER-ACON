@@ -49,6 +49,8 @@ import com.acon.server.spot.infra.repository.SpotRepository;
 import java.time.DayOfWeek;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -138,6 +140,23 @@ public class SpotService {
                 .filter(spot -> isSpotOpen(spot.getId()))
                 .toList();
 
+        // ========== [ CASE 1: preferenceEntity가 없는 사용자 ] ==========
+        if (preferenceEntity == null) {
+            // 가변 리스트 생성
+            List<SpotEntity> mutableList = new ArrayList<>(filteredSpotList);
+
+            // 무작위로 6개 추출
+            Collections.shuffle(mutableList);
+
+            List<RecommendedSpot> spotList = mutableList.stream()
+                    .map(this::toRecommendedSpot)
+                    .limit(6)
+                    .toList();
+
+            return new SpotListResponse(spotList);
+        }
+
+        // ========== [ CASE 2: preferenceEntity가 있는 사용자 ] ==========
         // 2) 비선호 음식 제외
         filteredSpotList = excludeDislikedSpotList(filteredSpotList, preferenceEntity.getDislikeFoodList());
 
@@ -402,6 +421,19 @@ public class SpotService {
         return acornScore;
     }
 
+    // SpotEntity -> RecommendedSpot 변환 메서드 (게스트 혹은 온보딩 건너뛴 유저)
+    private RecommendedSpot toRecommendedSpot(final SpotEntity spotEntity) {
+        return new RecommendedSpot(
+                spotEntity.getId(),
+                fetchSpotImage(spotEntity.getId()),
+                null,
+                spotEntity.getSpotType().name(),
+                spotEntity.getName(),
+                calculateWalkingTime(spotEntity, spotEntity.getLatitude(), spotEntity.getLongitude())
+        );
+    }
+
+    // SpotEntity -> RecommendedSpot 변환 메서드 (온보딩 마친 유저)
     private RecommendedSpot toRecommendedSpot(final SpotEntity spotEntity, final int matchingRate) {
         return new RecommendedSpot(
                 spotEntity.getId(),
