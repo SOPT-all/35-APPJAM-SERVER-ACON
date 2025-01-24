@@ -148,6 +148,14 @@ public class MemberService {
         return legalDong;
     }
 
+    @Transactional(readOnly = true)
+    public String fetchMemberArea(
+            final Double latitude,
+            final Double longitude
+    ) {
+        return naverMapsAdapter.getReverseGeoCodingResult(latitude, longitude);
+    }
+
     @Transactional
     public void createPreference(
             final List<DislikeFood> dislikeFoodList,

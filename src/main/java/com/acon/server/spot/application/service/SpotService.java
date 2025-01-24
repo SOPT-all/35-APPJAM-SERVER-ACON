@@ -15,6 +15,7 @@ import com.acon.server.member.domain.enums.FavoriteSpot;
 import com.acon.server.member.domain.enums.SpotStyle;
 import com.acon.server.member.infra.entity.MemberEntity;
 import com.acon.server.member.infra.entity.PreferenceEntity;
+import com.acon.server.member.infra.repository.GuidedSpotCustomRepository;
 import com.acon.server.member.infra.repository.GuidedSpotRepository;
 import com.acon.server.member.infra.repository.MemberRepository;
 import com.acon.server.member.infra.repository.PreferenceRepository;
@@ -67,12 +68,13 @@ public class SpotService {
 
     private final PreferenceRepository preferenceRepository;
 
-    // TODO: 매직 넘버 yml로 옮기기, 250m로 바꾸고 변수명 수정
-    private static final int WALKING_RADIUS_30_MIN = 2000;
+    // TODO: 매직 넘버 yml로 옮기기
+    private static final int SUGGESTION_RADIUS = 250;
     private static final int SUGGESTION_LIMIT = 5;
     private static final int VERIFICATION_DISTANCE = 250;
     private static final int SEARCH_LIMIT = 10;
 
+    private final GuidedSpotCustomRepository guidedSpotCustomRepository;
     private final GuidedSpotRepository guidedSpotRepository;
     private final MemberRepository memberRepository;
     private final MenuRepository menuRepository;
@@ -578,34 +580,37 @@ public class SpotService {
     public SearchSuggestionListResponse fetchSearchSuggestions(final Double latitude, final Double longitude) {
         MemberEntity memberEntity = memberRepository.findByIdOrElseThrow(principalHandler.getUserIdFromPrincipal());
 
-        List<SearchSuggestionResponse> recentSpotSuggestion =
-                // TODO: 250m 범위 내의 TOP5로 수정
-                guidedSpotRepository.findTopByMemberIdOrderByUpdatedAtDesc(memberEntity.getId())
-                        .flatMap(recentGuidedSpot -> spotRepository.findById(recentGuidedSpot.getSpotId()))
-                        .map(spotDtoMapper::toSearchSuggestionResponse)
-                        .stream()
-                        .toList();
+        List<SearchSuggestionResponse> recentSpotSuggestion = guidedSpotCustomRepository.findRecentGuidedSpotSuggestions(
+                memberEntity.getId(),
+                latitude,
+                longitude,
+                SUGGESTION_RADIUS,
+                SUGGESTION_LIMIT
+        );
 
-        List<SearchSuggestionResponse> nearestSpotList =
-                findNearestSpotList(longitude, latitude, WALKING_RADIUS_30_MIN, SUGGESTION_LIMIT);
+        if (recentSpotSuggestion.size() < SUGGESTION_LIMIT) {
+            int needed = SUGGESTION_LIMIT - recentSpotSuggestion.size();
 
-        // Set을 통한 필터링 성능 향상
-        Set<Long> recentSpotIds = recentSpotSuggestion.stream()
-                .map(SearchSuggestionResponse::spotId)
-                .collect(Collectors.toSet());
+            List<SearchSuggestionResponse> nearestSpotList =
+                    findNearestSpotList(longitude, latitude, SUGGESTION_RADIUS, SUGGESTION_LIMIT);
 
-        List<SearchSuggestionResponse> filteredNearestSpotList = nearestSpotList.stream()
-                .filter(nearestSpot -> !recentSpotIds.contains(nearestSpot.spotId()))
-                .toList();
+            // Set을 통한 필터링 성능 향상
+            Set<Long> existingSpotIds = recentSpotSuggestion.stream()
+                    .map(SearchSuggestionResponse::spotId)
+                    .collect(Collectors.toSet());
 
-        List<SearchSuggestionResponse> combinedSuggestionList = Stream.concat(
-                        recentSpotSuggestion.stream(),
-                        filteredNearestSpotList.stream()
-                )
-                .limit(SUGGESTION_LIMIT)
-                .toList();
+            List<SearchSuggestionResponse> filteredNearestSpotList = nearestSpotList.stream()
+                    .filter(nearestSpot -> !existingSpotIds.contains(nearestSpot.spotId()))
+                    .limit(needed)
+                    .toList();
 
-        return new SearchSuggestionListResponse(combinedSuggestionList);
+            recentSpotSuggestion = Stream.concat(
+                    recentSpotSuggestion.stream(),
+                    filteredNearestSpotList.stream()
+            ).toList();
+        }
+
+        return new SearchSuggestionListResponse(recentSpotSuggestion);
     }
 
     // TODO: limit 없는 메서드로부터 분기하도록 리팩토링
@@ -626,15 +631,18 @@ public class SpotService {
         if (keyword == null || keyword.trim().isEmpty()) {
             return new SearchSpotListResponse(Collections.emptyList());
         }
-      
+
         List<SpotEntity> spotEntityList = spotRepository.findTop10ByNameStartingWithIgnoreCase(keyword);
-      
+
         if (spotEntityList.size() < SEARCH_LIMIT) {
-            List<SpotEntity> additionalSpots =
-              spotRepository.findByNameContainingWithLimitIgnoreCase(keyword, SEARCH_LIMIT - spotEntityList.size());
+            List<SpotEntity> additionalSpots = spotRepository.findByNameContainingWithLimitIgnoreCase(
+                    keyword, SEARCH_LIMIT - spotEntityList.size()
+            );
+
             Set<Long> existingSpotIds = spotEntityList.stream()
                     .map(SpotEntity::getId)
                     .collect(Collectors.toSet());
+
             spotEntityList.addAll(
                     additionalSpots.stream()
                             .filter(additionalSpot -> !existingSpotIds.contains(additionalSpot.getId()))
