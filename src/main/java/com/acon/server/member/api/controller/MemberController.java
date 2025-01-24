@@ -15,14 +15,18 @@ import com.acon.server.member.domain.enums.SocialType;
 import com.acon.server.member.domain.enums.SpotStyle;
 import com.acon.server.spot.domain.enums.SpotType;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.DecimalMax;
+import jakarta.validation.constraints.DecimalMin;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -55,6 +59,20 @@ public class MemberController {
             @Valid @RequestBody final MemberAreaRequest request
     ) {
         String area = memberService.createMemberArea(request.latitude(), request.longitude());
+
+        return ResponseEntity.ok(new MemberAreaResponse(area));
+    }
+
+    @GetMapping(path = "/area", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<MemberAreaResponse> getArea(
+            @DecimalMin(value = "33.1", message = "위도는 최소 33.1°N 이상이어야 합니다.(대한민국 기준)")
+            @DecimalMax(value = "38.6", message = "위도는 최대 38.6°N 이하이어야 합니다.(대한민국 기준)")
+            @Validated @RequestParam(name = "latitude") final Double latitude,
+            @DecimalMin(value = "124.6", message = "경도는 최소 124.6°E 이상이어야 합니다.(대한민국 기준)")
+            @DecimalMax(value = "131.9", message = "경도는 최대 131.9°E 이하이어야 합니다.(대한민국 기준)")
+            @Validated @RequestParam(name = "longitude") final Double longitude
+    ) {
+        String area = memberService.fetchMemberArea(latitude, longitude);
 
         return ResponseEntity.ok(new MemberAreaResponse(area));
     }
