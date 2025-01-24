@@ -257,11 +257,6 @@ public class SpotService {
         // TODO: 매직 넘버 yml로 옮기기
         double score = 0.0;
 
-        if (preferenceEntity == null) {
-            return score;
-        }
-
-        // TODO: 매직 넘버 yml로 옮기기
         if (preferenceEntity.getFavoriteSpotType() == spotEntity.getSpotType()) {
             score += 6.0;
         } else {
