@@ -139,9 +139,10 @@ public class SpotService {
 
         // 1) 필터(거리, 가격, 옵션 등) + 영업중인 가게
         List<SpotEntity> filteredSpotList = filterSpotList(request);
-        filteredSpotList = filteredSpotList.stream()
-                .filter(spot -> isSpotOpen(spot.getId()))
-                .toList();
+        System.out.println(filteredSpotList.size());
+//        filteredSpotList = filteredSpotList.stream()
+//                .filter(spot -> isSpotOpen(spot.getId()))
+//                .toList();
 
         // TODO: 메서드로 분리
         // ========== [ CASE 1: preferenceEntity가 없는 사용자 ] ==========
@@ -229,6 +230,9 @@ public class SpotService {
     }
 
     private double calculateDistanceFromWalkingTime(final int walkingTime) {
+        if (walkingTime == -1) {
+            return 2000.0;
+        }
         // TODO: 매직 넘버 yml로 옮기기
         double distanceKm = (walkingTime / 60.0) * 4.0;
         return distanceKm * 1000.0;
