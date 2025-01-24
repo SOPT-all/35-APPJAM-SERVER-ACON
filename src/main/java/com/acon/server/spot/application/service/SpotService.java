@@ -71,6 +71,7 @@ public class SpotService {
     private static final int WALKING_RADIUS_30_MIN = 2000;
     private static final int SUGGESTION_LIMIT = 5;
     private static final int VERIFICATION_DISTANCE = 250;
+    private static final int SEARCH_LIMIT = 10;
 
     private final GuidedSpotRepository guidedSpotRepository;
     private final MemberRepository memberRepository;
@@ -621,9 +622,25 @@ public class SpotService {
                 .toList();
     }
 
-    // TODO: 검색어 문자가 첫 문자인 가게로 정렬
     public SearchSpotListResponse searchSpot(final String keyword) {
-        List<SpotEntity> spotEntityList = spotRepository.findTop10ByNameContainsIgnoreCase(keyword);
+        if (keyword == null || keyword.trim().isEmpty()) {
+            return new SearchSpotListResponse(Collections.emptyList());
+        }
+      
+        List<SpotEntity> spotEntityList = spotRepository.findTop10ByNameStartingWithIgnoreCase(keyword);
+      
+        if (spotEntityList.size() < SEARCH_LIMIT) {
+            List<SpotEntity> additionalSpots =
+              spotRepository.findByNameContainingWithLimitIgnoreCase(keyword, SEARCH_LIMIT - spotEntityList.size());
+            Set<Long> existingSpotIds = spotEntityList.stream()
+                    .map(SpotEntity::getId)
+                    .collect(Collectors.toSet());
+            spotEntityList.addAll(
+                    additionalSpots.stream()
+                            .filter(additionalSpot -> !existingSpotIds.contains(additionalSpot.getId()))
+                            .toList()
+            );
+        }
 
         // TODO: mapper로 변경
         List<SearchSpotResponse> spotList = spotEntityList.stream()
