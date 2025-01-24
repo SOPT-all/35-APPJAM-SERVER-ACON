@@ -153,7 +153,7 @@ public class SpotService {
             Collections.shuffle(mutableList);
 
             List<RecommendedSpot> spotList = mutableList.stream()
-                    .map(this::toRecommendedSpot)
+                    .map(spotEntity -> toRecommendedSpot(spotEntity, request.latitude(), request.longitude()))
                     .limit(6)
                     .toList();
 
@@ -208,7 +208,8 @@ public class SpotService {
         // 4) DTO 변환
         List<RecommendedSpot> spotList = scoredList.stream()
                 .map(spotWithScore ->
-                        toRecommendedSpot(spotWithScore.spotEntity(), spotWithScore.matchingRate())
+                        toRecommendedSpot(spotWithScore.spotEntity(), spotWithScore.matchingRate(), request.latitude(),
+                                request.longitude())
                 )
                 .collect(Collectors.toList());
 
@@ -423,27 +424,36 @@ public class SpotService {
     }
 
     // SpotEntity -> RecommendedSpot 변환 메서드 (게스트 혹은 온보딩 건너뛴 유저)
-    private RecommendedSpot toRecommendedSpot(final SpotEntity spotEntity) {
+    private RecommendedSpot toRecommendedSpot(
+            final SpotEntity spotEntity,
+            final double latitude,
+            final double longitude
+    ) {
         return new RecommendedSpot(
                 spotEntity.getId(),
                 fetchSpotImage(spotEntity.getId()),
                 null,
                 spotEntity.getSpotType().name(),
                 spotEntity.getName(),
-                calculateWalkingTime(spotEntity, spotEntity.getLatitude(), spotEntity.getLongitude())
+                calculateWalkingTime(spotEntity, latitude, longitude)
         );
     }
 
     // TODO: mapper로 분리
     // SpotEntity -> RecommendedSpot 변환 메서드 (온보딩 마친 유저)
-    private RecommendedSpot toRecommendedSpot(final SpotEntity spotEntity, final int matchingRate) {
+    private RecommendedSpot toRecommendedSpot(
+            final SpotEntity spotEntity,
+            final int matchingRate,
+            final Double latitude,
+            final Double longitude
+    ) {
         return new RecommendedSpot(
                 spotEntity.getId(),
                 fetchSpotImage(spotEntity.getId()),
                 matchingRate,
                 spotEntity.getSpotType().name(),
                 spotEntity.getName(),
-                calculateWalkingTime(spotEntity, spotEntity.getLatitude(), spotEntity.getLongitude())
+                calculateWalkingTime(spotEntity, latitude, longitude)
         );
     }
 
