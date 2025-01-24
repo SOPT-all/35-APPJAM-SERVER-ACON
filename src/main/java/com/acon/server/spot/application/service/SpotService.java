@@ -312,10 +312,9 @@ public class SpotService {
         if (keyword == null || keyword.trim().isEmpty()) {
             return new SearchSpotListResponse(Collections.emptyList());
         }
-        List<SpotEntity> spotEntityList = spotRepository.findTop10ByNameStartingWith(keyword);
-
+        List<SpotEntity> spotEntityList = spotRepository.findTop10ByNameStartingWithIgnoreCase(keyword);
         if (spotEntityList.size() < SEARCH_LIMIT) {
-            List<SpotEntity> additionalSpots = spotRepository.findByNameContainingWithLimit(keyword,
+            List<SpotEntity> additionalSpots = spotRepository.findByNameContainingWithLimitIgnoreCase(keyword,
                     SEARCH_LIMIT - spotEntityList.size());
             Set<Long> existingSpotIds = spotEntityList.stream()
                     .map(SpotEntity::getId)
