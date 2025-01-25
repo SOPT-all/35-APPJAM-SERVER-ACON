@@ -16,7 +16,6 @@ import com.acon.server.member.domain.enums.SpotStyle;
 import com.acon.server.member.infra.entity.MemberEntity;
 import com.acon.server.member.infra.entity.PreferenceEntity;
 import com.acon.server.member.infra.repository.GuidedSpotCustomRepository;
-import com.acon.server.member.infra.repository.GuidedSpotRepository;
 import com.acon.server.member.infra.repository.MemberRepository;
 import com.acon.server.member.infra.repository.PreferenceRepository;
 import com.acon.server.spot.api.request.SpotListRequest;
@@ -75,7 +74,6 @@ public class SpotService {
     private static final int SEARCH_LIMIT = 10;
 
     private final GuidedSpotCustomRepository guidedSpotCustomRepository;
-    private final GuidedSpotRepository guidedSpotRepository;
     private final MemberRepository memberRepository;
     private final MenuRepository menuRepository;
     private final OpeningHourRepository openingHourRepository;
@@ -134,12 +132,26 @@ public class SpotService {
 
     @Transactional(readOnly = true)
     public SpotListResponse fetchRecommendedSpotList(final SpotListRequest request) {
+        if (principalHandler.isGuestUser()) { // TODO: 메서드화 (게스트 유저와 온보딩 건너뛴 유저)
+            List<SpotEntity> filteredSpotList = filterSpotList(request);
+            List<SpotEntity> mutableList = new ArrayList<>(filteredSpotList);
+
+            // 무작위로 6개 추출
+            Collections.shuffle(mutableList);
+
+            List<RecommendedSpot> spotList = mutableList.stream()
+                    .map(spotEntity -> toRecommendedSpot(spotEntity, request.latitude(), request.longitude()))
+                    .limit(6)
+                    .toList();
+
+            return new SpotListResponse(spotList);
+        }
+
         MemberEntity memberEntity = memberRepository.findByIdOrElseThrow(principalHandler.getUserIdFromPrincipal());
         PreferenceEntity preferenceEntity = preferenceRepository.findByMemberId(memberEntity.getId()).orElse(null);
 
         // 1) 필터(거리, 가격, 옵션 등) + 영업중인 가게
         List<SpotEntity> filteredSpotList = filterSpotList(request);
-        System.out.println(filteredSpotList.size());
 //        filteredSpotList = filteredSpotList.stream()
 //                .filter(spot -> isSpotOpen(spot.getId()))
 //                .toList();
@@ -640,6 +652,7 @@ public class SpotService {
                 .toList();
     }
 
+    @Transactional(readOnly = true)
     public SearchSpotListResponse searchSpot(final String keyword) {
         if (keyword == null || keyword.trim().isEmpty()) {
             return new SearchSpotListResponse(Collections.emptyList());
