@@ -14,6 +14,7 @@ public enum SpotStyle {
 
     VINTAGE,
     MODERN,
+    TRADITIONAL, // TODO: 이후 삭제
     ;
 
     private static final Map<String, SpotStyle> SPOT_STYLE_MAP = new HashMap<>();
