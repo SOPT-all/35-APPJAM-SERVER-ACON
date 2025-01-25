@@ -1,12 +1,12 @@
 package com.acon.server.spot.infra.entity;
 
-import com.acon.server.global.entity.BaseTimeEntity;
 import com.acon.server.spot.api.response.SearchSuggestionResponse;
 import com.acon.server.spot.domain.enums.SpotType;
 import jakarta.persistence.Column;
 import jakarta.persistence.ColumnResult;
 import jakarta.persistence.ConstructorResult;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
@@ -22,6 +22,9 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 import org.locationtech.jts.geom.Point;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @SqlResultSetMapping(
         name = "SearchSuggestionResponseMapping",
@@ -37,10 +40,11 @@ import org.locationtech.jts.geom.Point;
 )
 @Entity
 @Getter
+@EntityListeners(AuditingEntityListener.class)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "spot")
 // TODO: 공간 인덱스 설정
-public class SpotEntity extends BaseTimeEntity {
+public class SpotEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -81,6 +85,14 @@ public class SpotEntity extends BaseTimeEntity {
     @Column(name = "legal_dong")
     private String legalDong;
 
+    @CreatedDate
+    @Column(name = "created_at") // TODO: updateable = false
+    private LocalDateTime createdAt;
+
+    @LastModifiedDate
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
+
     @Builder
     public SpotEntity(
             Long id,
@@ -94,7 +106,9 @@ public class SpotEntity extends BaseTimeEntity {
             Double latitude,
             Double longitude,
             Point geom,
-            String legalDong
+            String legalDong,
+            LocalDateTime createdAt,
+            LocalDateTime updatedAt
     ) {
         this.id = id;
         this.name = name;
@@ -109,5 +123,7 @@ public class SpotEntity extends BaseTimeEntity {
         this.longitude = longitude;
         this.geom = geom;
         this.legalDong = legalDong;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
     }
 }
