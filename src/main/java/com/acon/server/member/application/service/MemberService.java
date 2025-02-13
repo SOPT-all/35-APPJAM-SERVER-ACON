@@ -39,7 +39,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -225,7 +224,7 @@ public class MemberService {
                 .verifiedArea(verifiedAreaEntityList.stream()
                         .map(verifiedAreaEntity -> new ProfileResponse.VerifiedArea(verifiedAreaEntity.getId(),
                                 verifiedAreaEntity.getName()))
-                        .collect(Collectors.toList()))
+                        .toList())
                 .build();
     }
 
