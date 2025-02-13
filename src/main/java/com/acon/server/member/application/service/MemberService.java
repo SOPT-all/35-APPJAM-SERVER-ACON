@@ -103,6 +103,7 @@ public class MemberService {
                         .socialType(socialType)
                         .socialId(socialId)
                         .leftAcornCount(25)
+                        // TODO: 닉네임 생성 방식 변경
                         .nickname(UUID.randomUUID().toString())
                         // TODO: 기본 이미지 구현 전까지 임의로 이미지 할당
                         .profileImage("https://avatars.githubusercontent.com/u/81469686?v=4")
