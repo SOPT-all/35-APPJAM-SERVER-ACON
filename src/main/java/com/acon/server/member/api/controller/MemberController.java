@@ -7,6 +7,7 @@ import com.acon.server.member.api.request.PreferenceRequest;
 import com.acon.server.member.api.response.AcornCountResponse;
 import com.acon.server.member.api.response.LoginResponse;
 import com.acon.server.member.api.response.MemberAreaResponse;
+import com.acon.server.member.api.response.ProfileResponse;
 import com.acon.server.member.application.service.MemberService;
 import com.acon.server.member.domain.enums.Cuisine;
 import com.acon.server.member.domain.enums.DislikeFood;
@@ -107,6 +108,13 @@ public class MemberController {
     public ResponseEntity<AcornCountResponse> getAcornCount() {
         return ResponseEntity.ok(
                 memberService.fetchAcornCount()
+        );
+    }
+
+    @GetMapping(path = "/members/me", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<ProfileResponse> getProfile() {
+        return ResponseEntity.ok(
+                memberService.fetchProfile()
         );
     }
 }

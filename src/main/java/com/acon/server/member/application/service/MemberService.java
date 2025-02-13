@@ -8,6 +8,7 @@ import com.acon.server.global.exception.ErrorType;
 import com.acon.server.global.external.NaverMapsAdapter;
 import com.acon.server.member.api.response.AcornCountResponse;
 import com.acon.server.member.api.response.LoginResponse;
+import com.acon.server.member.api.response.ProfileResponse;
 import com.acon.server.member.application.mapper.GuidedSpotMapper;
 import com.acon.server.member.application.mapper.MemberMapper;
 import com.acon.server.member.application.mapper.PreferenceMapper;
@@ -37,6 +38,8 @@ import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -89,31 +92,22 @@ public class MemberService {
         return LoginResponse.of(accessToken, refreshToken);
     }
 
-    private boolean isExistingMember(
-            final SocialType socialType,
-            final String socialId
-    ) {
-        return memberRepository.findBySocialTypeAndSocialId(socialType, socialId).isPresent();
-    }
-
     protected Long fetchMemberId(
             final SocialType socialType,
             final String socialId
     ) {
-        MemberEntity memberEntity;
-
-        if (isExistingMember(socialType, socialId)) {
-            memberEntity = memberRepository.findBySocialTypeAndSocialId(
-                    socialType,
-                    socialId
-            ).orElse(null);
-        } else {
-            memberEntity = memberRepository.save(MemberEntity.builder()
-                    .socialType(socialType)
-                    .socialId(socialId)
-                    .leftAcornCount(25)
-                    .build());
-        }
+        Optional<MemberEntity> optionalMemberEntity = memberRepository.findBySocialTypeAndSocialId(socialType,
+                socialId);
+        MemberEntity memberEntity = optionalMemberEntity.orElseGet(() ->
+                memberRepository.save(MemberEntity.builder()
+                        .socialType(socialType)
+                        .socialId(socialId)
+                        .leftAcornCount(25)
+                        .nickname(UUID.randomUUID().toString())
+                        // TODO: 기본 이미지 구현 전까지 임의로 이미지 할당
+                        .profileImage("https://avatars.githubusercontent.com/u/81469686?v=4")
+                        .build())
+        );
 
         Member member = memberMapper.toDomain(memberEntity);
 
@@ -214,6 +208,24 @@ public class MemberService {
         int acornCount = memberEntity.getLeftAcornCount();
 
         return new AcornCountResponse(acornCount);
+    }
+
+    @Transactional(readOnly = true)
+    public ProfileResponse fetchProfile() {
+        MemberEntity memberEntity = memberRepository.findByIdOrElseThrow(principalHandler.getUserIdFromPrincipal());
+        List<VerifiedAreaEntity> verifiedAreaEntityList = verifiedAreaRepository.findAllByMemberId(
+                memberEntity.getId());
+
+        return ProfileResponse.builder().
+                image(memberEntity.getProfileImage())
+                .nickname(memberEntity.getNickname())
+                .birthDate(memberEntity.getBirthDate() != null ? memberEntity.getBirthDate().toString() : null)
+                .leftAcornCount(memberEntity.getLeftAcornCount())
+                .verifiedArea(verifiedAreaEntityList.stream()
+                        .map(verifiedAreaEntity -> new ProfileResponse.VerifiedArea(verifiedAreaEntity.getId(),
+                                verifiedAreaEntity.getName()))
+                        .collect(Collectors.toList()))
+                .build();
     }
 
     // TODO: 최근 길 안내 장소 지우는 스케줄러 추가
