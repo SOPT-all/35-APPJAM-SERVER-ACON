@@ -9,6 +9,7 @@ import com.acon.server.global.external.NaverMapsAdapter;
 import com.acon.server.member.api.response.AcornCountResponse;
 import com.acon.server.member.api.response.LoginResponse;
 import com.acon.server.member.api.response.ProfileResponse;
+import com.acon.server.member.api.response.ReissueTokenResponse;
 import com.acon.server.member.application.mapper.GuidedSpotMapper;
 import com.acon.server.member.application.mapper.MemberMapper;
 import com.acon.server.member.application.mapper.PreferenceMapper;
@@ -25,12 +26,14 @@ import com.acon.server.member.domain.enums.SpotStyle;
 import com.acon.server.member.infra.entity.GuidedSpotEntity;
 import com.acon.server.member.infra.entity.MemberEntity;
 import com.acon.server.member.infra.entity.VerifiedAreaEntity;
+import com.acon.server.member.infra.entity.WithdrawalReasonEntity;
 import com.acon.server.member.infra.external.google.GoogleSocialService;
 import com.acon.server.member.infra.external.ios.AppleAuthAdapter;
 import com.acon.server.member.infra.repository.GuidedSpotRepository;
 import com.acon.server.member.infra.repository.MemberRepository;
 import com.acon.server.member.infra.repository.PreferenceRepository;
 import com.acon.server.member.infra.repository.VerifiedAreaRepository;
+import com.acon.server.member.infra.repository.WithdrawalReasonRepository;
 import com.acon.server.spot.domain.enums.SpotType;
 import com.acon.server.spot.infra.repository.SpotRepository;
 import java.time.LocalDate;
@@ -53,6 +56,7 @@ public class MemberService {
     private final PreferenceRepository preferenceRepository;
     private final VerifiedAreaRepository verifiedAreaRepository;
     private final SpotRepository spotRepository;
+    private final WithdrawalReasonRepository withdrawalReasonRepository;
 
     private final GuidedSpotMapper guidedSpotMapper;
     private final MemberMapper memberMapper;
@@ -87,8 +91,7 @@ public class MemberService {
         Long memberId = fetchMemberId(socialType, socialId);
         MemberAuthentication memberAuthentication = new MemberAuthentication(memberId, null, null);
         String accessToken = jwtTokenProvider.issueAccessToken(memberAuthentication);
-        String refreshToken = jwtTokenProvider.issueRefreshToken();
-
+        String refreshToken = jwtTokenProvider.issueRefreshToken(memberId);
         return LoginResponse.of(accessToken, refreshToken);
     }
 
@@ -226,6 +229,48 @@ public class MemberService {
                                 verifiedAreaEntity.getName()))
                         .collect(Collectors.toList()))
                 .build();
+    }
+
+    @Transactional
+    public void logout(String refreshToken) {
+        MemberEntity memberEntity = memberRepository.findByIdOrElseThrow(principalHandler.getUserIdFromPrincipal());
+        if (!memberEntity.getId().equals(jwtTokenProvider.validateRefreshToken(refreshToken))) {
+            throw new BusinessException(ErrorType.INVALID_ACCESS_TOKEN_ERROR);
+        }
+        jwtTokenProvider.deleteRefreshToken(refreshToken);
+    }
+
+    @Transactional
+    public ReissueTokenResponse reissueToken(String refreshToken) {
+        // TODO: 리팩토링
+        Long memberId = jwtTokenProvider.validateRefreshToken(refreshToken);
+        memberRepository.findByIdOrElseThrow(memberId);
+
+        MemberEntity memberEntity = memberRepository.findByIdOrElseThrow(principalHandler.getUserIdFromPrincipal());
+        if (!memberEntity.getId().equals(jwtTokenProvider.validateRefreshToken(refreshToken))) {
+            throw new BusinessException(ErrorType.INVALID_ACCESS_TOKEN_ERROR);
+        }
+
+        jwtTokenProvider.deleteRefreshToken(refreshToken);
+
+        MemberAuthentication memberAuthentication = new MemberAuthentication(memberId, null, null);
+        String newAccessToken = jwtTokenProvider.issueAccessToken(memberAuthentication);
+        String newRefreshToken = jwtTokenProvider.issueRefreshToken(memberId);
+        return ReissueTokenResponse.of(newAccessToken, newRefreshToken);
+    }
+
+    @Transactional
+    public void withdrawMember(String reason) {
+        MemberEntity memberEntity = memberRepository.findByIdOrElseThrow(principalHandler.getUserIdFromPrincipal());
+        memberRepository.findByIdOrElseThrow(memberEntity.getId());
+
+        memberRepository.deleteById(memberEntity.getId());
+        withdrawalReasonRepository.save(
+                WithdrawalReasonEntity.builder()
+                        .reason(reason)
+                        .build()
+        );
+
     }
 
     // TODO: 최근 길 안내 장소 지우는 스케줄러 추가
