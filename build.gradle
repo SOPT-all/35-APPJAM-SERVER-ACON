@@ -52,24 +52,26 @@ dependencies {
     annotationProcessor 'org.mapstruct:mapstruct-processor:1.6.3'
     testAnnotationProcessor 'org.mapstruct:mapstruct-processor:1.6.3'
 
-    // TODO: 버전 확인하기
     // Google
-    implementation 'com.google.api-client:google-api-client:2.7.0'
+    implementation 'com.google.api-client:google-api-client:2.7.1'
 
     // JWT
-    implementation group: 'io.jsonwebtoken', name: 'jjwt-api', version: '0.11.5'
-    implementation group: 'io.jsonwebtoken', name: 'jjwt-impl', version: '0.11.5'
-    implementation group: 'io.jsonwebtoken', name: 'jjwt-jackson', version: '0.11.5'
+    implementation group: 'io.jsonwebtoken', name: 'jjwt-api', version: '0.12.6'
+    implementation group: 'io.jsonwebtoken', name: 'jjwt-impl', version: '0.12.6'
+    implementation group: 'io.jsonwebtoken', name: 'jjwt-jackson', version: '0.12.6'
 
     // OpenFeign
     implementation 'org.springframework.cloud:spring-cloud-starter-openfeign:4.2.0'
 
     // PostGIS
     implementation 'org.hibernate:hibernate-spatial:6.6.4.Final'
-    implementation 'org.locationtech.jts:jts-core:1.19.0' // TODO: 버전 확인하기
+    implementation 'org.locationtech.jts:jts-core:1.20.0'
 
     // Spring Security
     implementation 'org.springframework.boot:spring-boot-starter-security'
+
+    // AWS
+    implementation 'io.awspring.cloud:spring-cloud-starter-aws:2.4.4'
 }
 
 tasks.named('test') {
