@@ -50,6 +50,7 @@ public enum ErrorType {
 
     /* 500 Internal Server Error */
     FAILED_DOWNLOAD_GOOGLE_PUBLIC_KEY_ERROR(HttpStatus.BAD_REQUEST, 50002, "구글 공개키 다운로드에 실패하였습니다."),
+    FAILED_GET_PRE_SIGNED_URL_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, 50005, "PreSigned URL 획득에 실패하였습니다."),
 
     /* Review Error */
     /* 400 Bad Request */
