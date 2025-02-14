@@ -1,10 +1,10 @@
 package com.acon.server.member.api.request;
 
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotBlank;
 
 public record ReissueTokenRequest(
 
-        @NotNull(message = "refreshToken은 필수입니다.")
+        @NotBlank(message = "refreshToken은 필수입니다.")
         String refreshToken
 ) {
 
