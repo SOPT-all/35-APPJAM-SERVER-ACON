@@ -262,7 +262,6 @@ public class MemberService {
     @Transactional
     public void withdrawMember(String reason) {
         MemberEntity memberEntity = memberRepository.findByIdOrElseThrow(principalHandler.getUserIdFromPrincipal());
-        memberRepository.findByIdOrElseThrow(memberEntity.getId());
 
         memberRepository.deleteById(memberEntity.getId());
         withdrawalReasonRepository.save(
