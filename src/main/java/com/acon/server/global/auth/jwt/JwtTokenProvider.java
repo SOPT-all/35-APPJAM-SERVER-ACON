@@ -160,9 +160,7 @@ public class JwtTokenProvider {
     public void deleteRefreshToken(String refreshToken) {
         Cache cache = cacheManager.getCache("refreshTokenCache");
         validateRefreshToken(refreshToken);
-        System.out.println(cache.get(refreshToken, Long.class));
         cache.evict(refreshToken);
-        System.out.println(cache.get(refreshToken, Long.class));
     }
 
 }
