@@ -20,7 +20,7 @@ public class CacheConfig {
 
     @Bean
     public CacheManager cacheManager() {
-
+        // TODO: initialCapacity, maximumSize 설정
         // 최대 용량 설정을 따로 진행하지 않음. 메모리 부족 문제 주의 필요
         Caffeine<Object, Object> caffeineBuilder = Caffeine.newBuilder()
                 .expireAfterWrite(REFRESH_TOKEN_EXPIRATION_TIME, TimeUnit.MILLISECONDS);
