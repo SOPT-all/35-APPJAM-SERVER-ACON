@@ -141,6 +141,7 @@ public class JwtTokenProvider {
                 .getBody();
     }
 
+    // TODO: cache token 관리 로직 클래스로 분리
     public void storeRefreshToken(String refreshToken, Long memberId) {
         Cache cache = cacheManager.getCache("refreshTokenCache");
         // 존재 유무만 확인하므로 빈 값
