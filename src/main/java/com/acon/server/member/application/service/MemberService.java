@@ -246,11 +246,6 @@ public class MemberService {
         Long memberId = jwtTokenProvider.validateRefreshToken(refreshToken);
         memberRepository.findByIdOrElseThrow(memberId);
 
-        MemberEntity memberEntity = memberRepository.findByIdOrElseThrow(principalHandler.getUserIdFromPrincipal());
-        if (!memberEntity.getId().equals(jwtTokenProvider.validateRefreshToken(refreshToken))) {
-            throw new BusinessException(ErrorType.INVALID_ACCESS_TOKEN_ERROR);
-        }
-
         jwtTokenProvider.deleteRefreshToken(refreshToken);
 
         MemberAuthentication memberAuthentication = new MemberAuthentication(memberId, null, null);
