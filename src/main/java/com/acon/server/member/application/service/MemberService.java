@@ -42,7 +42,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -106,6 +105,7 @@ public class MemberService {
                         .socialType(socialType)
                         .socialId(socialId)
                         .leftAcornCount(25)
+                        // TODO: 닉네임 생성 방식 변경
                         .nickname(UUID.randomUUID().toString())
                         // TODO: 기본 이미지 구현 전까지 임의로 이미지 할당
                         .profileImage("https://avatars.githubusercontent.com/u/81469686?v=4")
@@ -227,7 +227,7 @@ public class MemberService {
                 .verifiedArea(verifiedAreaEntityList.stream()
                         .map(verifiedAreaEntity -> new ProfileResponse.VerifiedArea(verifiedAreaEntity.getId(),
                                 verifiedAreaEntity.getName()))
-                        .collect(Collectors.toList()))
+                        .toList())
                 .build();
     }
 
