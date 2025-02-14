@@ -7,10 +7,12 @@ import com.acon.server.member.api.request.PreferenceRequest;
 import com.acon.server.member.api.response.AcornCountResponse;
 import com.acon.server.member.api.response.LoginResponse;
 import com.acon.server.member.api.response.MemberAreaResponse;
+import com.acon.server.member.api.response.PreSignedUrlResponse;
 import com.acon.server.member.application.service.MemberService;
 import com.acon.server.member.domain.enums.Cuisine;
 import com.acon.server.member.domain.enums.DislikeFood;
 import com.acon.server.member.domain.enums.FavoriteSpot;
+import com.acon.server.member.domain.enums.ImageType;
 import com.acon.server.member.domain.enums.SocialType;
 import com.acon.server.member.domain.enums.SpotStyle;
 import com.acon.server.spot.domain.enums.SpotType;
@@ -107,6 +109,17 @@ public class MemberController {
     public ResponseEntity<AcornCountResponse> getAcornCount() {
         return ResponseEntity.ok(
                 memberService.fetchAcornCount()
+        );
+    }
+
+    @GetMapping(path = "/images/presigned-url", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<PreSignedUrlResponse> getPreSignedUrl(
+            @RequestParam(name = "imageType") final String imageTypeString
+    ) {
+        ImageType imageType = ImageType.fromValue(imageTypeString);
+
+        return ResponseEntity.ok(
+                memberService.fetchPreSignedUrl(imageType)
         );
     }
 }
