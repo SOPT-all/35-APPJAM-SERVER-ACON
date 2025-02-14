@@ -5,7 +5,7 @@ import com.acon.server.global.auth.PrincipalHandler;
 import com.acon.server.global.auth.jwt.JwtTokenProvider;
 import com.acon.server.global.exception.BusinessException;
 import com.acon.server.global.exception.ErrorType;
-import com.acon.server.global.external.NaverMapsAdapter;
+import com.acon.server.global.external.maps.NaverMapsAdapter;
 import com.acon.server.member.api.response.AcornCountResponse;
 import com.acon.server.member.api.response.LoginResponse;
 import com.acon.server.member.application.mapper.GuidedSpotMapper;

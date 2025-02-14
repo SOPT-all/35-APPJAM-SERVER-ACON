@@ -1,4 +1,4 @@
-package com.acon.server.global.external;
+package com.acon.server.global.external.maps;
 
 import java.util.Map;
 import org.springframework.cloud.openfeign.FeignClient;
