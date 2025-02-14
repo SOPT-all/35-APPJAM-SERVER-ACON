@@ -122,7 +122,7 @@ public class MemberController {
         );
     }
 
-    @PostMapping(path = "/auth/logout", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(path = "/auth/logout", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Void> logout(
             @Valid @RequestBody LogoutRequest request
     ) {
@@ -130,7 +130,7 @@ public class MemberController {
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping(path = "/auth/reissue", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(path = "/auth/reissue", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ReissueTokenResponse> reissueToken(
             @Valid @RequestBody ReissueTokenRequest request
     ) {
@@ -139,7 +139,7 @@ public class MemberController {
         );
     }
 
-    @PostMapping(path = "/members/withdrawal", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(path = "/members/withdrawal", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Void> postWithdrawal(
             @Valid @RequestBody WithdrawalReasonRequest request
     ) {
