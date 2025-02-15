@@ -8,6 +8,7 @@ import com.acon.server.global.exception.ErrorType;
 import com.acon.server.global.external.NaverMapsAdapter;
 import com.acon.server.member.api.response.AcornCountResponse;
 import com.acon.server.member.api.response.LoginResponse;
+import com.acon.server.member.api.response.MemberAreaResponse;
 import com.acon.server.member.api.response.ProfileResponse;
 import com.acon.server.member.api.response.ReissueTokenResponse;
 import com.acon.server.member.application.mapper.GuidedSpotMapper;
@@ -126,31 +127,34 @@ public class MemberService {
     }
 
     @Transactional
-    public String createMemberArea(
+    public MemberAreaResponse createMemberArea(
             final Double latitude,
             final Double longitude
     ) {
         MemberEntity memberEntity = memberRepository.findByIdOrElseThrow(principalHandler.getUserIdFromPrincipal());
+
+        // 추후 여러 동네 인증이 가능하게 되면 제거 예정
+        if (fetchHasVerifiedArea(memberEntity.getId())) {
+            throw new BusinessException(ErrorType.ALREADY_VERIFIED_AREA_ERROR);
+        }
+
         String legalDong = naverMapsAdapter.getReverseGeoCodingResult(latitude, longitude);
         Optional<VerifiedAreaEntity> optionalVerifiedAreaEntity = verifiedAreaRepository.findByMemberIdAndName(
                 memberEntity.getId(), legalDong);
 
-        optionalVerifiedAreaEntity.ifPresentOrElse(
-                verifiedAreaEntity -> {
-                    VerifiedArea verifiedArea = verifiedAreaMapper.toDomain(verifiedAreaEntity);
-                    verifiedArea.updateVerifiedDate(LocalDate.now());
-                    verifiedAreaRepository.save(verifiedAreaMapper.toEntity(verifiedArea));
-                },
-                () -> verifiedAreaRepository.save(
-                        VerifiedAreaEntity.builder()
-                                .name(legalDong)
-                                .memberId(memberEntity.getId())
-                                .verifiedDate(Collections.singletonList(LocalDate.now()))
-                                .build()
-                )
-        );
+        VerifiedAreaEntity savedVerifiedAreaEntity = optionalVerifiedAreaEntity.map(verifiedAreaEntity -> {
+            VerifiedArea verifiedArea = verifiedAreaMapper.toDomain(verifiedAreaEntity);
+            verifiedArea.updateVerifiedDate(LocalDate.now());
+            return verifiedAreaRepository.save(verifiedAreaMapper.toEntity(verifiedArea));
+        }).orElseGet(() -> verifiedAreaRepository.save(
+                VerifiedAreaEntity.builder()
+                        .name(legalDong)
+                        .memberId(memberEntity.getId())
+                        .verifiedDate(Collections.singletonList(LocalDate.now()))
+                        .build()
+        ));
 
-        return legalDong;
+        return MemberAreaResponse.of(savedVerifiedAreaEntity.getId(), savedVerifiedAreaEntity.getName());
     }
 
     @Transactional(readOnly = true)
@@ -266,6 +270,7 @@ public class MemberService {
     public void withdrawMember(String reason, String refreshToken) {
         MemberEntity memberEntity = memberRepository.findByIdOrElseThrow(principalHandler.getUserIdFromPrincipal());
 
+        // TODO: memberId 존재하는 테이블에 member row 제거 ( 리뷰 테이블 제외 )
         memberRepository.deleteById(memberEntity.getId());
         jwtTokenProvider.deleteRefreshToken(refreshToken);
         // TODO: 엑세스 토큰 블랙리스트
