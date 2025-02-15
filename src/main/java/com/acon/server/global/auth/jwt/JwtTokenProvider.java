@@ -22,6 +22,8 @@ import java.util.Map;
 import javax.crypto.SecretKey;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.Cache;
+import org.springframework.cache.CacheManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
@@ -30,6 +32,8 @@ import org.springframework.stereotype.Component;
 public class JwtTokenProvider {
 
     private static final String MEMBER_ID = "memberId";
+
+    private final CacheManager cacheManager;
 
     @Value("${jwt.access-token-expire-time}")
     private long ACCESS_TOKEN_EXPIRATION_TIME;
@@ -50,15 +54,18 @@ public class JwtTokenProvider {
         return generateToken(authentication, ACCESS_TOKEN_EXPIRATION_TIME);
     }
 
-    public String issueRefreshToken() {
+    public String issueRefreshToken(Long memberId) {
         final Date now = new Date();
 
-        return Jwts.builder()
+        final String refreshToken = Jwts.builder()
                 .setHeaderParam(Header.TYPE, Header.JWT_TYPE)
                 .setIssuedAt(now)
                 .setExpiration(new Date(now.getTime() + REFRESH_TOKEN_EXPIRATION_TIME))
                 .signWith(getSigningKey())
                 .compact();
+        storeRefreshToken(refreshToken, memberId);
+
+        return refreshToken;
     }
 
     public String generateToken(
@@ -133,4 +140,29 @@ public class JwtTokenProvider {
                 .parseClaimsJws(token)
                 .getBody();
     }
+
+    // TODO: cache token 관리 로직 클래스로 분리
+    public void storeRefreshToken(String refreshToken, Long memberId) {
+        Cache cache = cacheManager.getCache("refreshTokenCache");
+        // 존재 유무만 확인하므로 빈 값
+        // TODO: Refresh Token key 수정
+        cache.put(refreshToken, memberId);
+    }
+
+    public Long validateRefreshToken(String refreshToken) {
+        Cache cache = cacheManager.getCache("refreshTokenCache");
+        // Intellij는 해당 조건이 항상 true라고 메세지를 띄우지만 cache.get(memberId)의 반환값이 존재하지 않을 시 null입니다!
+        if (cache.get(refreshToken) != null) {
+            return cache.get(refreshToken, Long.class);
+        }
+        throw new BusinessException(ErrorType.INVALID_REFRESH_TOKEN_ERROR);
+    }
+
+    // TODO: 블랙리스트 설정 필요
+    public void deleteRefreshToken(String refreshToken) {
+        Cache cache = cacheManager.getCache("refreshTokenCache");
+        validateRefreshToken(refreshToken);
+        cache.evict(refreshToken);
+    }
+
 }
