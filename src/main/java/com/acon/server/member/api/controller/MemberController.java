@@ -130,7 +130,9 @@ public class MemberController {
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping(path = "/auth/reissue", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(path = "/auth/reissue",
+            consumes = MediaType.APPLICATION_JSON_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ReissueTokenResponse> reissueToken(
             @Valid @RequestBody ReissueTokenRequest request
     ) {
