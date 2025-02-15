@@ -10,6 +10,8 @@ import com.acon.server.global.external.s3.S3Adapter;
 import com.acon.server.member.api.response.AcornCountResponse;
 import com.acon.server.member.api.response.LoginResponse;
 import com.acon.server.member.api.response.PreSignedUrlResponse;
+import com.acon.server.member.api.response.ProfileResponse;
+import com.acon.server.member.api.response.ReissueTokenResponse;
 import com.acon.server.member.application.mapper.GuidedSpotMapper;
 import com.acon.server.member.application.mapper.MemberMapper;
 import com.acon.server.member.application.mapper.PreferenceMapper;
@@ -27,12 +29,14 @@ import com.acon.server.member.domain.enums.SpotStyle;
 import com.acon.server.member.infra.entity.GuidedSpotEntity;
 import com.acon.server.member.infra.entity.MemberEntity;
 import com.acon.server.member.infra.entity.VerifiedAreaEntity;
+import com.acon.server.member.infra.entity.WithdrawalReasonEntity;
 import com.acon.server.member.infra.external.google.GoogleSocialService;
 import com.acon.server.member.infra.external.ios.AppleAuthAdapter;
 import com.acon.server.member.infra.repository.GuidedSpotRepository;
 import com.acon.server.member.infra.repository.MemberRepository;
 import com.acon.server.member.infra.repository.PreferenceRepository;
 import com.acon.server.member.infra.repository.VerifiedAreaRepository;
+import com.acon.server.member.infra.repository.WithdrawalReasonRepository;
 import com.acon.server.spot.domain.enums.SpotType;
 import com.acon.server.spot.infra.repository.SpotRepository;
 import java.time.LocalDate;
@@ -54,6 +58,7 @@ public class MemberService {
     private final PreferenceRepository preferenceRepository;
     private final VerifiedAreaRepository verifiedAreaRepository;
     private final SpotRepository spotRepository;
+    private final WithdrawalReasonRepository withdrawalReasonRepository;
 
     private final GuidedSpotMapper guidedSpotMapper;
     private final MemberMapper memberMapper;
@@ -62,6 +67,7 @@ public class MemberService {
 
     private final JwtTokenProvider jwtTokenProvider;
     private final PrincipalHandler principalHandler;
+
     // TODO: 네이밍 변경
     private final GoogleSocialService googleSocialService;
     private final AppleAuthAdapter appleAuthService;
@@ -91,36 +97,28 @@ public class MemberService {
         Long memberId = fetchMemberId(socialType, socialId);
         MemberAuthentication memberAuthentication = new MemberAuthentication(memberId, null, null);
         String accessToken = jwtTokenProvider.issueAccessToken(memberAuthentication);
-        String refreshToken = jwtTokenProvider.issueRefreshToken();
+        String refreshToken = jwtTokenProvider.issueRefreshToken(memberId);
 
         return LoginResponse.of(accessToken, refreshToken);
-    }
-
-    private boolean isExistingMember(
-            final SocialType socialType,
-            final String socialId
-    ) {
-        return memberRepository.findBySocialTypeAndSocialId(socialType, socialId).isPresent();
     }
 
     protected Long fetchMemberId(
             final SocialType socialType,
             final String socialId
     ) {
-        MemberEntity memberEntity;
-
-        if (isExistingMember(socialType, socialId)) {
-            memberEntity = memberRepository.findBySocialTypeAndSocialId(
-                    socialType,
-                    socialId
-            ).orElse(null);
-        } else {
-            memberEntity = memberRepository.save(MemberEntity.builder()
-                    .socialType(socialType)
-                    .socialId(socialId)
-                    .leftAcornCount(25)
-                    .build());
-        }
+        Optional<MemberEntity> optionalMemberEntity = memberRepository.findBySocialTypeAndSocialId(socialType,
+                socialId);
+        MemberEntity memberEntity = optionalMemberEntity.orElseGet(() ->
+                memberRepository.save(MemberEntity.builder()
+                        .socialType(socialType)
+                        .socialId(socialId)
+                        .leftAcornCount(25)
+                        // TODO: 닉네임 생성 방식 변경
+                        .nickname(UUID.randomUUID().toString())
+                        // TODO: 기본 이미지 구현 전까지 임의로 이미지 할당
+                        .profileImage("https://avatars.githubusercontent.com/u/81469686?v=4")
+                        .build())
+        );
 
         Member member = memberMapper.toDomain(memberEntity);
 
@@ -223,6 +221,24 @@ public class MemberService {
         return new AcornCountResponse(acornCount);
     }
 
+    @Transactional(readOnly = true)
+    public ProfileResponse fetchProfile() {
+        MemberEntity memberEntity = memberRepository.findByIdOrElseThrow(principalHandler.getUserIdFromPrincipal());
+        List<VerifiedAreaEntity> verifiedAreaEntityList = verifiedAreaRepository.findAllByMemberId(
+                memberEntity.getId());
+
+        return ProfileResponse.builder().
+                image(memberEntity.getProfileImage())
+                .nickname(memberEntity.getNickname())
+                .birthDate(memberEntity.getBirthDate() != null ? memberEntity.getBirthDate().toString() : null)
+                .leftAcornCount(memberEntity.getLeftAcornCount())
+                .verifiedArea(verifiedAreaEntityList.stream()
+                        .map(verifiedAreaEntity -> new ProfileResponse.VerifiedArea(verifiedAreaEntity.getId(),
+                                verifiedAreaEntity.getName()))
+                        .toList())
+                .build();
+    }
+
     public PreSignedUrlResponse fetchPreSignedUrl(ImageType imageType) {
         // TODO: 확장자 방식 고민하기
         String fileName = UUID.randomUUID() + ".jpg";
@@ -235,6 +251,44 @@ public class MemberService {
         };
 
         return PreSignedUrlResponse.of(fileName, preSignedUrl);
+    }
+
+    @Transactional
+    public void logout(String refreshToken) {
+        MemberEntity memberEntity = memberRepository.findByIdOrElseThrow(principalHandler.getUserIdFromPrincipal());
+        if (!memberEntity.getId().equals(jwtTokenProvider.validateRefreshToken(refreshToken))) {
+            throw new BusinessException(ErrorType.INVALID_ACCESS_TOKEN_ERROR);
+        }
+        jwtTokenProvider.deleteRefreshToken(refreshToken);
+    }
+
+    @Transactional
+    public ReissueTokenResponse reissueToken(String refreshToken) {
+        // TODO: 리팩토링
+        Long memberId = jwtTokenProvider.validateRefreshToken(refreshToken);
+        memberRepository.findByIdOrElseThrow(memberId);
+
+        jwtTokenProvider.deleteRefreshToken(refreshToken);
+
+        MemberAuthentication memberAuthentication = new MemberAuthentication(memberId, null, null);
+        String newAccessToken = jwtTokenProvider.issueAccessToken(memberAuthentication);
+        String newRefreshToken = jwtTokenProvider.issueRefreshToken(memberId);
+        return ReissueTokenResponse.of(newAccessToken, newRefreshToken);
+    }
+
+    @Transactional
+    public void withdrawMember(String reason, String refreshToken) {
+        MemberEntity memberEntity = memberRepository.findByIdOrElseThrow(principalHandler.getUserIdFromPrincipal());
+
+        memberRepository.deleteById(memberEntity.getId());
+        jwtTokenProvider.deleteRefreshToken(refreshToken);
+        // TODO: 엑세스 토큰 블랙리스트
+
+        withdrawalReasonRepository.save(
+                WithdrawalReasonEntity.builder()
+                        .reason(reason)
+                        .build()
+        );
     }
 
     // TODO: 최근 길 안내 장소 지우는 스케줄러 추가

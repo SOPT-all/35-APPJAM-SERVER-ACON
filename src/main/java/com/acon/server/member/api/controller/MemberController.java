@@ -2,12 +2,17 @@ package com.acon.server.member.api.controller;
 
 import com.acon.server.member.api.request.GuidedSpotRequest;
 import com.acon.server.member.api.request.LoginRequest;
+import com.acon.server.member.api.request.LogoutRequest;
 import com.acon.server.member.api.request.MemberAreaRequest;
 import com.acon.server.member.api.request.PreferenceRequest;
+import com.acon.server.member.api.request.ReissueTokenRequest;
+import com.acon.server.member.api.request.WithdrawalReasonRequest;
 import com.acon.server.member.api.response.AcornCountResponse;
 import com.acon.server.member.api.response.LoginResponse;
 import com.acon.server.member.api.response.MemberAreaResponse;
 import com.acon.server.member.api.response.PreSignedUrlResponse;
+import com.acon.server.member.api.response.ProfileResponse;
+import com.acon.server.member.api.response.ReissueTokenResponse;
 import com.acon.server.member.application.service.MemberService;
 import com.acon.server.member.domain.enums.Cuisine;
 import com.acon.server.member.domain.enums.DislikeFood;
@@ -112,6 +117,13 @@ public class MemberController {
         );
     }
 
+    @GetMapping(path = "/members/me", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<ProfileResponse> getProfile() {
+        return ResponseEntity.ok(
+                memberService.fetchProfile()
+        );
+    }
+
     @GetMapping(path = "/images/presigned-url", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<PreSignedUrlResponse> getPreSignedUrl(
             @RequestParam(name = "imageType") final String imageTypeString
@@ -121,5 +133,35 @@ public class MemberController {
         return ResponseEntity.ok(
                 memberService.fetchPreSignedUrl(imageType)
         );
+    }
+
+    @PostMapping(path = "/auth/logout", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Void> logout(
+            @Valid @RequestBody LogoutRequest request
+    ) {
+        memberService.logout(request.refreshToken());
+
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping(path = "/auth/reissue",
+            consumes = MediaType.APPLICATION_JSON_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    public ResponseEntity<ReissueTokenResponse> reissueToken(
+            @Valid @RequestBody ReissueTokenRequest request
+    ) {
+        return ResponseEntity.ok(
+                memberService.reissueToken(request.refreshToken())
+        );
+    }
+
+    @PostMapping(path = "/members/withdrawal", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Void> postWithdrawal(
+            @Valid @RequestBody WithdrawalReasonRequest request
+    ) {
+        memberService.withdrawMember(request.reason(), request.refreshToken());
+
+        return ResponseEntity.ok().build();
     }
 }

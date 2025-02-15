@@ -42,7 +42,7 @@ public class MemberEntity extends BaseTimeEntity {
     @Column(name = "profile_image")
     private String profileImage;
 
-    @Column(name = "nickname", unique = true)
+    @Column(name = "nickname", unique = true, nullable = false)
     private String nickname;
 
     @Column(name = "nickname_updated_at")

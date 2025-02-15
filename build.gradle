@@ -70,7 +70,11 @@ dependencies {
 
     // Spring Security
     implementation 'org.springframework.boot:spring-boot-starter-security'
-
+    
+    // Caffeine Cache
+    implementation 'org.springframework.boot:spring-boot-starter-cache'
+    implementation 'com.github.ben-manes.caffeine:caffeine'
+    
     // AWS
     implementation 'io.awspring.cloud:spring-cloud-starter-aws:2.4.4'
 }
