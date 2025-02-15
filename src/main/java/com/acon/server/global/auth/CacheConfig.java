@@ -11,6 +11,7 @@ import org.springframework.cache.support.SimpleCacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+// TODO: 어노테이션을 활용하여 리팩
 @Configuration
 @EnableCaching
 public class CacheConfig {
