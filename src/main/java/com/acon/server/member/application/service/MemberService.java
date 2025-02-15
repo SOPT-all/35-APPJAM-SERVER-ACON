@@ -91,7 +91,10 @@ public class MemberService {
         MemberAuthentication memberAuthentication = new MemberAuthentication(memberId, null, null);
         String accessToken = jwtTokenProvider.issueAccessToken(memberAuthentication);
         String refreshToken = jwtTokenProvider.issueRefreshToken(memberId);
-        return LoginResponse.of(accessToken, refreshToken);
+
+        boolean hasVerifiedArea = fetchHasVerifiedArea(memberId);
+
+        return LoginResponse.of(accessToken, refreshToken, hasVerifiedArea);
     }
 
     protected Long fetchMemberId(
@@ -115,6 +118,11 @@ public class MemberService {
         Member member = memberMapper.toDomain(memberEntity);
 
         return member.getId();
+    }
+
+    private boolean fetchHasVerifiedArea(Long memberId) {
+        List<VerifiedAreaEntity> verifiedAreaEntityList = verifiedAreaRepository.findAllByMemberId(memberId);
+        return !verifiedAreaEntityList.isEmpty();
     }
 
     @Transactional
