@@ -143,7 +143,7 @@ public class MemberController {
     public ResponseEntity<Void> postWithdrawal(
             @Valid @RequestBody WithdrawalReasonRequest request
     ) {
-        memberService.withdrawMember(request.reason());
+        memberService.withdrawMember(request.reason(), request.refreshToken());
         return ResponseEntity.ok().build();
     }
 }

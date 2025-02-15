@@ -255,10 +255,13 @@ public class MemberService {
     }
 
     @Transactional
-    public void withdrawMember(String reason) {
+    public void withdrawMember(String reason, String refreshToken) {
         MemberEntity memberEntity = memberRepository.findByIdOrElseThrow(principalHandler.getUserIdFromPrincipal());
 
         memberRepository.deleteById(memberEntity.getId());
+        jwtTokenProvider.deleteRefreshToken(refreshToken);
+        // TODO: 엑세스 토큰 블랙리스트
+
         withdrawalReasonRepository.save(
                 WithdrawalReasonEntity.builder()
                         .reason(reason)
