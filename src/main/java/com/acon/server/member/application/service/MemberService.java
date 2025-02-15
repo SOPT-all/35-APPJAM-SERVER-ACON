@@ -93,7 +93,7 @@ public class MemberService {
         String accessToken = jwtTokenProvider.issueAccessToken(memberAuthentication);
         String refreshToken = jwtTokenProvider.issueRefreshToken(memberId);
 
-        boolean hasVerifiedArea = fetchHasVerifiedArea(memberId);
+        boolean hasVerifiedArea = existsVerifiedAreaByMemberId(memberId);
 
         return LoginResponse.of(accessToken, refreshToken, hasVerifiedArea);
     }
@@ -121,7 +121,7 @@ public class MemberService {
         return member.getId();
     }
 
-    private boolean fetchHasVerifiedArea(Long memberId) {
+    private boolean existsVerifiedAreaByMemberId(Long memberId) {
         List<VerifiedAreaEntity> verifiedAreaEntityList = verifiedAreaRepository.findAllByMemberId(memberId);
         return !verifiedAreaEntityList.isEmpty();
     }
@@ -134,7 +134,7 @@ public class MemberService {
         MemberEntity memberEntity = memberRepository.findByIdOrElseThrow(principalHandler.getUserIdFromPrincipal());
 
         // 추후 여러 동네 인증이 가능하게 되면 제거 예정
-        if (fetchHasVerifiedArea(memberEntity.getId())) {
+        if (existsVerifiedAreaByMemberId(memberEntity.getId())) {
             throw new BusinessException(ErrorType.ALREADY_VERIFIED_AREA_ERROR);
         }
 
