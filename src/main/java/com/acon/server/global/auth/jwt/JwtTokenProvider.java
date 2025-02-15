@@ -158,6 +158,7 @@ public class JwtTokenProvider {
         throw new BusinessException(ErrorType.INVALID_REFRESH_TOKEN_ERROR);
     }
 
+    // TODO: 블랙리스트 설정 필요
     public void deleteRefreshToken(String refreshToken) {
         Cache cache = cacheManager.getCache("refreshTokenCache");
         validateRefreshToken(refreshToken);
