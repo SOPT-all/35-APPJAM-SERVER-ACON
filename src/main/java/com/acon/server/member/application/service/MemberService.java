@@ -247,7 +247,7 @@ public class MemberService {
                 .nickname(memberEntity.getNickname())
                 .birthDate(memberEntity.getBirthDate() != null ? memberEntity.getBirthDate().toString() : null)
                 .leftAcornCount(memberEntity.getLeftAcornCount())
-                .verifiedArea(verifiedAreaEntityList.stream()
+                .verifiedAreaList(verifiedAreaEntityList.stream()
                         .map(verifiedAreaEntity -> new ProfileResponse.VerifiedArea(verifiedAreaEntity.getId(),
                                 verifiedAreaEntity.getName()))
                         .toList())
