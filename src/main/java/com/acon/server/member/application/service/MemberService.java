@@ -100,7 +100,7 @@ public class MemberService {
         String accessToken = jwtTokenProvider.issueAccessToken(memberAuthentication);
         String refreshToken = jwtTokenProvider.issueRefreshToken(memberId);
 
-        boolean hasVerifiedArea = existsVerifiedAreaByMemberId(memberId);
+        boolean hasVerifiedArea = verifiedAreaRepository.existsByMemberId(memberId);
 
         return LoginResponse.of(accessToken, refreshToken, hasVerifiedArea);
     }
@@ -128,11 +128,6 @@ public class MemberService {
         return member.getId();
     }
 
-    private boolean existsVerifiedAreaByMemberId(Long memberId) {
-        List<VerifiedAreaEntity> verifiedAreaEntityList = verifiedAreaRepository.findAllByMemberId(memberId);
-        return !verifiedAreaEntityList.isEmpty();
-    }
-
     @Transactional
     public MemberAreaResponse createMemberArea(
             final Double latitude,
@@ -141,7 +136,7 @@ public class MemberService {
         MemberEntity memberEntity = memberRepository.findByIdOrElseThrow(principalHandler.getUserIdFromPrincipal());
 
         // 추후 여러 동네 인증이 가능하게 되면 제거 예정
-        if (existsVerifiedAreaByMemberId(memberEntity.getId())) {
+        if (verifiedAreaRepository.existsByMemberId(memberEntity.getId())) {
             throw new BusinessException(ErrorType.ALREADY_VERIFIED_AREA_ERROR);
         }
 
