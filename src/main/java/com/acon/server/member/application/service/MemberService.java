@@ -144,19 +144,28 @@ public class MemberService {
         Optional<VerifiedAreaEntity> optionalVerifiedAreaEntity = verifiedAreaRepository.findByMemberIdAndName(
                 memberEntity.getId(), legalDong);
 
-        VerifiedAreaEntity savedVerifiedAreaEntity = optionalVerifiedAreaEntity.map(verifiedAreaEntity -> {
-            VerifiedArea verifiedArea = verifiedAreaMapper.toDomain(verifiedAreaEntity);
-            verifiedArea.updateVerifiedDate(LocalDate.now());
-            return verifiedAreaRepository.save(verifiedAreaMapper.toEntity(verifiedArea));
-        }).orElseGet(() -> verifiedAreaRepository.save(
-                VerifiedAreaEntity.builder()
-                        .name(legalDong)
-                        .memberId(memberEntity.getId())
-                        .verifiedDate(Collections.singletonList(LocalDate.now()))
-                        .build()
-        ));
+        LocalDate currentDate = LocalDate.now();
+        VerifiedAreaEntity savedVerifiedAreaEntity = optionalVerifiedAreaEntity
+                .map(entity -> updateVerifiedAreaEntity(entity, currentDate))
+                .orElseGet(() -> createVerifiedAreaEntity(legalDong, memberEntity.getId(), currentDate));
 
         return MemberAreaResponse.of(savedVerifiedAreaEntity.getId(), savedVerifiedAreaEntity.getName());
+    }
+
+    private VerifiedAreaEntity updateVerifiedAreaEntity(VerifiedAreaEntity entity, LocalDate currentDate) {
+        VerifiedArea verifiedArea = verifiedAreaMapper.toDomain(entity);
+        verifiedArea.updateVerifiedDate(currentDate);
+        return verifiedAreaRepository.save(verifiedAreaMapper.toEntity(verifiedArea));
+    }
+
+    private VerifiedAreaEntity createVerifiedAreaEntity(String legalDong, Long memberId, LocalDate currentDate) {
+        return verifiedAreaRepository.save(
+                VerifiedAreaEntity.builder()
+                        .name(legalDong)
+                        .memberId(memberId)
+                        .verifiedDate(Collections.singletonList(currentDate))
+                        .build()
+        );
     }
 
     @Transactional(readOnly = true)
