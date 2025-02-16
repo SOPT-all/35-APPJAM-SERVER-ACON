@@ -8,6 +8,7 @@ import com.acon.server.member.api.request.PreferenceRequest;
 import com.acon.server.member.api.request.ReissueTokenRequest;
 import com.acon.server.member.api.request.WithdrawalReasonRequest;
 import com.acon.server.member.api.response.AcornCountResponse;
+import com.acon.server.member.api.response.AreaResponse;
 import com.acon.server.member.api.response.LoginResponse;
 import com.acon.server.member.api.response.MemberAreaResponse;
 import com.acon.server.member.api.response.PreSignedUrlResponse;
@@ -65,13 +66,14 @@ public class MemberController {
     public ResponseEntity<MemberAreaResponse> postArea(
             @Valid @RequestBody final MemberAreaRequest request
     ) {
-        String area = memberService.createMemberArea(request.latitude(), request.longitude());
 
-        return ResponseEntity.ok(new MemberAreaResponse(area));
+        return ResponseEntity.ok(
+                memberService.createMemberArea(request.latitude(), request.longitude())
+        );
     }
 
     @GetMapping(path = "/area", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<MemberAreaResponse> getArea(
+    public ResponseEntity<AreaResponse> getArea(
             @DecimalMin(value = "33.1", message = "위도는 최소 33.1°N 이상이어야 합니다.(대한민국 기준)")
             @DecimalMax(value = "38.6", message = "위도는 최대 38.6°N 이하이어야 합니다.(대한민국 기준)")
             @Validated @RequestParam(name = "latitude") final Double latitude,
@@ -81,7 +83,7 @@ public class MemberController {
     ) {
         String area = memberService.fetchMemberArea(latitude, longitude);
 
-        return ResponseEntity.ok(new MemberAreaResponse(area));
+        return ResponseEntity.ok(new AreaResponse(area));
     }
 
     @PostMapping(path = "/member/preference", consumes = MediaType.APPLICATION_JSON_VALUE)

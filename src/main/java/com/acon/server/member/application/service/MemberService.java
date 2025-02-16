@@ -9,6 +9,7 @@ import com.acon.server.global.external.maps.NaverMapsAdapter;
 import com.acon.server.global.external.s3.S3Adapter;
 import com.acon.server.member.api.response.AcornCountResponse;
 import com.acon.server.member.api.response.LoginResponse;
+import com.acon.server.member.api.response.MemberAreaResponse;
 import com.acon.server.member.api.response.PreSignedUrlResponse;
 import com.acon.server.member.api.response.ProfileResponse;
 import com.acon.server.member.api.response.ReissueTokenResponse;
@@ -99,7 +100,9 @@ public class MemberService {
         String accessToken = jwtTokenProvider.issueAccessToken(memberAuthentication);
         String refreshToken = jwtTokenProvider.issueRefreshToken(memberId);
 
-        return LoginResponse.of(accessToken, refreshToken);
+        boolean hasVerifiedArea = verifiedAreaRepository.existsByMemberId(memberId);
+
+        return LoginResponse.of(accessToken, refreshToken, hasVerifiedArea);
     }
 
     protected Long fetchMemberId(
@@ -126,31 +129,43 @@ public class MemberService {
     }
 
     @Transactional
-    public String createMemberArea(
+    public MemberAreaResponse createMemberArea(
             final Double latitude,
             final Double longitude
     ) {
         MemberEntity memberEntity = memberRepository.findByIdOrElseThrow(principalHandler.getUserIdFromPrincipal());
+
+        // 추후 여러 동네 인증이 가능하게 되면 제거 예정
+        if (verifiedAreaRepository.existsByMemberId(memberEntity.getId())) {
+            throw new BusinessException(ErrorType.ALREADY_VERIFIED_AREA_ERROR);
+        }
+
         String legalDong = naverMapsAdapter.getReverseGeoCodingResult(latitude, longitude);
         Optional<VerifiedAreaEntity> optionalVerifiedAreaEntity = verifiedAreaRepository.findByMemberIdAndName(
                 memberEntity.getId(), legalDong);
 
-        optionalVerifiedAreaEntity.ifPresentOrElse(
-                verifiedAreaEntity -> {
-                    VerifiedArea verifiedArea = verifiedAreaMapper.toDomain(verifiedAreaEntity);
-                    verifiedArea.updateVerifiedDate(LocalDate.now());
-                    verifiedAreaRepository.save(verifiedAreaMapper.toEntity(verifiedArea));
-                },
-                () -> verifiedAreaRepository.save(
-                        VerifiedAreaEntity.builder()
-                                .name(legalDong)
-                                .memberId(memberEntity.getId())
-                                .verifiedDate(Collections.singletonList(LocalDate.now()))
-                                .build()
-                )
-        );
+        LocalDate currentDate = LocalDate.now();
+        VerifiedAreaEntity savedVerifiedAreaEntity = optionalVerifiedAreaEntity
+                .map(entity -> updateVerifiedAreaEntity(entity, currentDate))
+                .orElseGet(() -> createVerifiedAreaEntity(legalDong, memberEntity.getId(), currentDate));
 
-        return legalDong;
+        return MemberAreaResponse.of(savedVerifiedAreaEntity.getId(), savedVerifiedAreaEntity.getName());
+    }
+
+    private VerifiedAreaEntity updateVerifiedAreaEntity(VerifiedAreaEntity entity, LocalDate currentDate) {
+        VerifiedArea verifiedArea = verifiedAreaMapper.toDomain(entity);
+        verifiedArea.updateVerifiedDate(currentDate);
+        return verifiedAreaRepository.save(verifiedAreaMapper.toEntity(verifiedArea));
+    }
+
+    private VerifiedAreaEntity createVerifiedAreaEntity(String legalDong, Long memberId, LocalDate currentDate) {
+        return verifiedAreaRepository.save(
+                VerifiedAreaEntity.builder()
+                        .name(legalDong)
+                        .memberId(memberId)
+                        .verifiedDate(Collections.singletonList(currentDate))
+                        .build()
+        );
     }
 
     @Transactional(readOnly = true)
@@ -280,6 +295,7 @@ public class MemberService {
     public void withdrawMember(String reason, String refreshToken) {
         MemberEntity memberEntity = memberRepository.findByIdOrElseThrow(principalHandler.getUserIdFromPrincipal());
 
+        // TODO: memberId 존재하는 테이블에 member row 제거 ( 리뷰 테이블 제외 )
         memberRepository.deleteById(memberEntity.getId());
         jwtTokenProvider.deleteRefreshToken(refreshToken);
         // TODO: 엑세스 토큰 블랙리스트
