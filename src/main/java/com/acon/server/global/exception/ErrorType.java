@@ -22,7 +22,7 @@ public enum ErrorType {
     DATA_INTEGRITY_VIOLATION_ERROR(HttpStatus.BAD_REQUEST, 40007, "데이터 무결성 제약 조건을 위반했습니다."),
     INVALID_ACCESS_TOKEN_ERROR(HttpStatus.BAD_REQUEST, 40008, "유효하지 않은 accessToken입니다."),
     INVALID_REFRESH_TOKEN_ERROR(HttpStatus.BAD_REQUEST, 40088, "유효하지 않은 refreshToken입니다."),
-    // TODO: NonNull 필드에 null 값이 입력되었을 때 발생하는 예외 처리 추가
+    INVALID_IMAGE_PATH_ERROR(HttpStatus.NOT_FOUND, 40052, "유효하지 않는 이미지 경로입니다."),
 
     /* 401 Unauthorized */
     EXPIRED_ACCESS_TOKEN_ERROR(HttpStatus.UNAUTHORIZED, 40101, "만료된 accessToken입니다."),
