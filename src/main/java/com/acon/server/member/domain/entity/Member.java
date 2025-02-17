@@ -54,6 +54,19 @@ public class Member {
         this.updatedAt = updatedAt;
     }
 
+    public void setProfileImage(String profileImage) {
+        this.profileImage = profileImage;
+    }
+
+    public void setNickname(String nickname) {
+        this.nickname = nickname;
+        this.nicknameUpdatedAt = LocalDate.now();
+    }
+
+    public void setBirthDate(LocalDate birthDate) {
+        this.birthDate = birthDate;
+    }
+
     // TODO: 에러 처리
     public void useAcorn(int acornCount) {
         if (leftAcornCount >= acornCount) {
