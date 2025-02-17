@@ -32,6 +32,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -86,8 +87,8 @@ public class MemberController {
         return ResponseEntity.ok(new AreaResponse(area));
     }
 
-    @PostMapping(path = "/member/preference", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Void> postPreference(
+    @PutMapping(path = "/member/preference", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Void> putPreference(
             @Valid @RequestBody final PreferenceRequest request
     ) {
         List<DislikeFood> dislikeFoodList = request.dislikeFoodList().stream().map(DislikeFood::fromValue).toList();
@@ -96,7 +97,7 @@ public class MemberController {
         SpotStyle favoriteSpotStyle = SpotStyle.fromValue(request.favoriteSpotStyle());
         List<FavoriteSpot> favoriteSpotRank = request.favoriteSpotRank().stream().map(FavoriteSpot::fromValue).toList();
 
-        memberService.createPreference(dislikeFoodList, favoriteCuisineList, favoriteSpotType, favoriteSpotStyle,
+        memberService.upsertPreference(dislikeFoodList, favoriteCuisineList, favoriteSpotType, favoriteSpotStyle,
                 favoriteSpotRank);
 
         return ResponseEntity.ok().build();
