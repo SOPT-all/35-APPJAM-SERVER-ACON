@@ -42,6 +42,9 @@ import com.acon.server.spot.domain.enums.SpotType;
 import com.acon.server.spot.infra.repository.SpotRepository;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.time.format.ResolverStyle;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -312,6 +315,54 @@ public class MemberService {
     private void validateNicknameDuplication(String nickname) {
         if (memberRepository.existsByNickname(nickname)) {
             throw new BusinessException(ErrorType.DUPLICATED_NICKNAME_ERROR);
+        }
+    }
+
+    @Transactional
+    public void updateProfile(String profileImage, String nickname, String birthDate
+    ) {
+        MemberEntity memberEntity = memberRepository.findByIdOrElseThrow(principalHandler.getUserIdFromPrincipal());
+        Member member = memberMapper.toDomain(memberEntity);
+
+        if (profileImage != null) {
+            if (profileImage.isEmpty()) {
+                String basicProfileImageUrl = s3Adapter.getBasicProfileImageUrl();
+                member.setProfileImage(basicProfileImageUrl);
+            } else {
+                String fileName = s3Adapter.getFileName(profileImage);
+                s3Adapter.validateImageExists(fileName);
+                String imageUrl = s3Adapter.getImageUrl(fileName);
+                member.setProfileImage(imageUrl);
+            }
+        }
+
+        if (nickname != null) {
+            validateNickname(nickname);
+            member.setNickname(nickname);
+        }
+
+        if (birthDate != null) {
+            LocalDate parsedBirthDate = validateAndParseBirthDate(birthDate);
+            member.setBirthDate(parsedBirthDate);
+        }
+
+        memberRepository.save(memberMapper.toEntity(member));
+    }
+
+    private LocalDate validateAndParseBirthDate(String birthDate) {
+        try {
+            LocalDate parsedDate = LocalDate.parse(
+                    birthDate,
+                    DateTimeFormatter.ofPattern("yyyy.MM.dd").withResolverStyle(ResolverStyle.STRICT)
+            );
+
+            if (parsedDate.isAfter(LocalDate.now())) {
+                throw new BusinessException(ErrorType.INVALID_BIRTH_DATE_ERROR);
+            }
+
+            return parsedDate;
+        } catch (DateTimeParseException e) {
+            throw new BusinessException(ErrorType.INVALID_BIRTH_DATE_ERROR);
         }
     }
 
