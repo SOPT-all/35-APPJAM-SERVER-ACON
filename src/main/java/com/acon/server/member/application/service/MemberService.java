@@ -178,13 +178,20 @@ public class MemberService {
         return MemberAreaResponse.of(savedVerifiedAreaEntity.getId(), savedVerifiedAreaEntity.getName());
     }
 
-    private VerifiedAreaEntity updateVerifiedAreaEntity(VerifiedAreaEntity entity, LocalDate currentDate) {
+    private VerifiedAreaEntity updateVerifiedAreaEntity(
+            final VerifiedAreaEntity entity,
+            final LocalDate currentDate
+    ) {
         VerifiedArea verifiedArea = verifiedAreaMapper.toDomain(entity);
         verifiedArea.updateVerifiedDate(currentDate);
         return verifiedAreaRepository.save(verifiedAreaMapper.toEntity(verifiedArea));
     }
 
-    private VerifiedAreaEntity createVerifiedAreaEntity(String legalDong, Long memberId, LocalDate currentDate) {
+    private VerifiedAreaEntity createVerifiedAreaEntity(
+            final String legalDong,
+            final Long memberId,
+            final LocalDate currentDate
+    ) {
         return verifiedAreaRepository.save(
                 VerifiedAreaEntity.builder()
                         .name(legalDong)
@@ -280,7 +287,7 @@ public class MemberService {
                 .build();
     }
 
-    public PreSignedUrlResponse fetchPreSignedUrl(ImageType imageType) {
+    public PreSignedUrlResponse fetchPreSignedUrl(final ImageType imageType) {
         // TODO: 확장자 방식 고민하기
         String fileName = UUID.randomUUID() + ".jpg";
 
@@ -295,19 +302,19 @@ public class MemberService {
     }
 
     @Transactional(readOnly = true)
-    public void validateNickname(String nickname) {
+    public void validateNickname(final String nickname) {
         validateNicknamePattern(nickname);
         validateNicknameLength(nickname);
         validateNicknameDuplication(nickname);
     }
 
-    private void validateNicknamePattern(String nickname) {
+    private void validateNicknamePattern(final String nickname) {
         if (!nickname.matches(NICKNAME_PATTERN)) {
             throw new BusinessException(ErrorType.INVALID_NICKNAME_ERROR);
         }
     }
 
-    private void validateNicknameLength(String nickname) {
+    private void validateNicknameLength(final String nickname) {
         int length = calculateNicknameLength(nickname);
 
         if (length < 1 || length > MAX_NICKNAME_LENGTH) {
@@ -315,7 +322,7 @@ public class MemberService {
         }
     }
 
-    private int calculateNicknameLength(String nickname) {
+    private int calculateNicknameLength(final String nickname) {
         int length = 0;
 
         for (char c : nickname.toCharArray()) {
@@ -333,14 +340,17 @@ public class MemberService {
         return (c >= 0xAC00 && c <= 0xD7A3);
     }
 
-    private void validateNicknameDuplication(String nickname) {
+    private void validateNicknameDuplication(final String nickname) {
         if (memberRepository.existsByNickname(nickname)) {
             throw new BusinessException(ErrorType.DUPLICATED_NICKNAME_ERROR);
         }
     }
 
     @Transactional
-    public void updateProfile(String profileImage, String nickname, String birthDate
+    public void updateProfile(
+            final String profileImage,
+            final String nickname,
+            final String birthDate
     ) {
         MemberEntity memberEntity = memberRepository.findByIdOrElseThrow(principalHandler.getUserIdFromPrincipal());
         Member member = memberMapper.toDomain(memberEntity);
@@ -370,7 +380,7 @@ public class MemberService {
         memberRepository.save(memberMapper.toEntity(member));
     }
 
-    private LocalDate validateAndParseBirthDate(String birthDate) {
+    private LocalDate validateAndParseBirthDate(final String birthDate) {
         try {
             LocalDate parsedDate = LocalDate.parse(
                     birthDate,
@@ -388,7 +398,7 @@ public class MemberService {
     }
 
     @Transactional
-    public void logout(String refreshToken) {
+    public void logout(final String refreshToken) {
         MemberEntity memberEntity = memberRepository.findByIdOrElseThrow(principalHandler.getUserIdFromPrincipal());
         if (!memberEntity.getId().equals(jwtTokenProvider.validateRefreshToken(refreshToken))) {
             throw new BusinessException(ErrorType.INVALID_ACCESS_TOKEN_ERROR);
@@ -397,7 +407,7 @@ public class MemberService {
     }
 
     @Transactional
-    public ReissueTokenResponse reissueToken(String refreshToken) {
+    public ReissueTokenResponse reissueToken(final String refreshToken) {
         // TODO: 리팩토링
         Long memberId = jwtTokenProvider.validateRefreshToken(refreshToken);
         memberRepository.findByIdOrElseThrow(memberId);
@@ -411,7 +421,10 @@ public class MemberService {
     }
 
     @Transactional
-    public void withdrawMember(String reason, String refreshToken) {
+    public void withdrawMember(
+            final String reason,
+            final String refreshToken
+    ) {
         MemberEntity memberEntity = memberRepository.findByIdOrElseThrow(principalHandler.getUserIdFromPrincipal());
 
         // TODO: memberId 존재하는 테이블에 member row 제거 ( 리뷰 테이블 제외 )
