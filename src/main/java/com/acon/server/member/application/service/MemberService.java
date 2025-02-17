@@ -310,6 +310,12 @@ public class MemberService {
     }
 
     private void validateNicknameDuplication(String nickname) {
+        MemberEntity memberEntity = memberRepository.findByIdOrElseThrow(principalHandler.getUserIdFromPrincipal());
+
+        if (memberEntity.getNickname().equals(nickname)) {
+            return;
+        }
+
         if (memberRepository.existsByNickname(nickname)) {
             throw new BusinessException(ErrorType.DUPLICATED_NICKNAME_ERROR);
         }
