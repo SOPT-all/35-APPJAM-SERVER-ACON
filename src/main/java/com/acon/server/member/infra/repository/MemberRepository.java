@@ -11,6 +11,8 @@ public interface MemberRepository extends JpaRepository<MemberEntity, Long> {
 
     Optional<MemberEntity> findBySocialTypeAndSocialId(SocialType socialType, String socialId);
 
+    boolean existsByNickname(String nickname);
+
     default MemberEntity findByIdOrElseThrow(Long id) {
         return findById(id)
                 .orElseThrow(() -> new BusinessException(ErrorType.NOT_FOUND_MEMBER_ERROR));
