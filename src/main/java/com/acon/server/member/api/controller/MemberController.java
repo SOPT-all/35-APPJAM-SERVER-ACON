@@ -137,6 +137,15 @@ public class MemberController {
         );
     }
 
+    @GetMapping(path = "/nickname/validate")
+    public ResponseEntity<Void> getNicknameValidate(
+            @RequestParam(name = "nickname") final String nickname
+    ) {
+        memberService.validateNickname(nickname);
+
+        return ResponseEntity.ok().build();
+    }
+
     @PostMapping(path = "/auth/logout", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Void> logout(
             @Valid @RequestBody LogoutRequest request
