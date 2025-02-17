@@ -374,7 +374,7 @@ public class MemberService {
         try {
             LocalDate parsedDate = LocalDate.parse(
                     birthDate,
-                    DateTimeFormatter.ofPattern("yyyy.MM.dd").withResolverStyle(ResolverStyle.STRICT)
+                    DateTimeFormatter.ofPattern("yyyy.MM.dd").withResolverStyle(ResolverStyle.SMART)
             );
 
             if (parsedDate.isAfter(LocalDate.now())) {
