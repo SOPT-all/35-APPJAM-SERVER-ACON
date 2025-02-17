@@ -54,6 +54,8 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class MemberService {
 
+    private static final String NICKNAME_PATTERN = "^[a-zA-Z0-9_.가-힣]+$";
+
     private final GuidedSpotRepository guidedSpotRepository;
     private final MemberRepository memberRepository;
     private final PreferenceRepository preferenceRepository;
@@ -266,6 +268,51 @@ public class MemberService {
         };
 
         return PreSignedUrlResponse.of(fileName, preSignedUrl);
+    }
+
+    @Transactional(readOnly = true)
+    public void validateNickname(String nickname) {
+        validateNicknamePattern(nickname);
+        validateNicknameLength(nickname);
+        validateNicknameDuplication(nickname);
+    }
+
+    private void validateNicknamePattern(String nickname) {
+        if (!nickname.matches(NICKNAME_PATTERN)) {
+            throw new BusinessException(ErrorType.INVALID_NICKNAME_ERROR);
+        }
+    }
+
+    private void validateNicknameLength(String nickname) {
+        int length = calculateNicknameLength(nickname);
+
+        if (length < 1 || length > 16) {
+            throw new BusinessException(ErrorType.INVALID_NICKNAME_ERROR);
+        }
+    }
+
+    private int calculateNicknameLength(String nickname) {
+        int length = 0;
+
+        for (char c : nickname.toCharArray()) {
+            if (isKorean(c)) {
+                length += 2;
+            } else {
+                length += 1;
+            }
+        }
+
+        return length;
+    }
+
+    private boolean isKorean(char c) {
+        return (c >= 0xAC00 && c <= 0xD7A3);
+    }
+
+    private void validateNicknameDuplication(String nickname) {
+        if (memberRepository.existsByNickname(nickname)) {
+            throw new BusinessException(ErrorType.DUPLICATED_NICKNAME_ERROR);
+        }
     }
 
     @Transactional

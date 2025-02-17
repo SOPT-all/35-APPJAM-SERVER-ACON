@@ -50,6 +50,10 @@ public enum ErrorType {
     INVALID_FAVORITE_CUISINE_RANK_SIZE_ERROR(HttpStatus.BAD_REQUEST, 40031, "favoriteCuisineRank의 사이즈가 잘못되었습니다."),
     ALREADY_VERIFIED_AREA_ERROR(HttpStatus.BAD_REQUEST, 40032, "이미 인증된 동네가 존재합니다."),
     INVALID_IMAGE_TYPE_ERROR(HttpStatus.BAD_REQUEST, 40045, "유효하지 않은 imageType입니다."),
+    INVALID_NICKNAME_ERROR(HttpStatus.BAD_REQUEST, 40051, "닉네임이 조건을 만족하지 않습니다."),
+
+    /* 409 Conflict */
+    DUPLICATED_NICKNAME_ERROR(HttpStatus.CONFLICT, 40901, "이미 사용 중인 닉네임입니다."),
 
     /* 500 Internal Server Error */
     FAILED_DOWNLOAD_GOOGLE_PUBLIC_KEY_ERROR(HttpStatus.BAD_REQUEST, 50002, "구글 공개키 다운로드에 실패하였습니다."),
