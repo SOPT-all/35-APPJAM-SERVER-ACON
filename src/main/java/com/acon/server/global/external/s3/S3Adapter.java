@@ -95,15 +95,15 @@ public class S3Adapter {
     }
 
     public String getFileName(String imageUrl) {
-        if (imageUrl.startsWith(bucketUrlPrefix)) {
-            return imageUrl.substring(bucketUrlPrefix.length());
+        if (imageUrl.startsWith(bucketUrlPrefix + profileImagePath)) {
+            return imageUrl.substring((bucketUrlPrefix + profileImagePath).length());
         } else {
             return imageUrl;
         }
     }
 
     public void validateImageExists(String fileName) {
-        if (!amazonS3.doesObjectExist(bucketName, fileName)) {
+        if (!amazonS3.doesObjectExist(bucketName, profileImagePath + fileName)) {
             throw new BusinessException(ErrorType.INVALID_IMAGE_PATH_ERROR);
         }
     }
