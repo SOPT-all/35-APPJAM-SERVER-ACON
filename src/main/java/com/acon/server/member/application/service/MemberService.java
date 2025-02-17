@@ -49,6 +49,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.ThreadLocalRandom;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -57,6 +58,8 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class MemberService {
 
+    private static final char[] CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_.".toCharArray();
+    private static final int MAX_NICKNAME_LENGTH = 16;
     private static final String NICKNAME_PATTERN = "^[a-zA-Z0-9_.가-힣]+$";
 
     private final GuidedSpotRepository guidedSpotRepository;
@@ -110,7 +113,7 @@ public class MemberService {
         return LoginResponse.of(accessToken, refreshToken, hasVerifiedArea);
     }
 
-    protected Long fetchMemberId(
+    private Long fetchMemberId(
             final SocialType socialType,
             final String socialId
     ) {
@@ -121,16 +124,34 @@ public class MemberService {
                         .socialType(socialType)
                         .socialId(socialId)
                         .leftAcornCount(25)
-                        // TODO: 닉네임 생성 방식 변경
-                        .nickname(UUID.randomUUID().toString())
-                        // TODO: 기본 이미지 구현 전까지 임의로 이미지 할당
-                        .profileImage("https://avatars.githubusercontent.com/u/81469686?v=4")
+                        .nickname(generateUniqueNickname())
+                        .profileImage(s3Adapter.getBasicProfileImageUrl())
                         .build())
         );
 
         Member member = memberMapper.toDomain(memberEntity);
 
         return member.getId();
+    }
+
+    public String generateUniqueNickname() {
+        String nickname;
+        do {
+            nickname = generateRandomNickname();
+        } while (memberRepository.existsByNickname(nickname));
+
+        return nickname;
+    }
+
+    private String generateRandomNickname() {
+        char[] nickname = new char[MAX_NICKNAME_LENGTH];
+        ThreadLocalRandom random = ThreadLocalRandom.current();
+
+        for (int i = 0; i < MAX_NICKNAME_LENGTH; i++) {
+            nickname[i] = CHARACTERS[random.nextInt(CHARACTERS.length)];
+        }
+
+        return new String(nickname);
     }
 
     @Transactional
@@ -289,7 +310,7 @@ public class MemberService {
     private void validateNicknameLength(String nickname) {
         int length = calculateNicknameLength(nickname);
 
-        if (length < 1 || length > 16) {
+        if (length < 1 || length > MAX_NICKNAME_LENGTH) {
             throw new BusinessException(ErrorType.INVALID_NICKNAME_ERROR);
         }
     }
