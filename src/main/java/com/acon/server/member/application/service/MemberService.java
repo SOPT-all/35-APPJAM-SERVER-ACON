@@ -61,6 +61,7 @@ public class MemberService {
     private static final char[] CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_.".toCharArray();
     private static final int MAX_NICKNAME_LENGTH = 16;
     private static final String NICKNAME_PATTERN = "^[a-zA-Z0-9_.가-힣]+$";
+    private static final int NUMBER_OF_VERIFIED_AREA = 5;
 
     private final GuidedSpotRepository guidedSpotRepository;
     private final MemberRepository memberRepository;
@@ -161,9 +162,10 @@ public class MemberService {
     ) {
         MemberEntity memberEntity = memberRepository.findByIdOrElseThrow(principalHandler.getUserIdFromPrincipal());
 
-        // 추후 여러 동네 인증이 가능하게 되면 제거 예정
-        if (verifiedAreaRepository.existsByMemberId(memberEntity.getId())) {
-            throw new BusinessException(ErrorType.ALREADY_VERIFIED_AREA_ERROR);
+        List<VerifiedAreaEntity> verifiedAreaEntityList = verifiedAreaRepository.findAllByMemberId(
+                memberEntity.getId());
+        if (verifiedAreaEntityList.size() > NUMBER_OF_VERIFIED_AREA || verifiedAreaEntityList.isEmpty()) {
+            throw new BusinessException(ErrorType.INVALID_AREA_NUMBER_ERROR);
         }
 
         String legalDong = naverMapsAdapter.getReverseGeoCodingResult(latitude, longitude);
