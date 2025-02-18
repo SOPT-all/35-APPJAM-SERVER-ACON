@@ -90,23 +90,29 @@ public class S3Adapter {
         return Date.from(expirationTime);
     }
 
-    public String getImageUrl(String fileName) {
-        return amazonS3.getUrl(bucketName, profileImagePath + fileName).toString();
+    public String getProfileImageUrl(String fileName) {
+        return getImageUrl(profileImagePath, fileName);
     }
 
-    public String getFileName(String imageUrl) {
-        if (imageUrl.startsWith(bucketUrlPrefix + profileImagePath)) {
-            return imageUrl.substring((bucketUrlPrefix + profileImagePath).length());
-        } else {
-            return imageUrl;
-        }
+    private String getImageUrl(String path, String fileName) {
+        return amazonS3.getUrl(bucketName, path + fileName).toString();
     }
 
-    public void validateImageExists(String fileName) {
-        if (!amazonS3.doesObjectExist(bucketName, profileImagePath + fileName)) {
+    public void validateProfileImageExists(String fileName) {
+        validateImageExists(profileImagePath, fileName);
+    }
+
+    private void validateImageExists(String path, String fileName) {
+        if (!amazonS3.doesObjectExist(bucketName, path + fileName)) {
             throw new BusinessException(ErrorType.INVALID_IMAGE_PATH_ERROR);
         }
     }
 
-    // TODO: S3에서 파일 삭제하는 로직 추가
+    public void deleteFile(String fileUrl) {
+        amazonS3.deleteObject(bucketName, getFileKey(fileUrl));
+    }
+
+    private String getFileKey(String fileUrl) {
+        return fileUrl.substring(bucketUrlPrefix.length());
+    }
 }

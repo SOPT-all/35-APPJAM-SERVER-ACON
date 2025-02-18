@@ -361,24 +361,24 @@ public class MemberService {
         MemberEntity memberEntity = memberRepository.findByIdOrElseThrow(principalHandler.getUserIdFromPrincipal());
         Member member = memberMapper.toDomain(memberEntity);
 
-        if (profileImage != null) {
+        if (!profileImage.equals(member.getProfileImage())) {
             if (profileImage.isEmpty()) {
                 String basicProfileImageUrl = s3Adapter.getBasicProfileImageUrl();
                 member.setProfileImage(basicProfileImageUrl);
             } else {
-                String fileName = s3Adapter.getFileName(profileImage);
-                s3Adapter.validateImageExists(fileName);
-                String imageUrl = s3Adapter.getImageUrl(fileName);
+                s3Adapter.validateProfileImageExists(profileImage);
+                String imageUrl = s3Adapter.getProfileImageUrl(profileImage);
+                s3Adapter.deleteFile(member.getProfileImage());
                 member.setProfileImage(imageUrl);
             }
         }
 
-        if (nickname != null) {
+        if (!nickname.equals(member.getNickname())) {
             validateNickname(nickname);
             member.setNickname(nickname);
         }
 
-        if (birthDate != null) {
+        if (!birthDate.equals(member.getBirthDate().toString())) {
             LocalDate parsedBirthDate = validateAndParseBirthDate(birthDate);
             member.setBirthDate(parsedBirthDate);
         }
