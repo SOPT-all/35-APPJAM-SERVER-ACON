@@ -396,7 +396,9 @@ public class MemberService {
             member.setNickname(nickname);
         }
 
-        if (!birthDate.equals(member.getBirthDate().toString())) {
+        if (birthDate == null) {
+            member.setBirthDate(null);
+        } else if (member.getBirthDate() == null || !birthDate.equals(member.getBirthDate().toString())) {
             LocalDate parsedBirthDate = validateAndParseBirthDate(birthDate);
             member.setBirthDate(parsedBirthDate);
         }
