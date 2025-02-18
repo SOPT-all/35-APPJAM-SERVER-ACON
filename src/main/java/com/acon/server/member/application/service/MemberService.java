@@ -42,10 +42,14 @@ import com.acon.server.spot.domain.enums.SpotType;
 import com.acon.server.spot.infra.repository.SpotRepository;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.time.format.ResolverStyle;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.ThreadLocalRandom;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -54,6 +58,8 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class MemberService {
 
+    private static final char[] CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_.".toCharArray();
+    private static final int MAX_NICKNAME_LENGTH = 16;
     private static final String NICKNAME_PATTERN = "^[a-zA-Z0-9_.가-힣]+$";
 
     private final GuidedSpotRepository guidedSpotRepository;
@@ -107,7 +113,7 @@ public class MemberService {
         return LoginResponse.of(accessToken, refreshToken, hasVerifiedArea);
     }
 
-    protected Long fetchMemberId(
+    private Long fetchMemberId(
             final SocialType socialType,
             final String socialId
     ) {
@@ -118,16 +124,34 @@ public class MemberService {
                         .socialType(socialType)
                         .socialId(socialId)
                         .leftAcornCount(25)
-                        // TODO: 닉네임 생성 방식 변경
-                        .nickname(UUID.randomUUID().toString())
-                        // TODO: 기본 이미지 구현 전까지 임의로 이미지 할당
-                        .profileImage("https://avatars.githubusercontent.com/u/81469686?v=4")
+                        .nickname(generateUniqueNickname())
+                        .profileImage(s3Adapter.getBasicProfileImageUrl())
                         .build())
         );
 
         Member member = memberMapper.toDomain(memberEntity);
 
         return member.getId();
+    }
+
+    public String generateUniqueNickname() {
+        String nickname;
+        do {
+            nickname = generateRandomNickname();
+        } while (memberRepository.existsByNickname(nickname));
+
+        return nickname;
+    }
+
+    private String generateRandomNickname() {
+        char[] nickname = new char[MAX_NICKNAME_LENGTH];
+        ThreadLocalRandom random = ThreadLocalRandom.current();
+
+        for (int i = 0; i < MAX_NICKNAME_LENGTH; i++) {
+            nickname[i] = CHARACTERS[random.nextInt(CHARACTERS.length)];
+        }
+
+        return new String(nickname);
     }
 
     @Transactional
@@ -154,13 +178,20 @@ public class MemberService {
         return MemberAreaResponse.of(savedVerifiedAreaEntity.getId(), savedVerifiedAreaEntity.getName());
     }
 
-    private VerifiedAreaEntity updateVerifiedAreaEntity(VerifiedAreaEntity entity, LocalDate currentDate) {
+    private VerifiedAreaEntity updateVerifiedAreaEntity(
+            final VerifiedAreaEntity entity,
+            final LocalDate currentDate
+    ) {
         VerifiedArea verifiedArea = verifiedAreaMapper.toDomain(entity);
         verifiedArea.updateVerifiedDate(currentDate);
         return verifiedAreaRepository.save(verifiedAreaMapper.toEntity(verifiedArea));
     }
 
-    private VerifiedAreaEntity createVerifiedAreaEntity(String legalDong, Long memberId, LocalDate currentDate) {
+    private VerifiedAreaEntity createVerifiedAreaEntity(
+            final String legalDong,
+            final Long memberId,
+            final LocalDate currentDate
+    ) {
         return verifiedAreaRepository.save(
                 VerifiedAreaEntity.builder()
                         .name(legalDong)
@@ -256,7 +287,7 @@ public class MemberService {
                 .build();
     }
 
-    public PreSignedUrlResponse fetchPreSignedUrl(ImageType imageType) {
+    public PreSignedUrlResponse fetchPreSignedUrl(final ImageType imageType) {
         // TODO: 확장자 방식 고민하기
         String fileName = UUID.randomUUID() + ".jpg";
 
@@ -271,27 +302,27 @@ public class MemberService {
     }
 
     @Transactional(readOnly = true)
-    public void validateNickname(String nickname) {
+    public void validateNickname(final String nickname) {
         validateNicknamePattern(nickname);
         validateNicknameLength(nickname);
         validateNicknameDuplication(nickname);
     }
 
-    private void validateNicknamePattern(String nickname) {
+    private void validateNicknamePattern(final String nickname) {
         if (!nickname.matches(NICKNAME_PATTERN)) {
             throw new BusinessException(ErrorType.INVALID_NICKNAME_ERROR);
         }
     }
 
-    private void validateNicknameLength(String nickname) {
+    private void validateNicknameLength(final String nickname) {
         int length = calculateNicknameLength(nickname);
 
-        if (length < 1 || length > 16) {
+        if (length < 1 || length > MAX_NICKNAME_LENGTH) {
             throw new BusinessException(ErrorType.INVALID_NICKNAME_ERROR);
         }
     }
 
-    private int calculateNicknameLength(String nickname) {
+    private int calculateNicknameLength(final String nickname) {
         int length = 0;
 
         for (char c : nickname.toCharArray()) {
@@ -309,7 +340,7 @@ public class MemberService {
         return (c >= 0xAC00 && c <= 0xD7A3);
     }
 
-    private void validateNicknameDuplication(String nickname) {
+    private void validateNicknameDuplication(final String nickname) {
         MemberEntity memberEntity = memberRepository.findByIdOrElseThrow(principalHandler.getUserIdFromPrincipal());
 
         if (memberEntity.getNickname().equals(nickname)) {
@@ -322,7 +353,58 @@ public class MemberService {
     }
 
     @Transactional
-    public void logout(String refreshToken) {
+    public void updateProfile(
+            final String profileImage,
+            final String nickname,
+            final String birthDate
+    ) {
+        MemberEntity memberEntity = memberRepository.findByIdOrElseThrow(principalHandler.getUserIdFromPrincipal());
+        Member member = memberMapper.toDomain(memberEntity);
+
+        if (!profileImage.equals(member.getProfileImage())) {
+            if (profileImage.isEmpty()) {
+                String basicProfileImageUrl = s3Adapter.getBasicProfileImageUrl();
+                member.setProfileImage(basicProfileImageUrl);
+            } else {
+                s3Adapter.validateProfileImageExists(profileImage);
+                String imageUrl = s3Adapter.getProfileImageUrl(profileImage);
+                s3Adapter.deleteFile(member.getProfileImage());
+                member.setProfileImage(imageUrl);
+            }
+        }
+
+        if (!nickname.equals(member.getNickname())) {
+            validateNickname(nickname);
+            member.setNickname(nickname);
+        }
+
+        if (!birthDate.equals(member.getBirthDate().toString())) {
+            LocalDate parsedBirthDate = validateAndParseBirthDate(birthDate);
+            member.setBirthDate(parsedBirthDate);
+        }
+
+        memberRepository.save(memberMapper.toEntity(member));
+    }
+
+    private LocalDate validateAndParseBirthDate(final String birthDate) {
+        try {
+            LocalDate parsedDate = LocalDate.parse(
+                    birthDate,
+                    DateTimeFormatter.ofPattern("yyyy.MM.dd").withResolverStyle(ResolverStyle.SMART)
+            );
+
+            if (parsedDate.isAfter(LocalDate.now())) {
+                throw new BusinessException(ErrorType.INVALID_BIRTH_DATE_ERROR);
+            }
+
+            return parsedDate;
+        } catch (DateTimeParseException e) {
+            throw new BusinessException(ErrorType.INVALID_BIRTH_DATE_ERROR);
+        }
+    }
+
+    @Transactional
+    public void logout(final String refreshToken) {
         MemberEntity memberEntity = memberRepository.findByIdOrElseThrow(principalHandler.getUserIdFromPrincipal());
         if (!memberEntity.getId().equals(jwtTokenProvider.validateRefreshToken(refreshToken))) {
             throw new BusinessException(ErrorType.INVALID_ACCESS_TOKEN_ERROR);
@@ -331,7 +413,7 @@ public class MemberService {
     }
 
     @Transactional
-    public ReissueTokenResponse reissueToken(String refreshToken) {
+    public ReissueTokenResponse reissueToken(final String refreshToken) {
         // TODO: 리팩토링
         Long memberId = jwtTokenProvider.validateRefreshToken(refreshToken);
         memberRepository.findByIdOrElseThrow(memberId);
@@ -345,7 +427,10 @@ public class MemberService {
     }
 
     @Transactional
-    public void withdrawMember(String reason, String refreshToken) {
+    public void withdrawMember(
+            final String reason,
+            final String refreshToken
+    ) {
         MemberEntity memberEntity = memberRepository.findByIdOrElseThrow(principalHandler.getUserIdFromPrincipal());
 
         // TODO: memberId 존재하는 테이블에 member row 제거 ( 리뷰 테이블 제외 )

@@ -22,7 +22,7 @@ public enum ErrorType {
     DATA_INTEGRITY_VIOLATION_ERROR(HttpStatus.BAD_REQUEST, 40007, "데이터 무결성 제약 조건을 위반했습니다."),
     INVALID_ACCESS_TOKEN_ERROR(HttpStatus.BAD_REQUEST, 40008, "유효하지 않은 accessToken입니다."),
     INVALID_REFRESH_TOKEN_ERROR(HttpStatus.BAD_REQUEST, 40088, "유효하지 않은 refreshToken입니다."),
-    // TODO: NonNull 필드에 null 값이 입력되었을 때 발생하는 예외 처리 추가
+    INVALID_IMAGE_PATH_ERROR(HttpStatus.NOT_FOUND, 40052, "유효하지 않은 이미지 경로입니다."),
 
     /* 401 Unauthorized */
     EXPIRED_ACCESS_TOKEN_ERROR(HttpStatus.UNAUTHORIZED, 40101, "만료된 accessToken입니다."),
@@ -51,6 +51,7 @@ public enum ErrorType {
     ALREADY_VERIFIED_AREA_ERROR(HttpStatus.BAD_REQUEST, 40032, "이미 인증된 동네가 존재합니다."),
     INVALID_IMAGE_TYPE_ERROR(HttpStatus.BAD_REQUEST, 40045, "유효하지 않은 imageType입니다."),
     INVALID_NICKNAME_ERROR(HttpStatus.BAD_REQUEST, 40051, "닉네임이 조건을 만족하지 않습니다."),
+    INVALID_BIRTH_DATE_ERROR(HttpStatus.BAD_REQUEST, 40053, "유효하지 않은 생년월일입니다."),
 
     /* 409 Conflict */
     DUPLICATED_NICKNAME_ERROR(HttpStatus.CONFLICT, 40901, "이미 사용 중인 닉네임입니다."),
