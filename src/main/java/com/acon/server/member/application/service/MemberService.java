@@ -62,7 +62,7 @@ public class MemberService {
     private static final char[] CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_.".toCharArray();
     private static final int MAX_NICKNAME_LENGTH = 16;
     private static final String NICKNAME_PATTERN = "^[a-zA-Z0-9_.가-힣]+$";
-    private static final int MAX_VERIFIED_AREA_LIST = 5;
+    private static final int MAX_VERIFIED_AREA_SIZE = 5;
 
     private final GuidedSpotRepository guidedSpotRepository;
     private final MemberRepository memberRepository;
@@ -166,8 +166,8 @@ public class MemberService {
         List<VerifiedAreaEntity> verifiedAreaEntityList = verifiedAreaRepository.findAllByMemberId(
                 memberEntity.getId());
 
-        if (verifiedAreaEntityList.size() > MAX_VERIFIED_AREA_LIST - 1) {
-            throw new BusinessException(ErrorType.INVALID_AREA_NUMBER_ERROR);
+        if (verifiedAreaEntityList.size() >= MAX_VERIFIED_AREA_SIZE) {
+            throw new BusinessException(ErrorType.INVALID_AREA_SIZE_ERROR);
         }
 
         String legalDong = naverMapsAdapter.getReverseGeoCodingResult(latitude, longitude);
@@ -187,8 +187,8 @@ public class MemberService {
         MemberEntity memberEntity = memberRepository.findByIdOrElseThrow(principalHandler.getUserIdFromPrincipal());
         List<VerifiedAreaEntity> verifiedAreaEntityList = verifiedAreaRepository.findAllByMemberId(
                 memberEntity.getId());
-        List<VerifiedAreaListResponse.VerifiedArea> verifiedAreaList = verifiedAreaEntityList.stream()
-                .map(verifiedAreaEntity -> new VerifiedAreaListResponse.VerifiedArea(verifiedAreaEntity.getId(),
+        List<VerifiedAreaResponse> verifiedAreaList = verifiedAreaEntityList.stream()
+                .map(verifiedAreaEntity -> VerifiedAreaResponse.of(verifiedAreaEntity.getId(),
                         verifiedAreaEntity.getName()))
                 .toList();
 
