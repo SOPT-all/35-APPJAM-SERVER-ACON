@@ -48,7 +48,7 @@ public enum ErrorType {
     INVALID_FAVORITE_SPOT_ERROR(HttpStatus.BAD_REQUEST, 40017, "유효하지 않은 favoriteSpot입니다."),
     INVALID_FAVORITE_SPOT_RANK_SIZE_ERROR(HttpStatus.BAD_REQUEST, 40030, "favoriteSpotRank의 사이즈가 잘못되었습니다."),
     INVALID_FAVORITE_CUISINE_RANK_SIZE_ERROR(HttpStatus.BAD_REQUEST, 40031, "favoriteCuisineRank의 사이즈가 잘못되었습니다."),
-    ALREADY_VERIFIED_AREA_ERROR(HttpStatus.BAD_REQUEST, 40032, "이미 인증된 동네가 존재합니다."),
+    INVALID_AREA_SIZE_ERROR(HttpStatus.BAD_REQUEST, 40032, "동네 인증은 최소 1개 ~ 최대 5개까지 가능합니다."),
     INVALID_IMAGE_TYPE_ERROR(HttpStatus.BAD_REQUEST, 40045, "유효하지 않은 imageType입니다."),
     INVALID_NICKNAME_ERROR(HttpStatus.BAD_REQUEST, 40051, "닉네임이 조건을 만족하지 않습니다."),
     INVALID_BIRTH_DATE_ERROR(HttpStatus.BAD_REQUEST, 40053, "유효하지 않은 생년월일입니다."),

@@ -1,14 +1,14 @@
 package com.acon.server.member.api.response;
 
-public record MemberAreaResponse(
+public record VerifiedAreaResponse(
         Long id,
         String name
 ) {
 
-    public static MemberAreaResponse of(
+    public static VerifiedAreaResponse of(
             final Long id,
             final String name
     ) {
-        return new MemberAreaResponse(id, name);
+        return new VerifiedAreaResponse(id, name);
     }
 }
