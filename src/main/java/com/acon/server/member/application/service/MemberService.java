@@ -177,7 +177,7 @@ public class MemberService {
     }
 
     @Transactional
-    public void createPreference(
+    public void upsertPreference(
             final List<DislikeFood> dislikeFoodList,
             final List<Cuisine> favoriteCuisineList,
             final SpotType favoriteSpotType,
