@@ -44,7 +44,7 @@ public class SpotController {
         );
     }
 
-    @GetMapping(path = "/spot/{spotId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(path = "/spots/{spotId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<SpotDetailResponse> getSpotDetail(
             @Positive(message = "spotId는 양수여야 합니다.")
             @Validated @PathVariable(name = "spotId") final Long spotId
@@ -54,7 +54,7 @@ public class SpotController {
         );
     }
 
-    @GetMapping(path = "/spot/{spotId}/menus", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(path = "/spots/{spotId}/menus", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<MenuListResponse> getMenus(
             @Positive(message = "spotId는 양수여야 합니다.")
             @Validated @PathVariable(name = "spotId") final Long spotId
@@ -89,7 +89,7 @@ public class SpotController {
     }
 
     // TODO: 메서드 네이밍 수정 필요
-    @GetMapping(path = "/spot/verify", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(path = "/spots/verify", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<VerifiedSpotResponse> verifySpot(
             @Positive(message = "spotId는 양수여야 합니다.")
             @Validated @RequestParam(name = "spotId") final Long spotId,

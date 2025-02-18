@@ -18,7 +18,7 @@ public class ReviewController {
 
     private final ReviewService reviewService;
 
-    @PostMapping(path = "/review", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(path = "/reviews", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Void> postReview(
             @Valid @RequestBody final ReviewRequest request
     ) {

@@ -62,11 +62,11 @@ public class MemberController {
         );
     }
 
-    @PostMapping(path = "/member/area",
+    @PostMapping(path = "/members/verified-areas",
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public ResponseEntity<MemberAreaResponse> postArea(
+    public ResponseEntity<MemberAreaResponse> postVerifiedArea(
             @Valid @RequestBody final MemberAreaRequest request
     ) {
 
@@ -89,7 +89,7 @@ public class MemberController {
         return ResponseEntity.ok(new AreaResponse(area));
     }
 
-    @PutMapping(path = "/member/preference", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PutMapping(path = "/members/preference", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Void> putPreference(
             @Valid @RequestBody final PreferenceRequest request
     ) {
@@ -106,7 +106,7 @@ public class MemberController {
     }
 
     // TODO: Member 도메인에 있어야 할까? 고민 필요
-    @PostMapping(path = "/member/guided-spot", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(path = "/members/guided-spots", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Void> postGuidedSpot(
             @Valid @RequestBody final GuidedSpotRequest request
     ) {
@@ -115,7 +115,7 @@ public class MemberController {
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping(path = "/member/acorn", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(path = "/members/acorn", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<AcornCountResponse> getAcornCount() {
         return ResponseEntity.ok(
                 memberService.fetchAcornCount()
@@ -140,7 +140,7 @@ public class MemberController {
         );
     }
 
-    @GetMapping(path = "/nickname/validate")
+    @GetMapping(path = "/members/nickname/validate")
     public ResponseEntity<Void> getNicknameValidate(
             @RequestParam(name = "nickname") final String nickname
     ) {
