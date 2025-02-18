@@ -33,5 +33,4 @@ public enum FilterCategory {
 
         return category;
     }
-
 }

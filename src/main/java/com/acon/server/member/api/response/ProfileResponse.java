@@ -12,7 +12,7 @@ public record ProfileResponse(
         String nickname,
         int leftAcornCount,
         String birthDate,
-        List<VerifiedArea> verifiedArea
+        List<VerifiedArea> verifiedAreaList
 ) {
 
     public record VerifiedArea(

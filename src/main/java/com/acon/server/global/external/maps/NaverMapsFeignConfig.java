@@ -1,4 +1,4 @@
-package com.acon.server.global.external;
+package com.acon.server.global.external.maps;
 
 import com.acon.server.global.config.properties.NaverMapsProperties;
 import feign.RequestInterceptor;

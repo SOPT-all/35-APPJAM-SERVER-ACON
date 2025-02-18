@@ -5,9 +5,12 @@ import com.acon.server.global.auth.PrincipalHandler;
 import com.acon.server.global.auth.jwt.JwtTokenProvider;
 import com.acon.server.global.exception.BusinessException;
 import com.acon.server.global.exception.ErrorType;
-import com.acon.server.global.external.NaverMapsAdapter;
+import com.acon.server.global.external.maps.NaverMapsAdapter;
+import com.acon.server.global.external.s3.S3Adapter;
 import com.acon.server.member.api.response.AcornCountResponse;
 import com.acon.server.member.api.response.LoginResponse;
+import com.acon.server.member.api.response.MemberAreaResponse;
+import com.acon.server.member.api.response.PreSignedUrlResponse;
 import com.acon.server.member.api.response.ProfileResponse;
 import com.acon.server.member.api.response.ReissueTokenResponse;
 import com.acon.server.member.application.mapper.GuidedSpotMapper;
@@ -21,6 +24,7 @@ import com.acon.server.member.domain.entity.VerifiedArea;
 import com.acon.server.member.domain.enums.Cuisine;
 import com.acon.server.member.domain.enums.DislikeFood;
 import com.acon.server.member.domain.enums.FavoriteSpot;
+import com.acon.server.member.domain.enums.ImageType;
 import com.acon.server.member.domain.enums.SocialType;
 import com.acon.server.member.domain.enums.SpotStyle;
 import com.acon.server.member.infra.entity.GuidedSpotEntity;
@@ -64,10 +68,14 @@ public class MemberService {
 
     private final JwtTokenProvider jwtTokenProvider;
     private final PrincipalHandler principalHandler;
+
+    // TODO: 네이밍 변경
     private final GoogleSocialService googleSocialService;
     private final AppleAuthAdapter appleAuthService;
 
     private final NaverMapsAdapter naverMapsAdapter;
+
+    private final S3Adapter s3Adapter;
 
     // TODO: 메서드 순서 정리, TRANSACTION 설정, mapper 사용
     // TODO: @Valid 거친 건 원시타입으로 받기
@@ -91,7 +99,10 @@ public class MemberService {
         MemberAuthentication memberAuthentication = new MemberAuthentication(memberId, null, null);
         String accessToken = jwtTokenProvider.issueAccessToken(memberAuthentication);
         String refreshToken = jwtTokenProvider.issueRefreshToken(memberId);
-        return LoginResponse.of(accessToken, refreshToken);
+
+        boolean hasVerifiedArea = verifiedAreaRepository.existsByMemberId(memberId);
+
+        return LoginResponse.of(accessToken, refreshToken, hasVerifiedArea);
     }
 
     protected Long fetchMemberId(
@@ -118,31 +129,43 @@ public class MemberService {
     }
 
     @Transactional
-    public String createMemberArea(
+    public MemberAreaResponse createMemberArea(
             final Double latitude,
             final Double longitude
     ) {
         MemberEntity memberEntity = memberRepository.findByIdOrElseThrow(principalHandler.getUserIdFromPrincipal());
+
+        // 추후 여러 동네 인증이 가능하게 되면 제거 예정
+        if (verifiedAreaRepository.existsByMemberId(memberEntity.getId())) {
+            throw new BusinessException(ErrorType.ALREADY_VERIFIED_AREA_ERROR);
+        }
+
         String legalDong = naverMapsAdapter.getReverseGeoCodingResult(latitude, longitude);
         Optional<VerifiedAreaEntity> optionalVerifiedAreaEntity = verifiedAreaRepository.findByMemberIdAndName(
                 memberEntity.getId(), legalDong);
 
-        optionalVerifiedAreaEntity.ifPresentOrElse(
-                verifiedAreaEntity -> {
-                    VerifiedArea verifiedArea = verifiedAreaMapper.toDomain(verifiedAreaEntity);
-                    verifiedArea.updateVerifiedDate(LocalDate.now());
-                    verifiedAreaRepository.save(verifiedAreaMapper.toEntity(verifiedArea));
-                },
-                () -> verifiedAreaRepository.save(
-                        VerifiedAreaEntity.builder()
-                                .name(legalDong)
-                                .memberId(memberEntity.getId())
-                                .verifiedDate(Collections.singletonList(LocalDate.now()))
-                                .build()
-                )
-        );
+        LocalDate currentDate = LocalDate.now();
+        VerifiedAreaEntity savedVerifiedAreaEntity = optionalVerifiedAreaEntity
+                .map(entity -> updateVerifiedAreaEntity(entity, currentDate))
+                .orElseGet(() -> createVerifiedAreaEntity(legalDong, memberEntity.getId(), currentDate));
 
-        return legalDong;
+        return MemberAreaResponse.of(savedVerifiedAreaEntity.getId(), savedVerifiedAreaEntity.getName());
+    }
+
+    private VerifiedAreaEntity updateVerifiedAreaEntity(VerifiedAreaEntity entity, LocalDate currentDate) {
+        VerifiedArea verifiedArea = verifiedAreaMapper.toDomain(entity);
+        verifiedArea.updateVerifiedDate(currentDate);
+        return verifiedAreaRepository.save(verifiedAreaMapper.toEntity(verifiedArea));
+    }
+
+    private VerifiedAreaEntity createVerifiedAreaEntity(String legalDong, Long memberId, LocalDate currentDate) {
+        return verifiedAreaRepository.save(
+                VerifiedAreaEntity.builder()
+                        .name(legalDong)
+                        .memberId(memberId)
+                        .verifiedDate(Collections.singletonList(currentDate))
+                        .build()
+        );
     }
 
     @Transactional(readOnly = true)
@@ -154,7 +177,7 @@ public class MemberService {
     }
 
     @Transactional
-    public void createPreference(
+    public void upsertPreference(
             final List<DislikeFood> dislikeFoodList,
             final List<Cuisine> favoriteCuisineList,
             final SpotType favoriteSpotType,
@@ -224,11 +247,25 @@ public class MemberService {
                 .nickname(memberEntity.getNickname())
                 .birthDate(memberEntity.getBirthDate() != null ? memberEntity.getBirthDate().toString() : null)
                 .leftAcornCount(memberEntity.getLeftAcornCount())
-                .verifiedArea(verifiedAreaEntityList.stream()
+                .verifiedAreaList(verifiedAreaEntityList.stream()
                         .map(verifiedAreaEntity -> new ProfileResponse.VerifiedArea(verifiedAreaEntity.getId(),
                                 verifiedAreaEntity.getName()))
                         .toList())
                 .build();
+    }
+
+    public PreSignedUrlResponse fetchPreSignedUrl(ImageType imageType) {
+        // TODO: 확장자 방식 고민하기
+        String fileName = UUID.randomUUID() + ".jpg";
+
+        String preSignedUrl = switch (imageType) {
+            case PROFILE -> s3Adapter.getPreSignedUrlForProfileImage(fileName);
+//            case REVIEW -> s3Adapter.getPreSignedUrlForReviewImage(fileName);
+//            case SPOT -> s3Adapter.getPreSignedUrlForSpotImage(fileName);
+            default -> throw new BusinessException(ErrorType.INVALID_IMAGE_TYPE_ERROR);
+        };
+
+        return PreSignedUrlResponse.of(fileName, preSignedUrl);
     }
 
     @Transactional
@@ -258,6 +295,7 @@ public class MemberService {
     public void withdrawMember(String reason, String refreshToken) {
         MemberEntity memberEntity = memberRepository.findByIdOrElseThrow(principalHandler.getUserIdFromPrincipal());
 
+        // TODO: memberId 존재하는 테이블에 member row 제거 ( 리뷰 테이블 제외 )
         memberRepository.deleteById(memberEntity.getId());
         jwtTokenProvider.deleteRefreshToken(refreshToken);
         // TODO: 엑세스 토큰 블랙리스트
@@ -267,7 +305,6 @@ public class MemberService {
                         .reason(reason)
                         .build()
         );
-
     }
 
     // TODO: 최근 길 안내 장소 지우는 스케줄러 추가

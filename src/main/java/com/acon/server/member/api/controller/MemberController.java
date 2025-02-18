@@ -8,14 +8,17 @@ import com.acon.server.member.api.request.PreferenceRequest;
 import com.acon.server.member.api.request.ReissueTokenRequest;
 import com.acon.server.member.api.request.WithdrawalReasonRequest;
 import com.acon.server.member.api.response.AcornCountResponse;
+import com.acon.server.member.api.response.AreaResponse;
 import com.acon.server.member.api.response.LoginResponse;
 import com.acon.server.member.api.response.MemberAreaResponse;
+import com.acon.server.member.api.response.PreSignedUrlResponse;
 import com.acon.server.member.api.response.ProfileResponse;
 import com.acon.server.member.api.response.ReissueTokenResponse;
 import com.acon.server.member.application.service.MemberService;
 import com.acon.server.member.domain.enums.Cuisine;
 import com.acon.server.member.domain.enums.DislikeFood;
 import com.acon.server.member.domain.enums.FavoriteSpot;
+import com.acon.server.member.domain.enums.ImageType;
 import com.acon.server.member.domain.enums.SocialType;
 import com.acon.server.member.domain.enums.SpotStyle;
 import com.acon.server.spot.domain.enums.SpotType;
@@ -29,6 +32,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -63,13 +67,14 @@ public class MemberController {
     public ResponseEntity<MemberAreaResponse> postArea(
             @Valid @RequestBody final MemberAreaRequest request
     ) {
-        String area = memberService.createMemberArea(request.latitude(), request.longitude());
 
-        return ResponseEntity.ok(new MemberAreaResponse(area));
+        return ResponseEntity.ok(
+                memberService.createMemberArea(request.latitude(), request.longitude())
+        );
     }
 
     @GetMapping(path = "/area", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<MemberAreaResponse> getArea(
+    public ResponseEntity<AreaResponse> getArea(
             @DecimalMin(value = "33.1", message = "위도는 최소 33.1°N 이상이어야 합니다.(대한민국 기준)")
             @DecimalMax(value = "38.6", message = "위도는 최대 38.6°N 이하이어야 합니다.(대한민국 기준)")
             @Validated @RequestParam(name = "latitude") final Double latitude,
@@ -79,11 +84,11 @@ public class MemberController {
     ) {
         String area = memberService.fetchMemberArea(latitude, longitude);
 
-        return ResponseEntity.ok(new MemberAreaResponse(area));
+        return ResponseEntity.ok(new AreaResponse(area));
     }
 
-    @PostMapping(path = "/member/preference", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Void> postPreference(
+    @PutMapping(path = "/member/preference", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Void> putPreference(
             @Valid @RequestBody final PreferenceRequest request
     ) {
         List<DislikeFood> dislikeFoodList = request.dislikeFoodList().stream().map(DislikeFood::fromValue).toList();
@@ -92,7 +97,7 @@ public class MemberController {
         SpotStyle favoriteSpotStyle = SpotStyle.fromValue(request.favoriteSpotStyle());
         List<FavoriteSpot> favoriteSpotRank = request.favoriteSpotRank().stream().map(FavoriteSpot::fromValue).toList();
 
-        memberService.createPreference(dislikeFoodList, favoriteCuisineList, favoriteSpotType, favoriteSpotStyle,
+        memberService.upsertPreference(dislikeFoodList, favoriteCuisineList, favoriteSpotType, favoriteSpotStyle,
                 favoriteSpotRank);
 
         return ResponseEntity.ok().build();
@@ -122,17 +127,30 @@ public class MemberController {
         );
     }
 
+    @GetMapping(path = "/images/presigned-url", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<PreSignedUrlResponse> getPreSignedUrl(
+            @RequestParam(name = "imageType") final String imageTypeString
+    ) {
+        ImageType imageType = ImageType.fromValue(imageTypeString);
+
+        return ResponseEntity.ok(
+                memberService.fetchPreSignedUrl(imageType)
+        );
+    }
+
     @PostMapping(path = "/auth/logout", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Void> logout(
             @Valid @RequestBody LogoutRequest request
     ) {
         memberService.logout(request.refreshToken());
+
         return ResponseEntity.ok().build();
     }
 
     @PostMapping(path = "/auth/reissue",
             consumes = MediaType.APPLICATION_JSON_VALUE,
-            produces = MediaType.APPLICATION_JSON_VALUE)
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
     public ResponseEntity<ReissueTokenResponse> reissueToken(
             @Valid @RequestBody ReissueTokenRequest request
     ) {
@@ -146,6 +164,7 @@ public class MemberController {
             @Valid @RequestBody WithdrawalReasonRequest request
     ) {
         memberService.withdrawMember(request.reason(), request.refreshToken());
+
         return ResponseEntity.ok().build();
     }
 }
