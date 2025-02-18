@@ -56,7 +56,7 @@ public class MemberController {
         );
     }
 
-    @PostMapping(path = "/member/area",
+    @PostMapping(path = "/members/area",
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE
     )
