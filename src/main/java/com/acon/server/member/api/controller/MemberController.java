@@ -5,6 +5,7 @@ import com.acon.server.member.api.request.LoginRequest;
 import com.acon.server.member.api.request.LogoutRequest;
 import com.acon.server.member.api.request.MemberAreaRequest;
 import com.acon.server.member.api.request.PreferenceRequest;
+import com.acon.server.member.api.request.ProfileRequest;
 import com.acon.server.member.api.request.ReissueTokenRequest;
 import com.acon.server.member.api.request.WithdrawalReasonRequest;
 import com.acon.server.member.api.response.AcornCountResponse;
@@ -31,6 +32,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -136,6 +138,24 @@ public class MemberController {
         return ResponseEntity.ok(
                 memberService.fetchPreSignedUrl(imageType)
         );
+    }
+
+    @GetMapping(path = "/nickname/validate")
+    public ResponseEntity<Void> getNicknameValidate(
+            @RequestParam(name = "nickname") final String nickname
+    ) {
+        memberService.validateNickname(nickname);
+
+        return ResponseEntity.ok().build();
+    }
+
+    @PatchMapping(path = "/members/me", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Void> patchProfile(
+            @Valid @RequestBody ProfileRequest request
+    ) {
+        memberService.updateProfile(request.profileImage(), request.nickname(), request.birthDate());
+
+        return ResponseEntity.ok().build();
     }
 
     @PostMapping(path = "/auth/logout", consumes = MediaType.APPLICATION_JSON_VALUE)
