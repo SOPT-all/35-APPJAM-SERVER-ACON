@@ -3,18 +3,19 @@ package com.acon.server.member.api.controller;
 import com.acon.server.member.api.request.GuidedSpotRequest;
 import com.acon.server.member.api.request.LoginRequest;
 import com.acon.server.member.api.request.LogoutRequest;
-import com.acon.server.member.api.request.MemberAreaRequest;
 import com.acon.server.member.api.request.PreferenceRequest;
 import com.acon.server.member.api.request.ProfileRequest;
 import com.acon.server.member.api.request.ReissueTokenRequest;
+import com.acon.server.member.api.request.VerifiedAreaRequest;
 import com.acon.server.member.api.request.WithdrawalReasonRequest;
 import com.acon.server.member.api.response.AcornCountResponse;
 import com.acon.server.member.api.response.AreaResponse;
 import com.acon.server.member.api.response.LoginResponse;
-import com.acon.server.member.api.response.MemberAreaResponse;
 import com.acon.server.member.api.response.PreSignedUrlResponse;
 import com.acon.server.member.api.response.ProfileResponse;
 import com.acon.server.member.api.response.ReissueTokenResponse;
+import com.acon.server.member.api.response.VerifiedAreaListResponse;
+import com.acon.server.member.api.response.VerifiedAreaResponse;
 import com.acon.server.member.application.service.MemberService;
 import com.acon.server.member.domain.enums.Cuisine;
 import com.acon.server.member.domain.enums.DislikeFood;
@@ -62,16 +63,25 @@ public class MemberController {
         );
     }
 
-    @PostMapping(path = "/members/area",
+    @PostMapping(path = "/members/verified-areas",
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public ResponseEntity<MemberAreaResponse> postArea(
-            @Valid @RequestBody final MemberAreaRequest request
+    public ResponseEntity<VerifiedAreaResponse> postVerifiedArea(
+            @Valid @RequestBody final VerifiedAreaRequest request
     ) {
 
         return ResponseEntity.ok(
-                memberService.createMemberArea(request.latitude(), request.longitude())
+                memberService.createVerifiedArea(request.latitude(), request.longitude())
+        );
+    }
+
+    @GetMapping(path = "/members/verified-areas", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<VerifiedAreaListResponse> getVerifiedAreaList(
+    ) {
+
+        return ResponseEntity.ok(
+                memberService.fetchVerifiedAreaList()
         );
     }
 
